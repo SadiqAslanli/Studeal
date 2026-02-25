@@ -1,0 +1,168 @@
+.companyPage {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.hero {
+    height: 300px;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1517248135467-4c7ed9d42c7b?auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 40px;
+    color: var(--white);
+}
+
+.profileInfo {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.logoBox {
+    width: 120px;
+    height: 120px;
+    background: var(--white);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 4px solid var(--white);
+}
+
+.titleInfo h1 {
+    font-size: 36px;
+    margin-bottom: 5px;
+}
+
+.tagline {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.content {
+    padding: 60px 0;
+}
+
+.sectionTitle {
+    font-size: 24px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dealsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+.dealCard {
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.dealCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+.cardImage {
+    height: 180px;
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.discountBadge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--primary);
+    color: var(--white);
+    padding: 8px 15px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.cardBody {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.cardBody h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--text);
+    min-height: 28px;
+}
+
+.cardBody p {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 25px;
+    line-height: 1.6;
+    flex-grow: 1;
+    min-height: 45px;
+}
+
+.btnGetDeal {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: var(--white);
+    border-radius: 12px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: auto;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btnGetDeal:hover {
+    background: var(--primary-hover);
+}
+
+.btnActive {
+    background: #4caf50 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.timerText {
+    font-size: 12px;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .profileInfo {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .logoBox {
+        margin-top: -60px;
+    }
+}

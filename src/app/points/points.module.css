@@ -1,0 +1,718 @@
+.pointsPage {
+    background: #fbfcfe;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+.header {
+    background: linear-gradient(135deg, var(--primary) 0%, #004ecc 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+}
+
+.backLink {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 30px;
+    transition: 0.3s;
+}
+
+.backLink:hover {
+    color: white;
+    transform: translateX(-5px);
+}
+
+.headerContent h1 {
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.headerContent p {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 600px;
+}
+
+.statsContainer {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 30px;
+    margin-top: -80px;
+    margin-bottom: 50px;
+}
+
+.qrCard {
+    background: white;
+    padding: 30px;
+    border-radius: 40px;
+    box-shadow: 0 20px 50px rgba(0, 50, 150, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.qrWrapper {
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.qrCode {
+    width: 150px;
+    height: 150px;
+    background: #f4f7fe;
+    border-radius: 20px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    position: relative;
+    margin: 0 auto;
+}
+
+.qrCorner {
+    border: 4px solid #1b2559;
+    border-radius: 4px;
+}
+
+.qrCenter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--primary);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.qrHint {
+    font-size: 12px;
+    color: #a3aed0;
+    margin-top: 15px;
+    font-weight: 700;
+}
+
+.scanSimBtn {
+    margin-top: 15px;
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: #f4f7fe;
+    border: none;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.scanSimBtn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.mainStat {
+    background: white;
+    padding: 50px;
+    border-radius: 40px;
+    box-shadow: 0 20px 50px rgba(0, 50, 150, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.statLabel {
+    font-size: 14px;
+    font-weight: 800;
+    color: #a3aed0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.balanceWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 15px 0;
+}
+
+.balanceIcon {
+    font-size: 48px;
+}
+
+.balanceValue {
+    font-size: 64px;
+    font-weight: 900;
+    color: #1b2559;
+}
+
+.balanceSub {
+    color: #01b574;
+    font-weight: 700;
+}
+
+/* Marketplace */
+.marketplace {
+    grid-column: 1 / -1;
+    margin-bottom: 50px;
+}
+
+.sectionHeader {
+    margin-bottom: 30px;
+}
+
+.sectionHeader h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1b2559;
+}
+
+.sectionHeader p {
+    color: #a3aed0;
+}
+
+.rewardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.rewardCard {
+    background: white;
+    padding: 25px;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(112, 144, 176, 0.08);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    border: 1.5px solid transparent;
+}
+
+.rewardCard:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.rewardIconBg {
+    width: 60px;
+    height: 60px;
+    background: #f4f7fe;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.rewardCategory {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.rewardCard h4 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 20px;
+    min-height: 40px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+.rewardFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    border-top: 1px solid #f4f7fe;
+    padding-top: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
+    /* allow wrapping on narrow cards */
+}
+
+.costBadge {
+    font-weight: 800;
+    color: #1b2559;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .sectionHeader h2 {
+        font-size: 24px;
+    }
+
+    .rewardCard {
+        padding: 20px;
+    }
+
+    .rewardCard h4 {
+        font-size: 15px;
+        min-height: auto;
+    }
+
+    .costBadge {
+        font-size: 12px;
+    }
+
+    .redeemBtn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .rewardsGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .rewardCard {
+        padding: 16px;
+    }
+
+    .rewardCard h4 {
+        font-size: 14px;
+        min-height: auto;
+    }
+
+    .costBadge {
+        font-size: 12px;
+    }
+
+    .redeemBtn {
+        padding: 6px 10px;
+        font-size: 11px;
+        width: 100%;
+    }
+
+    .rewardFooter {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.redeemBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.redeemBtn:disabled {
+    background: #f4f7fe;
+    color: #a3aed0;
+    cursor: not-allowed;
+}
+
+.redeemBtn:not(:disabled):hover {
+    background: #004ecc;
+    transform: scale(1.05);
+}
+
+/* Active Gift Styles */
+.activeCard {
+    border: 2px solid #01b574 !important;
+    background: #f0fff9 !important;
+    position: relative;
+    overflow: hidden;
+    animation: pulseBorder 2s infinite;
+}
+
+@keyframes pulseBorder {
+    0% {
+        border-color: #01b574;
+        box-shadow: 0 0 0 0 rgba(1, 181, 116, 0.4);
+    }
+
+    70% {
+        border-color: #01b574;
+        box-shadow: 0 0 0 10px rgba(1, 181, 116, 0);
+    }
+
+    100% {
+        border-color: #01b574;
+        box-shadow: 0 0 0 0 rgba(1, 181, 116, 0);
+    }
+}
+
+.btnActive {
+    background: #01b574 !important;
+    color: white !important;
+    cursor: default !important;
+}
+
+.activeOverlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #01b574;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(1, 181, 116, 0.3);
+}
+
+.activeCard .costBadge {
+    color: #01b574;
+    font-size: 14px;
+}
+
+.miniStats {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.miniStatCard {
+    background: white;
+    padding: 30px;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+.miniLabel {
+    font-size: 13px;
+    color: #a3aed0;
+    font-weight: 700;
+}
+
+.miniValue {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 5px;
+}
+
+.contentGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+.historySection h2,
+.earnSection h2 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 25px;
+}
+
+.transactionList {
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02);
+}
+
+.transactionItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 35px;
+    border-bottom: 1px solid #f4f7fe;
+    transition: 0.2s;
+}
+
+.transactionItem:last-child {
+    border-bottom: none;
+}
+
+.transactionItem:hover {
+    background: #fbfcfe;
+}
+
+.itemInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.itemTitle {
+    font-weight: 700;
+    color: #1b2559;
+}
+
+.itemDate {
+    font-size: 13px;
+    color: #a3aed0;
+}
+
+.itemPoints {
+    font-weight: 800;
+    font-size: 18px;
+}
+
+.plus {
+    color: #01b574;
+}
+
+.minus {
+    color: #ee5d50;
+}
+
+.earnSection {
+    background: white;
+    padding: 35px;
+    border-radius: 35px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02);
+    height: fit-content;
+}
+
+.earnList {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.earnItem {
+    display: flex;
+    gap: 20px;
+}
+
+.earnIcon {
+    width: 50px;
+    height: 50px;
+    background: #f4f7fe;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.earnItem h4 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.earnItem p {
+    font-size: 14px;
+    color: #a3aed0;
+    line-height: 1.4;
+}
+
+.shareBtn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    background: #eef4ff;
+    border: none;
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+
+.shareBtn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 102, 255, 0.2);
+}
+
+@media (max-width: 1024px) {
+    .statsContainer {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .headerContent h1 {
+        font-size: 28px;
+    }
+
+    .mainStat {
+        padding: 24px;
+    }
+
+    .balanceValue {
+        font-size: 40px;
+    }
+
+    .statsContainer {
+        grid-template-columns: 1fr;
+        margin-top: -40px;
+    }
+
+    .qrCard {
+        padding: 20px;
+    }
+}
+
+/* Modal Styling */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 20, 52, 0.4);
+    backdrop-filter: blur(8px);
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modalContent {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 40px;
+    text-align: center;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modalIcon {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.modalContent h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 15px;
+}
+
+.modalContent p {
+    color: #47548c;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.modalWarning {
+    background: #fff8eb;
+    border: 1px solid #ffe5b4;
+    padding: 15px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #b36b00;
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.modalActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.modalCancel {
+    padding: 15px;
+    border-radius: 18px;
+    border: 2px solid #e0e5f2;
+    background: transparent;
+    font-weight: 800;
+    color: #a3aed0;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.modalCancel:hover {
+    background: #f4f7fe;
+    color: #1b2559;
+}
+
+.modalConfirm {
+    padding: 15px;
+    border-radius: 18px;
+    border: none;
+    background: var(--primary);
+    font-weight: 800;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.modalConfirm:hover {
+    background: #004ecc;
+    box-shadow: 0 10px 20px rgba(0, 102, 255, 0.2);
+}
+
+.showMoreBtn {
+    width: 100%;
+    padding: 20px;
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.showMoreBtn:hover {
+    background: #fafbff;
+    color: #004ecc;
+}
+
+@media (max-width: 480px) {
+    .modalContent {
+        padding: 30px 20px;
+        border-radius: 24px;
+    }
+
+    .modalActions {
+        grid-template-columns: 1fr;
+    }
+
+    .rewardsGrid {
+        grid-template-columns: 1fr;
+        /* single column on very small phones */
+    }
+
+    .rewardCard h4 {
+        min-height: auto;
+    }
+}

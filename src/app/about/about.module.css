@@ -1,0 +1,152 @@
+.aboutContainer {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.header {
+    margin-bottom: 60px;
+}
+
+.header h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+}
+
+.header p {
+    font-size: 20px;
+    color: #a3aed0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.introSection {
+    background: white;
+    border-radius: 40px;
+    padding: 60px 40px;
+    margin-bottom: 60px;
+    box-shadow: 0 20px 50px rgba(112, 144, 176, 0.08);
+}
+
+.introContent h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 10px;
+}
+
+.introSubtitle {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.introText {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.introText p {
+    color: #707ebe;
+    line-height: 1.8;
+    font-size: 17px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 80px;
+}
+
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 20px 50px rgba(112, 144, 176, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 15px;
+}
+
+.card p {
+    color: #707ebe;
+    line-height: 1.7;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 60px;
+    background: #f4f7fe;
+    border-radius: 40px;
+    margin-bottom: 80px;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statNumber {
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--primary);
+}
+
+.statLabel {
+    font-size: 14px;
+    font-weight: 700;
+    color: #a3aed0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contactCta {
+    background: #1b2559;
+    padding: 60px;
+    border-radius: 30px;
+    color: white;
+}
+
+.contactCta p {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .stats {
+        flex-direction: column;
+        gap: 40px;
+        padding: 40px;
+    }
+
+    .header h1 {
+        font-size: 36px;
+    }
+}

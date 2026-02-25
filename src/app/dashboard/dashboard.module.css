@@ -1,0 +1,389 @@
+.dashboardContainer {
+    background: #f4f7fe;
+    min-height: 100vh;
+}
+
+.dashboardLayout {
+    display: flex;
+    gap: 30px;
+    padding: 50px 0;
+}
+
+.sidebar {
+    width: 280px;
+    background: white;
+    padding: 30px;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(112, 144, 176, 0.08);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.sidebarHeader h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 25px;
+    padding-left: 15px;
+    color: #1b2559;
+}
+
+.navMenu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.navItem {
+    padding: 16px 20px;
+    border-radius: 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-weight: 700;
+    color: #a3aed0;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.navItem:hover {
+    background: #f4f7fe;
+    color: #1b2559;
+}
+
+.activeTab {
+    background: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 10px 20px rgba(0, 102, 255, 0.15);
+}
+
+.mainContent {
+    flex: 1;
+}
+
+.dashboardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.dashboardHeader h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1b2559;
+}
+
+.dashboardHeader p {
+    color: #a3aed0;
+    margin-top: 5px;
+}
+
+/* Stats */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.statCard {
+    background: white;
+    padding: 25px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 10px 40px rgba(112, 144, 176, 0.08);
+}
+
+.statIconBox {
+    width: 50px;
+    height: 50px;
+    background: #f4f7fe;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.statInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.statLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a3aed0;
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1b2559;
+}
+
+.trend {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.positive {
+    color: #01b574;
+}
+
+.negative {
+    color: #ee5d50;
+}
+
+/* Analytics */
+.analyticsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.chartCard {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 40px rgba(112, 144, 176, 0.08);
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.chartContainer {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.bar {
+    width: 12%;
+    background: var(--primary);
+    border-radius: 8px 8px 4px 4px;
+    position: relative;
+    transition: height 1s ease;
+}
+
+.bar:hover {
+    background: #004ecc;
+}
+
+.bar::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 800;
+    color: #a3aed0;
+}
+
+/* Deals Table */
+.dealsSection {
+    background: white;
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(112, 144, 176, 0.08);
+}
+
+.sectionHeader {
+    margin-bottom: 25px;
+}
+
+.dealsTable {
+    display: flex;
+    flex-direction: column;
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1fr 1fr 1fr;
+    padding: 0 20px 15px;
+    border-bottom: 1px solid #f4f7fe;
+    font-size: 13px;
+    font-weight: 800;
+    color: #a3aed0;
+    text-transform: uppercase;
+}
+
+.tableRow {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 1fr 1fr 1fr;
+    padding: 20px;
+    align-items: center;
+    border-bottom: 1px solid #f4f7fe;
+    transition: 0.2s;
+}
+
+.tableRow:hover {
+    background: #fbfcfe;
+}
+
+.dealNameCell {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dealIcon {
+    width: 40px;
+    height: 40px;
+    background: #f4f7fe;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.dealName {
+    font-weight: 700;
+    color: #1b2559;
+}
+
+.statusBadge {
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.statusActive {
+    background: #e6faf4;
+    color: #01b574;
+}
+
+.btnEdit {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #f4f7fe;
+    color: var(--primary);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modalContent {
+    background: white;
+    width: 100%;
+    max-width: 550px;
+    border-radius: 30px;
+    padding: 40px;
+    position: relative;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #a3aed0;
+}
+
+.dealForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #a3aed0;
+    text-transform: uppercase;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e0e5f2;
+    font-weight: 600;
+    color: #1b2559;
+}
+
+.fileUpload {
+    border: 2px dashed #e0e5f2;
+    border-radius: 15px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #a3aed0;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+    .dashboardLayout {
+        flex-direction: column;
+        padding: 30px 20px;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .analyticsGrid {
+        grid-template-columns: 1fr;
+    }
+}

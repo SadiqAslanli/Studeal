@@ -1,0 +1,307 @@
+.page {
+    min-height: 100vh;
+    background: #f8faff;
+    padding-bottom: 100px;
+}
+
+/* Hero */
+.hero {
+    background: linear-gradient(135deg, #0066ff 0%, #004ecc 100%);
+    color: white;
+    padding: 60px 0 70px;
+    margin-bottom: 60px;
+}
+
+.backLink {
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 700;
+    font-size: 14px;
+    display: inline-block;
+    margin-bottom: 30px;
+    transition: color 0.3s;
+}
+
+.backLink:hover {
+    color: white;
+}
+
+.heroContent {
+    max-width: 600px;
+}
+
+.heroBadge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.heroContent h1 {
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+}
+
+.heroContent h1 span {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.heroContent p {
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.6;
+}
+
+/* Layout */
+.faqLayout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebarCard {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1.5px solid #e0e5f2;
+}
+
+.sidebarCard h3 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #a3aed0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+.sidebarCard ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebarCard ul li a {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #47548c;
+    transition: all 0.2s;
+}
+
+.sidebarCard ul li a:hover {
+    background: #f0f7ff;
+    color: #0066ff;
+}
+
+.contactCard {
+    background: #0066ff;
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    color: white;
+}
+
+.contactIcon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.contactCard h4 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.contactCard p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.contactBtn {
+    display: inline-block;
+    background: white;
+    color: #0066ff;
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 800;
+    transition: all 0.3s;
+}
+
+.contactBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* FAQ Content */
+.faqContent {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.categorySection {
+    scroll-margin-top: 100px;
+}
+
+.categoryTitle {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f4ff;
+}
+
+.accordionList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.accordionItem {
+    background: white;
+    border-radius: 16px;
+    border: 1.5px solid #e0e5f2;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.accordionItem.open {
+    border-color: #0066ff;
+    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.08);
+}
+
+.accordionBtn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    gap: 20px;
+    transition: background 0.2s;
+}
+
+.accordionBtn:hover {
+    background: #f8faff;
+}
+
+.accordionBtn span:first-child {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1b2559;
+    line-height: 1.4;
+}
+
+.chevron {
+    width: 28px;
+    height: 28px;
+    background: #f0f7ff;
+    color: #0066ff !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    flex-shrink: 0;
+    transition: background 0.3s;
+}
+
+.open .chevron {
+    background: #0066ff;
+    color: white !important;
+}
+
+.accordionAnswer {
+    padding: 0 24px 22px;
+    animation: slideDown 0.25s ease;
+}
+
+.accordionAnswer p {
+    font-size: 14px;
+    color: #47548c;
+    line-height: 1.75;
+    border-top: 1px solid #f0f4ff;
+    padding-top: 16px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .faqLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebarCard {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .contactCard {
+        flex: 1;
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 600px) {
+    .heroContent h1 {
+        font-size: 32px;
+    }
+
+    .sidebar {
+        flex-direction: column;
+    }
+
+    .accordionBtn {
+        padding: 16px 18px;
+    }
+
+    .accordionAnswer {
+        padding: 0 18px 18px;
+    }
+}

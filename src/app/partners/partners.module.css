@@ -1,0 +1,111 @@
+.partnersContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.header h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 20px;
+}
+
+.header p {
+    font-size: 20px;
+    color: #a3aed0;
+}
+
+.partnersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 100px;
+}
+
+.partnerCard {
+    background: white;
+    padding: 40px 20px;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(112, 144, 176, 0.05);
+    border: 1px solid #f4f7fe;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.partnerCard:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 102, 255, 0.08);
+}
+
+.logoWrapper {
+    width: 80px;
+    height: 80px;
+    background: #f4f7fe;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 32px;
+}
+
+.partnerCard h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 10px;
+}
+
+.categoryBadge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #a3aed0;
+    background: #f4f7fe;
+    padding: 5px 12px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.becomePartner {
+    background: linear-gradient(135deg, #1b2559 0%, #050b2c 100%);
+    padding: 80px 40px;
+    border-radius: 40px;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.ctaContent {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.ctaContent h2 {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.ctaContent p {
+    font-size: 18px;
+    opacity: 0.8;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 36px;
+    }
+}
