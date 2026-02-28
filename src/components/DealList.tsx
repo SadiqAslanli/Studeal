@@ -93,7 +93,7 @@ export default function DealList({ activeCategoryId, searchQuery }: DealListProp
       type: t.categories.restaurant,
       typeId: 1,
       color: '#8b4513',
-      image: 'https://images.unsplash.com/photo-1484723088339-fe28233e562e?auto=format&fit=crop&q=80&w=800'
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSUtL8jpblmaz96T7X2DGjzcegUzEn0ufG6Q&s'
     },
     {
       id: 9,
@@ -103,7 +103,7 @@ export default function DealList({ activeCategoryId, searchQuery }: DealListProp
       type: t.categories.restaurant,
       typeId: 1,
       color: '#00704a',
-      image: 'https://images.unsplash.com/photo-1544787210-282aa5ac739d?auto=format&fit=crop&q=80&w=800'
+      image: 'https://ecanta.com.tr/cdn/shop/articles/20210330203937_16171259778469.webp?v=1711407605&width=1000'
     },
     {
       id: 10,
@@ -113,7 +113,7 @@ export default function DealList({ activeCategoryId, searchQuery }: DealListProp
       type: t.categories.restaurant,
       typeId: 1,
       color: '#e31837',
-      image: 'https://images.unsplash.com/photo-1534422298391-e4f8c170db06?auto=format&fit=crop&q=80&w=800'
+      image: 'https://imageproxy.wolt.com/mes-image/0207ffda-d544-4106-ae2d-c371ec2070b8/e9cbd1d4-3a16-423a-8c94-2b10fdac936e'
     },
     {
       id: 11,
@@ -136,8 +136,7 @@ export default function DealList({ activeCategoryId, searchQuery }: DealListProp
       image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800'
     },
     { id: 13, title: 'Baku Book Center', company: 'BBC', discount: '15%', type: t.categories.shop, typeId: 2, color: '#4b3621', image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&q=80&w=800' },
-    { id: 14, title: 'Ali & Nino', company: 'Ali & Nino', discount: '10%', type: t.categories.shop, typeId: 2, color: '#ed1c24', image: 'https://images.unsplash.com/photo-1491849593786-b44c3ec82135?auto=format&fit=crop&q=80&w=800' },
-    { id: 15, title: 'Bravo Market', company: 'Bravo', discount: '5%', type: t.categories.shop, typeId: 2, color: '#f7931e', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800' },
+    { id: 14, title: 'Ali & Nino', company: 'Ali & Nino', discount: '10%', type: t.categories.shop, typeId: 2, color: '#ed1c24', image: 'https://static.insales-cdn.com/files/1/7866/35536570/original/cf8fa59ae3c3c0ae86aaafda098c0f2f.png' },
   ];
 
   const handleFavorite = (e: React.MouseEvent, dealId: number, title: string) => {
