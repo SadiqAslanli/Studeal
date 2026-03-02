@@ -1,246 +1,264 @@
 .homeLayout {
   display: flex;
-  justify-content: center;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 140px 64px 80px;
+  gap: 48px;
   position: relative;
-  width: 100%;
+  align-items: flex-start;
 }
 
 .homeContent {
   flex: 1;
-  max-width: 100%;
+  min-width: 0;
 }
 
 .sideAd {
   position: sticky;
-  top: 100px;
-  width: 180px;
-  height: 600px;
+  top: 140px;
+  width: 300px;
+  flex-shrink: 0;
+  height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
-  color: #a3aed0;
-  font-weight: 700;
-  font-size: 14px;
-  text-align: center;
-  margin: 40px 20px;
+  gap: 20px;
+  padding: 0 8px 40px 0;
+  overflow: hidden;
 }
 
-.adBanner,
-.adBannerKfc {
+.adsList {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 102, 255, 0.1) transparent;
+}
+
+.adsList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.adsList::-webkit-scrollbar-thumb {
+  background: rgba(0, 102, 255, 0.1);
+  border-radius: 4px;
+}
+
+.adLabel {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  padding-left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.adLabelIcon {
+  color: var(--primary);
+}
+
+.adCard {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+}
+
+.adCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  border-color: var(--primary);
+}
+
+.adImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 140px;
+}
+
+.adImageWrapper img {
   width: 100%;
   height: 100%;
-  border-radius: 24px;
-  padding: 30px 15px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  position: relative;
+  object-fit: cover;
+  transition: transform 0.8s ease;
 }
 
-/* Pizza Ad */
-.adBanner {
-  background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%);
-  color: white;
+.adCard:hover .adImageWrapper img {
+  transform: scale(1.1);
 }
 
-.adBanner::after {
-  content: '🍕';
+.adImgOverlay {
   position: absolute;
-  font-size: 120px;
-  bottom: -20px;
-  right: -20px;
-  opacity: 0.15;
-  transform: rotate(-15deg);
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+  opacity: 0.6;
 }
 
-/* KFC Ad */
-.adBannerKfc {
-  background: linear-gradient(180deg, #ffffff 0%, #f4f7fe 100%);
-  color: #1b2559;
-  border: 1px solid #e0e5f2;
+.adDiscountRibbon {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: white;
+  color: #1e293b;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 6px 14px;
+  border-radius: 12px;
+  z-index: 2;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.adBannerKfc .adBrand {
-  color: #e4002b;
+.adCardBody {
+  padding: 20px;
 }
 
-.adBannerKfc .adTitle {
-  color: #1b2559;
+.adCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.adBannerKfc .priceVal {
-  color: #e4002b;
+.adIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
-.adTop {
+.adHeaderInfo {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: center;
 }
 
 .adBrand {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  opacity: 0.9;
-}
-
-.adTitle {
-  font-size: 22px;
-  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 2px;
   line-height: 1.2;
 }
 
-.adPrice {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px 0;
-}
-
-.priceVal {
-  font-size: 36px;
-  font-weight: 900;
-}
-
-.priceSymbol {
-  font-size: 14px;
+.adSub {
+  font-size: 11px;
+  color: #64748b;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.oldPrice {
-  font-size: 14px;
-  text-decoration: line-through;
-  opacity: 0.6;
-  margin-top: 5px;
+.adPriceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.adItems {
-  font-size: 24px;
-  margin: 20px 0;
-}
-
-.adBtn,
-.adBtnKfc {
-  padding: 12px;
-  border-radius: 12px;
+.adPriceVal {
+  font-size: 20px;
   font-weight: 800;
+  color: #1e293b;
+}
+
+.adOldPrice {
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.adCtaBtn {
+  width: 100%;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.adBtn {
-  background: white;
-  color: #cc0000;
+.adCtaBtn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 102, 255, 0.3);
 }
 
-.adBtnKfc {
-  background: #e4002b;
-  color: white;
+@media (max-width: 1600px) {
+  .homeLayout {
+    padding: 140px 32px 80px;
+  }
 }
 
-.adDecor,
-.adDecorKfc {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+@media (max-width: 1280px) {
+  .homeLayout {
+    padding: 140px 24px 80px;
+  }
 }
 
-.adDecor span,
-.adDecorKfc span {
-  position: absolute;
-  border-radius: 50%;
-  background: white;
-  opacity: 0.1;
-}
-
-.adDecor span:nth-child(1) {
-  width: 100px;
-  height: 100px;
-  top: -20px;
-  right: -20px;
-}
-
-.adDecor span:nth-child(2) {
-  width: 60px;
-  height: 60px;
-  bottom: 40px;
-  left: -10px;
-}
-
-.adDecor span:nth-child(3) {
-  width: 40px;
-  height: 40px;
-  top: 100px;
-  left: 20px;
-}
-
-.adDecorKfc span {
-  background: var(--primary);
-  opacity: 0.05;
-}
-
-.adDecorKfc span:nth-child(1) {
-  width: 120px;
-  height: 120px;
-  top: -30px;
-  left: -30px;
-}
-
-.adDecorKfc span:nth-child(2) {
-  width: 80px;
-  height: 80px;
-  bottom: -20px;
-  right: -20px;
-}
-
-.adDecorKfc span:nth-child(3) {
-  width: 50px;
-  height: 50px;
-  top: 150px;
-  right: 10px;
-}
-
-.adBtn:hover,
-.adBtnKfc:hover {
-  transform: scale(1.05);
-}
-
-@media (max-width: 1400px) {
+@media (max-width: 1100px) {
   .sideAd {
     display: none;
+  }
+
+  .homeLayout {
+    padding-top: 130px;
   }
 }
 
 .header {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-  padding: 15px 0;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  height: 110px;
+  display: flex;
+  align-items: center;
 }
 
 .headerContent {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 60px;
-  /* Fixed height for stability */
+  width: 100%;
 }
 
 .logo {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--primary);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoImg {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
 }
 
 .logo span {
@@ -351,6 +369,18 @@
 }
 
 @media (max-width: 900px) {
+  .header {
+    height: 70px;
+  }
+
+  .logoImg {
+    height: 45px;
+  }
+
+  .homeLayout {
+    padding-top: 90px;
+  }
+
   .burgerBtn {
     display: flex;
   }
@@ -506,35 +536,40 @@
   background: #f4f7fe;
 }
 
-.langBtn {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 0;
-  width: 40px;
-  /* Fixed width to prevent shifting */
-  text-align: center;
-  border-radius: 50px;
-  color: var(--text-light);
-  transition: var(--transition);
-  cursor: pointer;
-  border: none;
-  background: none;
+.langSelector {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 102, 255, 0.05);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 102, 255, 0.05);
 }
 
-.langBtn:hover {
-  color: var(--primary);
+.langBtn {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #64748b;
+  transition: var(--transition);
 }
 
 .activeLang {
-  background: var(--primary);
-  color: var(--white) !important;
-  box-shadow: 0 4px 10px rgba(0, 102, 255, 0.2);
+  background: white;
+  color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .authBtns {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
+}
+
+.btnLogin {
+  font-weight: 700;
+  color: var(--text);
+  padding: 10px 24px;
 }
 
 .btnLogin:hover {
@@ -698,107 +733,158 @@
   padding: 80px 0 40px;
   background: var(--white);
   border-top: 1px solid var(--border);
-  margin-top: 60px;
+  margin-top: 80px;
 }
 
 .footerGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 60px;
+  grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+  gap: 60px;
+  margin-bottom: 80px;
 }
 
-.footerBrand .logo {
-  font-size: 28px;
-  margin-bottom: 20px;
-  display: block;
-}
-
-.footerBrand p {
-  color: var(--text-light);
-  font-size: 15px;
-  max-width: 300px;
-  line-height: 1.6;
-}
-
-.footerCol h4 {
-  font-size: 18px;
-  color: var(--text);
-  margin-bottom: 25px;
-  font-weight: 700;
-}
-
-.footerCol ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footerCol ul li {
-  margin-bottom: 15px;
-}
-
-.footerCol ul li a {
-  color: var(--text-light);
-  font-size: 15px;
-  transition: var(--transition);
-}
-
-.footerCol ul li a:hover {
-  color: var(--primary);
-  padding-left: 5px;
-}
-
-.footerBottom {
-  border-top: 1px solid var(--border);
-  padding-top: 30px;
+.footerLogoWrap {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.footerBottom p {
-  color: var(--text-light);
-  font-size: 14px;
-}
-
-.socialLinks {
-  display: flex;
-  gap: 15px;
-}
-
-.socialIcon {
-  width: 36px;
-  height: 36px;
-  background: var(--secondary);
-  border-radius: 50%;
+.footerLogoIcon {
+  background: var(--primary);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: var(--primary);
+}
+
+.footerBrand p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 280px;
+}
+
+.footerSocials {
+  display: flex;
+  gap: 12px;
+}
+
+.footerSocialBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: var(--transition);
 }
 
-.socialIcon:hover {
+.footerSocialBtn:hover {
   background: var(--primary);
-  color: var(--white);
+  color: white;
   transform: translateY(-3px);
 }
 
-@media (max-width: 992px) {
+.footerTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.footerLinks {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footerLinks a {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.footerLinks a:hover {
+  color: var(--primary);
+  padding-left: 4px;
+}
+
+.newsletterText {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.newsletterBox {
+  display: flex;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.newsletterInput {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.newsletterBtn {
+  background: var(--primary);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.newsletterBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+}
+
+.footerBottom {
+  padding-top: 40px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
   .footerGrid {
     grid-template-columns: 1fr 1fr;
+    gap: 40px;
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 600px) {
   .footerGrid {
     grid-template-columns: 1fr;
   }
 
   .footerBottom {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
     text-align: center;
   }
 }

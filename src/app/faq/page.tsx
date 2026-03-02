@@ -15,13 +15,11 @@ export default function FaqPage() {
             items: [
                 {
                     az: { q: "StuDeal nədir?", a: "StuDeal, Azərbaycandakı tələbələrə xüsusi endirim və bonuslar təklif edən rəqəmsal platformadır." },
-                    en: { q: "What is StuDeal?", a: "StuDeal is a digital platform offering special discounts and bonuses for students in Azerbaijan." },
-                    ru: { q: "Что такое StuDeal?", a: "StuDeal — это цифровая платформа, предлагающая специальные скидки и бонусы для студентов в Азербайджане." }
+                    en: { q: "What is StuDeal?", a: "StuDeal is a digital platform offering special discounts and bonuses for students in Azerbaijan." }
                 },
                 {
                     az: { q: "StuDeal pulsuz istifadə olunur?", a: "Bəli, StuDeal-da qeydiyyat tamamilə pulsuzdur." },
-                    en: { q: "Is StuDeal free to use?", a: "Yes, registration on StuDeal is completely free." },
-                    ru: { q: "Является ли StuDeal бесплатным?", a: "Да, регистрация на StuDeal совершенно бесплатна." }
+                    en: { q: "Is StuDeal free to use?", a: "Yes, registration on StuDeal is completely free." }
                 }
             ]
         },
@@ -30,8 +28,7 @@ export default function FaqPage() {
             items: [
                 {
                     az: { q: "Xalları necə qazanıram?", a: "Tərəfdaş brendlərdə QR kodunuzu göstərərək hər ödənişin 5%-i xal kimi hesabınıza düşür." },
-                    en: { q: "How do I earn points?", a: "By showing your QR code at partner brands, 5% of each payment is added to your account as points." },
-                    ru: { q: "Как я могу заработать баллы?", a: "Показывая свой QR-код у брендов-партнеров, 5% от каждого платежа зачисляются на ваш счет в виде баллов." }
+                    en: { q: "How do I earn points?", a: "By showing your QR code at partner brands, 5% of each payment is added to your account as points." }
                 }
             ]
         }
@@ -42,7 +39,7 @@ export default function FaqPage() {
     };
 
     const { lang } = useLanguage();
-    const currentLang = (lang as 'az' | 'en' | 'ru') || 'az';
+    const currentLang = (lang as 'az' | 'en') || 'az';
 
     return (
         <div className={styles.page}>

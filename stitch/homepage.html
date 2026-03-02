@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Studeal - Premium Student Discounts</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0066ff",
+                        "background-light": "#f8faff",
+                        "background-dark": "#0f1723",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+    <!-- Sticky Glassmorphism Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-header border-b border-slate-200/50 dark:border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-2">
+                    <div class="bg-primary text-white p-2 rounded-lg">
+                        <span class="material-symbols-outlined block">school</span>
+                    </div>
+                    <h1 class="text-2xl font-800 tracking-tight text-slate-900 dark:text-white">Studeal</h1>
+                </div>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-primary" href="#">Deals</a>
+                    <a class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                        href="#">Categories</a>
+                    <a class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                        href="#">Brands</a>
+                    <a class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                        href="#">My Coupons</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-sm font-bold">
+                    <span class="material-symbols-outlined text-sm">language</span>
+                    <span>EN</span>
+                </button>
+                <button
+                    class="px-6 py-2 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    Login
+                </button>
+                <div class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-white dark:border-slate-800 shadow-sm"
+                    data-alt="User profile placeholder">
+                    <img alt="Profile" class="w-full h-full object-cover" data-alt="Student user avatar profile picture"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2x70LwKOlg_EQDvnp8b5eYHlNEe1qpkXpVBiVAdZnkkT5gWWZ_P4t_9pst6w5e93gcoaM1ZdKq9aqoBIloCTcLQnzNOJ9PtKje8G1EHrBAXQhclMkSOyhWnHl6MXYL2qI5Bh3IWm6pND7TBZq4CXppVwrOE_aKhfjCSFayD15UPlAQHzzPPmJ6TBboNCkbOoAl3kTtJB_y8TT9hCoH4QgnzjwvI98975Wmrgnihj6aRfWi546NvqMfjD0mEPp2-FLICd-OuZRyzdU" />
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="pt-28 pb-20 px-6 max-w-7xl mx-auto flex gap-10">
+        <!-- Sidebar Navigation & Ads -->
+        <aside class="hidden lg:flex flex-col gap-8 w-64 shrink-0 sticky top-28 h-fit">
+            <div class="flex flex-col gap-2">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest px-4">Partner Ads</p>
+                <div
+                    class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="size-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
+                            <span class="material-symbols-outlined">local_pizza</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold">Pizza Mizza</p>
+                            <p class="text-xs text-slate-500">Buy 1 Get 1 Free</p>
+                        </div>
+                    </div>
+                    <div class="w-full h-24 rounded-lg bg-slate-200 overflow-hidden"
+                        data-alt="Delicious pepperoni pizza offer advertisement">
+                        <img alt="Pizza Offer"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX7ncPT4ppX_t_LfQ0Jy3PfZTtCCc-jvxX0w89FaAjZtm9sJ2H_sIXk-hg8WLDD_vz75J6Sk_OHUbPkgo9gnxk4cTCuHwr6CdNeWRdb5Iv2FuzbC3s6hk_epLCOubr36IE36N8pQFIT3gGLtD_16u5sdms-f2GwUrSLtsiNi_YDh_hbXiGCzcJcCLNVaULQTqIzIhta2qqrZSSWUwgndklqM4bl7o1jj1puLlhTDdBQvknvesNU86iER2JMrzgjnATrC9alj0wuS-h" />
+                    </div>
+                </div>
+                <div
+                    class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="size-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600">
+                            <span class="material-symbols-outlined">fastfood</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold">KFC</p>
+                            <p class="text-xs text-slate-500">Student Meal - 20% Off</p>
+                        </div>
+                    </div>
+                    <div class="w-full h-24 rounded-lg bg-slate-200 overflow-hidden"
+                        data-alt="Crispy fried chicken bucket offer advertisement">
+                        <img alt="KFC Offer"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWrvTa9mKPTtsto55h43Newd4OBCqtJ195ilI8zwGhNV6khSPmvPMrhORY9VDUi4PF5M5Mi8xoNfznLbuaO0DWLxYzfdWrOymxRNnxMgtxppaQRBxgb4NVcG3K9asc_pgv9EJdKvK2p-Ypywpi62_-5uplI668ZTzJUgrapkapZyuwUYXZUteUX7AyhTh-98EN4byFot0s03CXtHgUuI-s4zBv6anF630iwj6lfzrw-1U7Zv6fMeh3BpDmO-0W5z4QAkmuC3pTi_dr" />
+                    </div>
+                </div>
+            </div>
+            <div class="bg-primary/5 dark:bg-primary/10 rounded-2xl p-6 border border-primary/10">
+                <h3 class="text-sm font-bold text-primary mb-2">Studeal Premium</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">Get access to golden deals and double
+                    rewards.</p>
+                <button class="w-full py-2 bg-primary text-white text-xs font-bold rounded-lg">Upgrade Now</button>
+            </div>
+        </aside>
+        <!-- Content Area -->
+        <div class="flex-1">
+            <!-- Hero Section -->
+            <section class="mb-12">
+                <div
+                    class="relative overflow-hidden rounded-3xl bg-slate-900 p-8 md:p-12 mb-8 min-h-[320px] flex flex-col justify-center">
+                    <div class="absolute inset-0 z-0 opacity-40"
+                        data-alt="Vibrant abstract blue and purple gradient background">
+                        <img alt="Background" class="w-full h-full object-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuArchZUfcphtqJKdF4BH6IvNI5S9nzGoZGFvSYH2tFImt3QUrcu94if0tD-ganakd9hVvq7bFlgqOvE0VrTKbb2jZyn8aV5lyMhZ1xOHY0WQCMpBQmuXctSY1qcHbc2SwFy79pOQumihjhSdxLgt8MvW7oSzTRKEeQKLEJxHfCnwmc2dNTmmHWmfmizP24TT1pLFmuwLalCHAU9HerFexrGGmzuP-9bst6M4AhqfLedExoMPVupt1uO5GkR8ENMD61I3_z1LzUbh7DJ" />
+                    </div>
+                    <div class="relative z-10 max-w-xl">
+                        <h2 class="text-white text-4xl md:text-5xl font-800 mb-4 leading-tight">Salam, <span
+                                class="text-primary">Ahmed!</span></h2>
+                        <p class="text-slate-300 text-lg mb-8">Unlock premium discounts curated just for your student
+                            lifestyle.</p>
+                        <div
+                            class="flex flex-col sm:flex-row gap-2 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20">
+                            <div class="flex-1 flex items-center px-4 gap-3 text-white">
+                                <span class="material-symbols-outlined text-slate-400">search</span>
+                                <input
+                                    class="bg-transparent border-none focus:ring-0 placeholder:text-slate-400 w-full text-sm"
+                                    placeholder="Search for brands or deals..." type="text" />
+                            </div>
+                            <button class="bg-primary text-white px-8 py-3 rounded-xl font-bold text-sm">Search</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Trending Tags -->
+                <div class="flex flex-wrap gap-3 items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2">Trending</span>
+                    <a class="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-medium hover:border-primary hover:text-primary transition-all"
+                        href="#">#fast</a>
+                    <a class="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-medium hover:border-primary hover:text-primary transition-all"
+                        href="#">#cafe</a>
+                    <a class="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-medium hover:border-primary hover:text-primary transition-all"
+                        href="#">#tech</a>
+                    <a class="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-medium hover:border-primary hover:text-primary transition-all"
+                        href="#">#fashion</a>
+                    <a class="px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-medium hover:border-primary hover:text-primary transition-all"
+                        href="#">#lifestyle</a>
+                </div>
+            </section>
+            <!-- Category Icons -->
+            <section class="mb-12">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-800">Categories</h3>
+                    <a class="text-primary text-sm font-bold flex items-center gap-1" href="#">View all <span
+                            class="material-symbols-outlined text-sm">arrow_forward</span></a>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div
+                        class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-3 cursor-pointer hover:border-primary group transition-all">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">restaurant</span>
+                        </div>
+                        <span class="text-sm font-bold">Food</span>
+                    </div>
+                    <div
+                        class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-3 cursor-pointer hover:border-primary group transition-all">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+                        </div>
+                        <span class="text-sm font-bold">Shopping</span>
+                    </div>
+                    <div
+                        class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-3 cursor-pointer hover:border-primary group transition-all">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">menu_book</span>
+                        </div>
+                        <span class="text-sm font-bold">Books</span>
+                    </div>
+                    <div
+                        class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-3 cursor-pointer hover:border-primary group transition-all">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">devices</span>
+                        </div>
+                        <span class="text-sm font-bold">Tech</span>
+                    </div>
+                    <div
+                        class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-3 cursor-pointer hover:border-primary group transition-all">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">fitness_center</span>
+                        </div>
+                        <span class="text-sm font-bold">Gym</span>
+                    </div>
+                    <div
+                        class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex flex-col items-center gap-3 cursor-pointer hover:border-primary group transition-all">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">more_horiz</span>
+                        </div>
+                        <span class="text-sm font-bold">Other</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Deal Grid -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-800">Hot Deals</h3>
+                    <div class="flex gap-2">
+                        <button
+                            class="size-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+                            <span class="material-symbols-outlined">filter_list</span>
+                        </button>
+                        <select
+                            class="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-bold px-4 py-2 outline-none focus:ring-primary">
+                            <option>Latest first</option>
+                            <option>Highest discount</option>
+                            <option>Ending soon</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Deal Card 1 -->
+                    <div
+                        class="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300">
+                        <div class="relative h-56 overflow-hidden">
+                            <img alt="Nike Store"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                data-alt="Nike lifestyle sneaker photography for discount deal"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoHRFyujtwFwDOOHNGkpISjqR1cAtLYRWGOurTFOCN3d-zfxd5C9_h4RzdRhjp0zfWZjVzLSnYpjRFdRM_6hGqhWtEi587D--TNgBPM0QtxpPbGSP9tCeFtkeehB0VgLUFQSVztomy7W1DjX9Y4rQGobMCN6LEOOSHl-Gdr15w6AWfrtNkR39tE3VqpLx_bndNwxi6tRlmhWgsfgkySNN9398txCZVeHM7R6h1sUp0tWzs7O2hQ5a5HrTuMcK-q-XUx8vVmj0L9H2-" />
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-white text-sm font-800 px-4 py-2 rounded-xl">
+                                40% OFF
+                            </div>
+                            <button
+                                class="absolute top-4 right-4 size-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white hover:text-red-500 transition-colors">
+                                <span class="material-symbols-outlined fill-0">favorite</span>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-primary uppercase tracking-wider">Fashion &amp;
+                                    Sports</span>
+                                <div class="flex items-center gap-1 text-slate-400 text-xs">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    <span>3 days left</span>
+                                </div>
+                            </div>
+                            <h4 class="text-xl font-800 mb-2">Nike Official Store</h4>
+                            <p class="text-sm text-slate-500 mb-6 line-clamp-2">Get up to 40% off on selected footwear
+                                and apparel. Exclusively for verified university students.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex -space-x-2">
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvYgx-1h_H2JsLmKRvRdI0XelMhBQhhej8Lt9Y-jW02dQqOiwSTzhe2Klo-jjTb-7-kYHTTK9LzHnjA5nSFT08wUjFbDCfD9O70UJmIi7ktW9w_q1C1-O-jjynMoNZuUdQd8pVRmi2Q7DuY6tV91whOI8v407srJa5TIynSJDQgvVqM19dMntTwk5djudHRajXHIIYSUXxRZAn5Y4kcL3Evvig55YA_HYDbQgseSzZhkihWx9ElT0tLSKY5TZSxu6zGdK6t5PE11k8" />
+                                    </div>
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcnd3jdvE7Dejx-KOUBCP4pdFwDVoqsMp5AjvH3f02NYWo39VRw9GDUNAMUlC9nQNEnvyHscsf7vJqpBWwWYZxL5ABgiNavMJ9qNuab7NFGLixhXLKWlfI7RqRK-nOgE7IWAKccgVFy6uLTWUvyFuNzXoUwAeugv8S7a4pWFsbVtF8nIBd8gjfMVhcUJCyjEzzjmuXox9jJdoodiagpep8yv-xJm1v1i5Fpi0DInZDYI9XauKs1TSEqTRb6-7666CCxY60fBZJLZlz" />
+                                    </div>
+                                    <div
+                                        class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] text-white font-bold">
+                                        +42
+                                    </div>
+                                </div>
+                                <button
+                                    class="px-6 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl text-sm font-bold group-hover:bg-primary group-hover:text-white transition-colors">
+                                    Get Deal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Deal Card 2 -->
+                    <div
+                        class="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300">
+                        <div class="relative h-56 overflow-hidden">
+                            <img alt="MacBook"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                data-alt="Apple Macbook laptop on a clean desk for technology discount"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkt-994xj5stKnlYRUjSHNMMSoZcIiHs0-Z6o-lej_tSkvaw9yrIgqal4URGzPjV-iaKOOXLGCplpOjoEDDG2zACH8irXEoz82BJVd66EvfY1YiaRmqXcT5TifD1SOBjs6HqEifUvoUpsttdwpA24NAmVH4Vdyv53q5bA9o2cD-hBam2zkVs2Qx10h3sDWgs-B9DaPwDk1AWFeEllZTrO6Kg8T70k0sSNOJ4wBof0PIseRjF4HMdSorGdcvIL5LXrUo5bvsvR4cx1N" />
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-white text-sm font-800 px-4 py-2 rounded-xl">
+                                $200 OFF
+                            </div>
+                            <button
+                                class="absolute top-4 right-4 size-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white hover:text-red-500 transition-colors">
+                                <span class="material-symbols-outlined fill-0">favorite</span>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-primary uppercase tracking-wider">Technology</span>
+                                <div class="flex items-center gap-1 text-slate-400 text-xs">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    <span>Ends tomorrow</span>
+                                </div>
+                            </div>
+                            <h4 class="text-xl font-800 mb-2">Apple Education Store</h4>
+                            <p class="text-sm text-slate-500 mb-6 line-clamp-2">Save on a new Mac or iPad with Apple
+                                education pricing. Plus get a gift card up to $150.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex -space-x-2">
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKIU8CysojczrXT_FFVQGtJzfhLSmvTFDYcV6PdJObzaL7IGC3euDHpiC7JYiIndapj0Gpze4yJwbF2w8FgtXhkP2WR_mP0U9h3022WlQTzyyHh6ue20dChFUZiHrWKcrOvOzNefi70oDxBZ1m01MPERjtjLTcAFsAYcK-E81Bmi0_emuP5RH1YYg-kjLqXkzHDEC8jJ4mgvnJMSRZORR37mQ_H6AsaU_Vqem5DsVlsPJZ32deSwBKQeCrwltMfLvwrQivgFRkSAVy" />
+                                    </div>
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJNXVNtbaUd2LWRjTyzWzkuKdoo3IFc-9ZX46uBW-fxbe8Q4x5uJ6VDS3alR8V4XjJUi9-crMG1GaBf3R67LiQUQI7_1rz8KvG47nIr1OIA75hVbraei1TWf6y7B5vbfnd8yHf6bcAQc7bl3t5JlgeP-xHNvmeHeGxD0nUZHN8GeOBhM8SpZ6hKk8jBaJ8w31MUWo2GWqzMhwjs-mFf8N_gCIgEEWhPxyHkcebwTrUeNmM1Kt6s32or79LpVLolNh6oieuS8PwSzjP" />
+                                    </div>
+                                    <div
+                                        class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] text-white font-bold">
+                                        +128
+                                    </div>
+                                </div>
+                                <button
+                                    class="px-6 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl text-sm font-bold group-hover:bg-primary group-hover:text-white transition-colors">
+                                    Get Deal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Deal Card 3 -->
+                    <div
+                        class="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300">
+                        <div class="relative h-56 overflow-hidden">
+                            <img alt="Burger"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                data-alt="Delicious gourmet burger with fries for food discount"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-6Rq1nOxVY3O0-Mm-Pt8M4yNG1VAqSSnZsvihv_4GstqlwE2L1UMKjl5WBR2gw-Nx9Kkf67-UbSuRvQXuvahiys-flB0GBNLy0kuyRyh_vTEjZcEVRARj9RIRoM0s11eEIzCeRdw8TWYYtZ0pAMKtrukO6I3pV82SKkfNMpRMrYRAWOrVEpUb8gPUeVmyRzTcRBm2hwagRw4OeM2nmBBzx1EucxYhBomIj_V2GT0HTNBce1ffgqOwjlGuGVcW4epPoglDwYk7g6H9" />
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-white text-sm font-800 px-4 py-2 rounded-xl">
+                                FREE DRINK
+                            </div>
+                            <button
+                                class="absolute top-4 right-4 size-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white hover:text-red-500 transition-colors">
+                                <span class="material-symbols-outlined fill-0">favorite</span>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-primary uppercase tracking-wider">Food &amp;
+                                    Dining</span>
+                                <div class="flex items-center gap-1 text-slate-400 text-xs">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    <span>Always on</span>
+                                </div>
+                            </div>
+                            <h4 class="text-xl font-800 mb-2">Burger King</h4>
+                            <p class="text-sm text-slate-500 mb-6 line-clamp-2">Free large soft drink with any burger
+                                purchase over $5. Valid at all participating locations.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex -space-x-2">
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9zdGYoihgvqE4aOJXdu3RVZbI2lFBSYcqucv1vwNTksYMP9VC9PwEqU6KDuFnn4hqHGSW0tzztl4azwc0tCJM2Qlq9UMdBDQKWMP-TatRJHg8jLfC4yYyerKrElBPU7pNYLYKJDGGpjFVXcFx9uaA3iPjJajEkUGhuEhzcQLLhlL5Lau4MrTktS2HKwhvbYjRpgQ71M7Z-pgLv6LijHIbINmFBylL8R9YOxQj7KDBBUFxXdREaEGT6xVQboOZOqNjAF5NFTWSUiNH" />
+                                    </div>
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrPh4lPZky2uTyYChkYEYTcjNxrtlIe4Rhr0nFD3JRXwq83WY5E6BdhezdBS8ukRrCLsu9P619ZPrHf8Gr3_s35fIdbHQTKoTsAKh1vvm017DNCan_sCjRQ3UnyYJQkN0Swo9Upj0N8jijdGAS-iA63jCnrWfrUjYiz_m6qehjZKLraSH_E247zhC3B0v0Vs6uYuQW1C84gj_0C7rPwbTFf6jMYfyMozn0WAKx06eVaq0x_zMRSu_XblE2Xm8Yn5kI6H9q3UwfA-Po" />
+                                    </div>
+                                    <div
+                                        class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] text-white font-bold">
+                                        +500
+                                    </div>
+                                </div>
+                                <button
+                                    class="px-6 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl text-sm font-bold group-hover:bg-primary group-hover:text-white transition-colors">
+                                    Get Deal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Deal Card 4 -->
+                    <div
+                        class="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300">
+                        <div class="relative h-56 overflow-hidden">
+                            <img alt="Books"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                data-alt="Cozy library setup with books and laptop for academic discount"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZe_ZQx9QDwkvw-TP4MzyKty9413sJvuyZuTvRgOgsCVS-YlLCnQ0xjCdQwG8zZqbbVcF6xiO-CnT4F-cK6oj6WRKRo7H_97pbYklvmTouHun22_ZdMNdWb83CXvGMlrqmGXDJ3q12Yh7iHfHRMnE9vUbiZTQRY5HmhVxBdSKIjEsNz0EOPqRm0_TASWl1AoAskDtB7YgUyRF9fb8l3z7aq6MrA9P5EihXwAp9RkP1dNXqJRJlCGeY2LvkWZ1m-iyF8KvU7jD6ZclY" />
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-white text-sm font-800 px-4 py-2 rounded-xl">
+                                50% OFF
+                            </div>
+                            <button
+                                class="absolute top-4 right-4 size-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white hover:text-red-500 transition-colors">
+                                <span class="material-symbols-outlined fill-0">favorite</span>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-primary uppercase tracking-wider">Education</span>
+                                <div class="flex items-center gap-1 text-slate-400 text-xs">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    <span>Ends in 12h</span>
+                                </div>
+                            </div>
+                            <h4 class="text-xl font-800 mb-2">Pearson Textbooks</h4>
+                            <p class="text-sm text-slate-500 mb-6 line-clamp-2">Start the semester right. 50% off on all
+                                digital rentals and 20% off physical copies.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex -space-x-2">
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA9Rphy8kYo6k30yOai9hGgUDNflLsK_GhuMmkdVsjsqy4-vcVfMqozgBr7_ezfoZymY5X0W2FN3jlYQZSV6l5ITmszV5sRl8O6e5c8kMpCBCdpkagfenwu39CeMYPt_AcSFjkklQRpKU08lp_7rHTTZnndiHkCZWMyvYYScDCwH-qx1LT9eK_JfSilToWbxIumVgV0XjvnI9g6rzqX2VM04X4DYnyoWq7UMDc5yiI7YKrff_4Wn6zD3TntixqLhMJBZXrE9dv9smT" />
+                                    </div>
+                                    <div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden"
+                                        data-alt="User avatar small thumbnail">
+                                        <img alt="User"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJLT--M2FQ3KPXWy52bcrOUizBLyGFA17cqu4GOkZc5WhJk-SpkqwM_CyCgYu2i6PYSYHW4PNjqlEzmmGP_fkN3GXjdLHDUiXMwXldeVpxhNs5R0pYzuzsBjCLexKywUaQUeqBifK5wgEQvCNHZkZi-ETTV9VbAdV1aNsq--eYHWafZOiZJ2ocKRtGOB90hZNb2js-2cGPYxYfvK-aa3TJt9Cr47XHHeaWXs5aWDgU6PlZAWVEifHEZ7lT0cGfUhRLowibtXQQkEMp" />
+                                    </div>
+                                    <div
+                                        class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-800 flex items-center justify-center text-[10px] text-white font-bold">
+                                        +89
+                                    </div>
+                                </div>
+                                <button
+                                    class="px-6 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl text-sm font-bold group-hover:bg-primary group-hover:text-white transition-colors">
+                                    Get Deal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 flex justify-center">
+                    <button
+                        class="px-8 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-sm hover:border-primary transition-colors flex items-center gap-2">
+                        <span>Show More Deals</span>
+                        <span class="material-symbols-outlined">expand_more</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 py-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="col-span-1 md:col-span-1">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="bg-primary text-white p-2 rounded-lg">
+                        <span class="material-symbols-outlined block">school</span>
+                    </div>
+                    <h1 class="text-2xl font-800 tracking-tight">Studeal</h1>
+                </div>
+                <p class="text-sm text-slate-500 leading-relaxed mb-6">Empowering students with exclusive premium deals
+                    to make university life affordable and exciting.</p>
+                <div class="flex gap-4">
+                    <a class="size-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                        href="#">
+                        <span class="material-symbols-outlined">social_leaderboard</span>
+                    </a>
+                    <a class="size-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+                        href="#">
+                        <span class="material-symbols-outlined">alternate_email</span>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold mb-6">Platform</h4>
+                <ul class="space-y-4 text-sm text-slate-500">
+                    <li><a class="hover:text-primary transition-colors" href="#">All Deals</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Categories</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Brands</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Partner With Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-6">Support</h4>
+                <ul class="space-y-4 text-sm text-slate-500">
+                    <li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Student Verification</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-6">Newsletter</h4>
+                <p class="text-sm text-slate-500 mb-4">Get the best deals delivered to your inbox weekly.</p>
+                <div class="flex gap-2">
+                    <input
+                        class="flex-1 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl text-sm px-4 focus:ring-primary"
+                        placeholder="Your email" type="email" />
+                    <button class="bg-primary text-white p-3 rounded-xl">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
+            class="max-w-7xl mx-auto pt-12 mt-12 border-t border-slate-100 dark:border-slate-900 text-center text-sm text-slate-400">
+            © 2024 Studeal Inc. All rights reserved. Designed for students, by students.
+        </div>
+    </footer>
+</body>
+
+</html>

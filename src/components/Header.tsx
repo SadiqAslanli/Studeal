@@ -4,6 +4,16 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import Link from 'next/link';
+import {
+  Home,
+  Star,
+  MessageSquare,
+  User,
+  LogOut,
+  ChevronDown,
+  Menu,
+  X
+} from 'lucide-react';
 import styles from '@/app/page.module.css';
 
 export default function Header() {
@@ -14,7 +24,7 @@ export default function Header() {
 
   const LangSelector = () => (
     <div className={styles.langSelector}>
-      {['az', 'ru', 'en'].map((l) => (
+      {['az', 'en'].map((l) => (
         <button
           key={l}
           className={`${styles.langBtn} ${lang === l ? styles.activeLang : ''}`}
@@ -31,13 +41,13 @@ export default function Header() {
       {user ? (
         <div className={styles.userWrapper}>
           <Link href="/points" className={styles.pointsBadge}>
-            <span className={styles.pointsIcon}>⭐️</span>
+            <Star size={14} className={styles.pointsIcon} fill="currentColor" />
             <span className={styles.pointsCount}>{user.points || 0}</span>
           </Link>
           <div className={styles.userDropdownTrigger} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
             <div className={styles.userName}>
               {user.name}
-              <span className={styles.chevron}>▾</span>
+              <ChevronDown size={14} className={styles.chevron} />
             </div>
           </div>
 
@@ -48,13 +58,13 @@ export default function Header() {
                 className={styles.dropdownItem}
                 onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}
               >
-                👤 {user.isCompany ? t.dashboard.overview : t.nav.home}
+                <User size={18} /> {user.isCompany ? t.dashboard.overview : t.nav.home}
               </Link>
               <button
                 onClick={() => { logout(); setIsUserMenuOpen(false); setIsMenuOpen(false); }}
                 className={`${styles.dropdownItem} ${styles.logoutItem}`}
               >
-                🚪 {t.dashboard.logout}
+                <LogOut size={18} /> {t.dashboard.logout}
               </button>
             </div>
           )}
@@ -75,13 +85,13 @@ export default function Header() {
   const NavLinks = () => (
     <nav className={styles.mainNav}>
       <Link href="/" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
-        <span className={styles.navIcon}>🏠</span> {t.nav.home}
+        <Home size={18} className={styles.navIcon} /> {t.nav.home}
       </Link>
       <Link href="/points" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
-        <span className={styles.navIcon}>⭐️</span> {t.nav.points}
+        <Star size={18} className={styles.navIcon} /> {t.nav.points}
       </Link>
       <Link href="/feedback" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
-        <span className={styles.navIcon}>💬</span> {t.nav.feedback}
+        <MessageSquare size={18} className={styles.navIcon} /> {t.nav.feedback}
       </Link>
     </nav>
   );
@@ -92,7 +102,7 @@ export default function Header() {
         <div className={`container ${styles.headerContent}`}>
           <div className={styles.headerLeft}>
             <Link href="/" className={styles.logo}>
-              Stu<span>Deal</span>
+              <img src="/logo.png" alt="Studeal Logo" className={styles.logoImg} />
             </Link>
             <NavLinks />
           </div>
@@ -101,11 +111,7 @@ export default function Header() {
             <LangSelector />
             <AuthButtons />
             <button className={styles.burgerBtn} onClick={() => setIsMenuOpen(true)}>
-              <div className={styles.burgerIcon}>
-                <span />
-                <span />
-                <span />
-              </div>
+              <Menu size={24} />
             </button>
           </div>
         </div>
@@ -121,7 +127,7 @@ export default function Header() {
           className={styles.closeBtn}
           onClick={() => setIsMenuOpen(false)}
         >
-          ✕
+          <X size={24} />
         </button>
         <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '30px' }}>
           <NavLinks />

@@ -1,23 +1,73 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
+import { Trash2, Edit, Plus, Image as ImageIcon } from 'lucide-react';
 
 export default function CompanyDashboard() {
     const { t } = useLanguage();
-    const [activeTab, setActiveTab] = useState('overview');
+    const { user, updateUser } = useAuth();
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState('deals');
     const [showAddDeal, setShowAddDeal] = useState(false);
 
-    const stats = [
-        { label: t.dashboard.activeDeals, value: "12", trend: `+2 ${t.dashboard.thisWeek}`, pos: true },
-        { label: t.dashboard.totalViews, value: "1,240", trend: `+15% ${t.dashboard.increase}`, pos: true },
-        { label: t.dashboard.usageCount, value: "450", trend: `-5% ${t.dashboard.decrease}`, pos: false },
-    ];
+    // Form State
+    const [newDeal, setNewDeal] = useState({
+        title: '',
+        description: '',
+        ingredients: '',
+        price: '',
+        discount: '',
+        image: '',
+        studentCardRequired: false
+    });
 
-    const handleUpdateDeal = (title: string) => {
-        alert(`${title} ${t.dashboard.updateSuccess}`);
+    useEffect(() => {
+        if (!user || user.isAdmin) {
+            router.push('/login');
+        }
+    }, [user]);
+
+    const handleAddDeal = (e: React.FormEvent) => {
+        e.preventDefault();
+        const dealToSave = {
+            ...newDeal,
+            id: Date.now(),
+            company: user?.name || 'Restaurant',
+            date: new Date().toISOString()
+        };
+
+        const currentDeals = (user as any).deals || [];
+        updateUser({
+            // @ts-ignore
+            deals: [dealToSave, ...currentDeals]
+        });
+
+        setNewDeal({
+            title: '',
+            description: '',
+            ingredients: '',
+            price: '',
+            discount: '',
+            image: '',
+            studentCardRequired: false
+        });
+        setShowAddDeal(false);
     };
+
+    const handleDeleteDeal = (id: number) => {
+        const currentDeals = (user as any).deals || [];
+        const updatedDeals = currentDeals.filter((d: any) => d.id !== id);
+        updateUser({
+            // @ts-ignore
+            deals: updatedDeals
+        });
+    };
+
+    const userDeals = (user as any)?.deals || [];
 
     return (
         <div className={`container ${styles.dashboardLayout}`}>
@@ -62,54 +112,63 @@ export default function CompanyDashboard() {
             <main className={styles.mainContent}>
                 <header className={styles.dashboardHeader}>
                     <div>
-                        <h1>{t.dashboard.welcomeMsg}, KFC Azerbaijan</h1>
+                        <h1>{t.dashboard.welcomeMsg}, {user?.name}</h1>
                         <p>{t.dashboard.statsSub}</p>
                     </div>
                     <button className="btn-primary" onClick={() => setShowAddDeal(true)}>
-                        <span style={{ marginRight: '8px' }}>+</span>
-                        {t.dashboard.newDeal}
+                        <Plus size={18} style={{ marginRight: '8px' }} />
+                        Yeni Endirim Menyu
                     </button>
                 </header>
 
-                <section className={styles.statsGrid}>
-                    {stats.map((stat, i) => (
-                        <div key={i} className={styles.statCard}>
-                            <div className={styles.statIconBox}>
-                                {i === 0 ? "🏷️" : i === 1 ? "👁️" : "📈"}
-                            </div>
+                {activeTab === 'overview' && (
+                    <section className={styles.statsGrid}>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIconBox}>🏷️</div>
                             <div className={styles.statInfo}>
-                                <span className={styles.statLabel}>{stat.label}</span>
-                                <span className={styles.statValue}>{stat.value}</span>
-                                <span className={`${styles.trend} ${stat.pos ? styles.positive : styles.negative}`}>
-                                    {stat.trend}
-                                </span>
+                                <span className={styles.statLabel}>Aktiv Endirimlər</span>
+                                <span className={styles.statValue}>{userDeals.length}</span>
                             </div>
                         </div>
-                    ))}
-                </section>
+                        <div className={styles.statCard}>
+                            <div className={styles.statIconBox}>👁️</div>
+                            <div className={styles.statInfo}>
+                                <span className={styles.statLabel}>Baxış Sayı</span>
+                                <span className={styles.statValue}>0</span>
+                            </div>
+                        </div>
+                    </section>
+                )}
 
-                <section className={styles.analyticsGrid}>
-                    <div className={styles.chartCard}>
-                        <div className={styles.chartHeader}>
-                            <h3>{t.dashboard.weeklyStats}</h3>
-                            <span className={styles.statLabel}>{t.dashboard.last7Days}</span>
+                {activeTab === 'deals' && (
+                    <section className={styles.dealsList}>
+                        <h2>Mənim Endirimlərim</h2>
+                        <div className={styles.dealGrid}>
+                            {userDeals.map((deal: any) => (
+                                <div key={deal.id} className={styles.dealItemCard}>
+                                    <div className={styles.dealItemImg}>
+                                        {deal.image ? <img src={deal.image} alt={deal.title} /> : <div className={styles.placeholderImg}><ImageIcon /></div>}
+                                        <div className={styles.dealItemDiscount}>-{deal.discount}%</div>
+                                    </div>
+                                    <div className={styles.dealItemContent}>
+                                        <h3>{deal.title}</h3>
+                                        <p className={styles.dealPrice}>{deal.price} AZN</p>
+                                        <p className={styles.dealDesc}>{deal.description}</p>
+                                        <div className={styles.dealMeta}>
+                                            <span>{deal.studentCardRequired ? "🪪 Tələbə kartı lazımdır" : "✅ Sərbəst giriş"}</span>
+                                        </div>
+                                        <div className={styles.dealActions}>
+                                            <button className={styles.deleteBtn} onClick={() => handleDeleteDeal(deal.id)}><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {userDeals.length === 0 && (
+                                <div className={styles.noDeals}>Hələ heç bir endirim əlavə edilməyib.</div>
+                            )}
                         </div>
-                        <div className={styles.chartContainer}>
-                            <div className={styles.bar} style={{ height: '60%' }} data-value="120"></div>
-                            <div className={styles.bar} style={{ height: '85%' }} data-value="240"></div>
-                            <div className={styles.bar} style={{ height: '40%' }} data-value="80"></div>
-                            <div className={styles.bar} style={{ height: '95%' }} data-value="310"></div>
-                            <div className={styles.bar} style={{ height: '70%' }} data-value="190"></div>
-                            <div className={styles.bar} style={{ height: '55%' }} data-value="140"></div>
-                            <div className={styles.bar} style={{ height: '80%' }} data-value="220"></div>
-                        </div>
-                    </div>
-                    <div className={styles.statCard} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <span className={styles.statLabel}>{t.dashboard.marketShare}</span>
-                        <span className={styles.statValue}>24%</span>
-                        <p style={{ color: '#a3aed0', fontSize: '13px', marginTop: '10px' }}>{t.dashboard.comparedToLastMonth} +4% {t.dashboard.increase}</p>
-                    </div>
-                </section>
+                    </section>
+                )}
             </main>
 
             {/* Modal */}
@@ -117,16 +176,85 @@ export default function CompanyDashboard() {
                 <div className={styles.modalOverlay} onClick={() => setShowAddDeal(false)}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2>{t.dashboard.addDealTitle}</h2>
+                            <h2>Yeni Endirim Menyu Əlavə Et</h2>
                             <button className={styles.closeBtn} onClick={() => setShowAddDeal(false)}>✕</button>
                         </div>
-                        <form className={styles.dealForm} onSubmit={(e) => e.preventDefault()}>
-                            <div className={styles.formGroup}>
-                                <label>{t.dashboard.dealTitleLabel}</label>
-                                <input type="text" placeholder={t.dashboard.dealPlaceholder} />
+                        <form className={styles.dealForm} onSubmit={handleAddDeal}>
+                            <div className={styles.formGrid}>
+                                <div className={styles.formGroup}>
+                                    <label>Menyu Adı</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Məs: Tələbə Kombo"
+                                        value={newDeal.title}
+                                        onChange={(e) => setNewDeal({ ...newDeal, title: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Qiymət (AZN)</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="9.90"
+                                        value={newDeal.price}
+                                        onChange={(e) => setNewDeal({ ...newDeal, price: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Endirim Faizi (%)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="20"
+                                        value={newDeal.discount}
+                                        onChange={(e) => setNewDeal({ ...newDeal, discount: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Şəkil URL</label>
+                                    <input
+                                        type="text"
+                                        placeholder="https://..."
+                                        value={newDeal.image}
+                                        onChange={(e) => setNewDeal({ ...newDeal, image: e.target.value })}
+                                    />
+                                </div>
                             </div>
+
+                            <div className={styles.formGroup}>
+                                <label>Qısa İzah</label>
+                                <textarea
+                                    placeholder="Tələbələr üçün xüsusi təklif..."
+                                    value={newDeal.description}
+                                    onChange={(e) => setNewDeal({ ...newDeal, description: e.target.value })}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label>İçindəkilər (Tərkibi)</label>
+                                <textarea
+                                    placeholder="1 Burger, 1 Orta Kartof, 1 Orta İçki..."
+                                    value={newDeal.ingredients}
+                                    onChange={(e) => setNewDeal({ ...newDeal, ingredients: e.target.value })}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.checkboxGroup}>
+                                <input
+                                    type="checkbox"
+                                    id="cardReq"
+                                    checked={newDeal.studentCardRequired}
+                                    onChange={(e) => setNewDeal({ ...newDeal, studentCardRequired: e.target.checked })}
+                                />
+                                <label htmlFor="cardReq">Tələbə kartı tələb olunur?</label>
+                            </div>
+
                             <button type="submit" className={`btn-primary ${styles.btnBlock}`}>
-                                {t.dashboard.share}
+                                Paylaş
                             </button>
                         </form>
                     </div>

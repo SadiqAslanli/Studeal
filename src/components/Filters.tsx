@@ -6,25 +6,31 @@ import styles from './Filters.module.css';
 
 interface FiltersProps {
   onCategoryChange: (categoryId: number) => void;
+  onSortChange: (sortOption: string) => void;
 }
 
-export default function Filters({ onCategoryChange }: FiltersProps) {
+export default function Filters({ onCategoryChange, onSortChange }: FiltersProps) {
   const { t } = useLanguage();
   const [activeCat, setActiveCat] = useState(6); // Default to 'All'
   const [activeSort, setActiveSort] = useState('new');
 
   const categories = [
-    { id: 1, name: t.categories.restaurant, icon: "🍴" },
-    { id: 2, name: t.categories.shop, icon: "🛍️" },
-    { id: 3, name: t.categories.education, icon: "📚" },
-    { id: 4, name: t.categories.entertainment, icon: "🎫" },
-    { id: 5, name: t.categories.tech, icon: "💻" },
-    { id: 6, name: t.categories.all, icon: "✨" },
+    { id: 1, name: t.categories.restaurant, icon: "restaurant" },
+    { id: 2, name: t.categories.shop, icon: "checkroom" }, // Clothing icon specifically mentioned
+    { id: 3, name: t.categories.education, icon: "school" },
+    { id: 4, name: t.categories.entertainment, icon: "theater_comedy" },
+    { id: 5, name: t.categories.tech, icon: "devices" },
+    { id: 6, name: t.categories.all, icon: "grid_view" },
   ];
 
   const handleCategoryClick = (id: number) => {
     setActiveCat(id);
     onCategoryChange(id);
+  };
+
+  const handleSortClick = (id: string) => {
+    setActiveSort(id);
+    onSortChange(id);
   };
 
   const subFilters = [
@@ -55,7 +61,9 @@ export default function Filters({ onCategoryChange }: FiltersProps) {
                 onClick={() => handleCategoryClick(cat.id)}
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <span className={styles.icon}>{cat.icon}</span>
+                <div className={styles.icon}>
+                  <span className="material-symbols-outlined">{cat.icon}</span>
+                </div>
                 <span className={styles.name}>{cat.name}</span>
               </button>
             ))}
@@ -79,7 +87,7 @@ export default function Filters({ onCategoryChange }: FiltersProps) {
                 <button
                   key={opt.id}
                   className={`${styles.sortBtn} ${activeSort === opt.id ? styles.activeSort : ''}`}
-                  onClick={() => setActiveSort(opt.id)}
+                  onClick={() => handleSortClick(opt.id)}
                 >
                   {opt.name}
                 </button>

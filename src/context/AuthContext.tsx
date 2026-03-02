@@ -23,6 +23,7 @@ export type User = {
     name: string;
     email: string;
     isCompany: boolean;
+    isAdmin?: boolean;
     points?: number;
     university?: string;
     course?: string;
@@ -59,8 +60,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = (email: string, password: string) => {
+        // Hardcoded System Admin
+        if (email === 'admin@gmail.com' && password === 'admin123') {
+            const adminUser: User = {
+                name: 'System Admin',
+                email: 'admin@gmail.com',
+                isCompany: false,
+                isAdmin: true
+            };
+            setUser(adminUser);
+            localStorage.setItem('loggedUser', JSON.stringify(adminUser));
+            return true;
+        }
+
         const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const foundUser = users.find((u: any) => u.email === email);
+        const foundUser = users.find((u: any) => u.email === email && (!u.password || u.password === password));
 
         if (foundUser) {
             setUser(foundUser);

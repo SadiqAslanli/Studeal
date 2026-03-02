@@ -5,20 +5,29 @@
   --primary-hover: #0052cc;
   --secondary: #f0f7ff;
   --text: #1b2559;
-  /* Updated to a deeper midnight blue for premium feel */
-  --text-light: #a3aed0;
-  /* More balanced light text color */
+  --text-light: #64748b;
   --white: #ffffff;
   --background: #f8faff;
+  --background-dark: #0f1723;
   --error: #ee5d50;
-  /* Softer, premium red */
   --success: #05cd99;
-  /* Menthe-green for success */
   --border: #e0e5f2;
   --shadow: 0 10px 40px rgba(0, 102, 255, 0.08);
   --radius: 16px;
-  /* Slightly more rounded for modern feel */
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(224, 229, 242, 0.5);
+}
+
+.dark {
+  --background: #0f1723;
+  --text: #f8faff;
+  --text-light: #94a3b8;
+  --border: #1e293b;
+  --glass-bg: rgba(15, 23, 35, 0.8);
+  --glass-border: rgba(30, 41, 59, 0.5);
 }
 
 * {
@@ -51,9 +60,9 @@ button {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 48px;
 }
 
 /* Common Components */

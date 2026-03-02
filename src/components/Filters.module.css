@@ -1,7 +1,5 @@
 .filters {
     padding: 40px 0;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
 }
 
 .filterWrapper {
@@ -29,54 +27,56 @@
 
 .filterList {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(6, 1fr);
     gap: 20px;
-    padding: 5px;
 }
 
 .filterItem {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    padding: 18px 24px;
+    gap: 12px;
+    padding: 24px;
     background: var(--white);
-    border-radius: 18px;
+    border-radius: 24px;
     border: 1px solid var(--border);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition);
     cursor: pointer;
-    text-align: left;
-    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .filterItem:hover {
     border-color: var(--primary);
-    background: #fcfdfe;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 102, 255, 0.08);
 }
 
 .filterItem.active {
-    background: #f4f8ff;
     border-color: var(--primary);
-    box-shadow: 0 10px 20px rgba(0, 102, 255, 0.05);
+    background: rgba(0, 102, 255, 0.02);
+    box-shadow: 0 12px 24px rgba(0, 102, 255, 0.08);
 }
 
 .icon {
-    font-size: 22px;
-    width: 40px;
-    height: 40px;
-    background: #f8fafc;
-    border-radius: 12px;
+    font-size: 24px;
+    width: 56px;
+    height: 56px;
+    background: var(--secondary);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition);
 }
 
+.filterItem:hover .icon,
 .filterItem.active .icon {
     background: var(--primary);
     color: white;
 }
 
 .name {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 14px;
     color: var(--text);
 }
@@ -87,11 +87,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 30px;
-    margin-top: 30px;
-    padding: 12px 25px;
-    background: #fbfcfe;
-    border-radius: 50px;
-    border: 1px solid var(--border);
+    margin-top: 40px;
 }
 
 .subTags {
@@ -101,54 +97,50 @@
 }
 
 .tagBtn {
-    padding: 8px 16px;
-    background: white;
-    color: var(--text-light);
+    padding: 8px 18px;
+    background: var(--white);
+    color: #64748b;
     border-radius: 50px;
     font-size: 13px;
     font-weight: 700;
     border: 1px solid var(--border);
-    transition: all 0.2s ease;
+    transition: var(--transition);
     cursor: pointer;
 }
 
 .tagBtn:hover {
     border-color: var(--primary);
     color: var(--primary);
+    background: rgba(0, 102, 255, 0.05);
 }
 
 .sortWrapper {
     display: flex;
     align-items: center;
-    gap: 15px;
+    background: var(--white);
+    padding: 4px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
 }
 
 .sortLabel {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--text-light);
-    white-space: nowrap;
-}
-
-.sortList {
-    display: flex;
-    gap: 5px;
+    display: none;
 }
 
 .sortBtn {
-    padding: 8px 15px;
-    border-radius: 50px;
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--text-light);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
     background: none;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition);
 }
 
 .activeSort {
-    background: var(--primary);
+    background: #1e293b;
     color: white;
 }
 
@@ -158,94 +150,21 @@
     }
 }
 
-@media (max-width: 768px) {
-    .filters {
-        padding: 25px 0;
-    }
-
+@media (max-width: 600px) {
     .filterList {
-        display: flex;
-        overflow-x: auto;
-        padding: 5px 20px;
-        margin: 0 -20px;
-        gap: 12px;
-        scrollbar-width: none;
-    }
-
-    .filterList::-webkit-scrollbar {
-        display: none;
-    }
-
-    .filterItem {
-        min-width: fit-content;
-        padding: 12px 18px;
-        flex-shrink: 0;
-        gap: 10px;
-    }
-
-    .icon {
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
-    }
-
-    .name {
-        font-size: 13px;
-        white-space: nowrap;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .secondaryFilters {
         flex-direction: column;
-        border-radius: 20px;
-        padding: 15px;
-        background: transparent;
-        border: none;
-        gap: 15px;
         align-items: stretch;
     }
 
-    .subTags {
-        display: flex;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding: 5px;
-        gap: 8px;
-        margin: 0 -15px;
-        padding: 0 15px;
-        scrollbar-width: none;
-    }
-
-    .subTags::-webkit-scrollbar {
-        display: none;
-    }
-
-    .tagBtn {
-        flex-shrink: 0;
-        padding: 8px 15px;
-        font-size: 12px;
-    }
-
     .sortWrapper {
-        flex-direction: row;
-        justify-content: space-between;
-        background: #f4f7fe;
-        padding: 10px 15px;
-        border-radius: 50px;
-        gap: 10px;
-    }
-
-    .sortLabel {
-        font-size: 11px;
-    }
-
-    .sortList {
-        width: auto;
-        gap: 2px;
+        justify-content: center;
     }
 
     .sortBtn {
-        padding: 6px 10px;
-        font-size: 11px;
-        flex: none;
+        flex: 1;
     }
 }

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { User, Mail, Lock, Building, ArrowLeft, ShoppingBag, Check } from 'lucide-react';
 import styles from '../auth.module.css';
 
 export default function RegisterPage() {
@@ -36,24 +37,32 @@ export default function RegisterPage() {
   return (
     <div className={styles.authContainer}>
       <Link href="/" className={styles.backBtn}>
-        <span>←</span>
+        <ArrowLeft size={20} />
       </Link>
 
       <div className={styles.authCard}>
         <Link href="/" className={styles.authLogo}>
-          Stu<span>Deal</span>
+          <ShoppingBag size={32} /> Stu<span>Deal</span>
         </Link>
         <h1>{t.register}</h1>
-        <p>{t.auth.haveAccount} <Link href="/login">{t.auth.loginNow}</Link></p>
+        <p>
+          {t.auth.haveAccount} <Link href="/login">{t.auth.loginNow}</Link>
+        </p>
 
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label>{t.auth.fullName}</label>
             <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>{formData.isCompany ? '🏢' : '👤'}</span>
+              {formData.isCompany ? (
+                <Building size={20} className={styles.inputIcon} />
+              ) : (
+                <User size={20} className={styles.inputIcon} />
+              )}
               <input
                 type="text"
-                placeholder={formData.isCompany ? t.auth.companyPlaceholder : t.auth.namePlaceholder}
+                placeholder={
+                  formData.isCompany ? t.auth.companyPlaceholder : t.auth.namePlaceholder
+                }
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
@@ -63,7 +72,7 @@ export default function RegisterPage() {
           <div className={styles.formGroup}>
             <label>{t.auth.email}</label>
             <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>📧</span>
+              <Mail size={20} className={styles.inputIcon} />
               <input
                 type="email"
                 placeholder={t.auth.emailPlaceholder}
@@ -76,7 +85,7 @@ export default function RegisterPage() {
           <div className={styles.formGroup}>
             <label>{t.auth.password}</label>
             <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>🔒</span>
+              <Lock size={20} className={styles.inputIcon} />
               <input
                 type="password"
                 placeholder="••••••••"
@@ -91,13 +100,18 @@ export default function RegisterPage() {
             className={styles.checkboxGroup}
             onClick={() => setFormData({ ...formData, isCompany: !formData.isCompany })}
           >
-            <div className={`${styles.customCheckbox} ${formData.isCompany ? styles.checked : ''}`}>
-              {formData.isCompany && <div className={styles.dot} />}
+            <div
+              className={`${styles.customCheckbox} ${formData.isCompany ? styles.checked : ''
+                }`}
+            >
+              {formData.isCompany && <Check size={14} color="white" />}
             </div>
             <span>{t.auth.companyRegister}</span>
           </div>
 
-          <button type="submit" className={`btn-primary ${styles.btnBlock}`}>{t.register}</button>
+          <button type="submit" className={styles.btnBlock}>
+            {t.register}
+          </button>
         </form>
       </div>
     </div>

@@ -368,6 +368,150 @@
     cursor: pointer;
 }
 
+.dealsList h2 {
+    margin-bottom: 25px;
+    color: #1b2559;
+    font-size: 20px;
+}
+
+.dealGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.dealItemCard {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(112, 144, 176, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.dealItemCard:hover {
+    transform: translateY(-5px);
+}
+
+.dealItemImg {
+    height: 180px;
+    position: relative;
+    background: #f4f7fe;
+}
+
+.dealItemImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: crop;
+}
+
+.placeholderImg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a3aed0;
+}
+
+.dealItemDiscount {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff4d4d;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.dealItemContent {
+    padding: 20px;
+}
+
+.dealItemContent h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #1b2559;
+}
+
+.dealPrice {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.dealDesc {
+    font-size: 14px;
+    color: #707ebe;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.dealMeta {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a3aed0;
+    margin-bottom: 15px;
+}
+
+.dealActions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.deleteBtn {
+    background: #fff5f5;
+    color: #ff4d4d;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+.noDeals {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    background: white;
+    border-radius: 20px;
+    color: #a3aed0;
+    font-weight: 600;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.checkboxGroup input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkboxGroup label {
+    font-weight: 700;
+    color: #1b2559;
+    cursor: pointer;
+}
+
 @media (max-width: 1024px) {
     .dashboardLayout {
         flex-direction: column;
