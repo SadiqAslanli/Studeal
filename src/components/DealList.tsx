@@ -15,7 +15,53 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
   const { t } = useLanguage();
   const { user, toggleFavorite, addNotification } = useAuth();
 
-  const allDeals = [
+  const [userRatings, setUserRatings] = useState<Record<number, number>>({});
+  const [hoverRating, setHoverRating] = useState<Record<number, number>>({});
+  const [dynamicDeals, setDynamicDeals] = useState<any[]>([]);
+
+  useEffect(() => {
+    const savedRatings = localStorage.getItem('studeal_user_ratings');
+    if (savedRatings) {
+      setUserRatings(JSON.parse(savedRatings));
+    }
+
+    // Also load dynamic deals from somewhere if needed, currently empty
+    // const savedDeals = localStorage.getItem('studeal_dynamic_deals');
+    // if (savedDeals) setDynamicDeals(JSON.parse(savedDeals));
+  }, []);
+
+  const handleRate = (e: React.MouseEvent, dealId: number, star: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      alert(t.auth.loginNow || "Puan vermək üçün daxil olun");
+      return;
+    }
+
+    const newRatings = { ...userRatings, [dealId]: star };
+    setUserRatings(newRatings);
+    localStorage.setItem('studeal_user_ratings', JSON.stringify(newRatings));
+  };
+
+  const getDisplayRating = (deal: any) => {
+    const baseRating = deal.rating || 4.5;
+    const baseCount = deal.ratingsCount || 0;
+
+    if (userRatings[deal.id]) {
+      const totalScore = (baseRating * baseCount) + userRatings[deal.id];
+      const totalCount = baseCount + 1;
+      return (totalScore / totalCount).toFixed(1);
+    }
+    return baseRating.toFixed(1);
+  };
+
+  const getDisplayCount = (deal: any) => {
+    const baseCount = deal.ratingsCount || 0;
+    return userRatings[deal.id] ? baseCount + 1 : baseCount;
+  };
+
+  const staticDeals = [
     {
       id: 1,
       title: 'KFC Tələbə Menyu',
