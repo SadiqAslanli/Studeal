@@ -1,24 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #0066ff;
-  --primary-hover: #0052cc;
-  --secondary: #f0f7ff;
+  --primary: #4318ff;
+  --primary-hover: #3311cc;
+  --secondary: #ffffff;
   --text: #1b2559;
-  --text-light: #64748b;
+  --text-light: #a3aed0;
   --white: #ffffff;
-  --background: #f8faff;
-  --background-dark: #0f1723;
+  --background: #ffffff;
+  --background-dark: #0b1433;
   --error: #ee5d50;
   --success: #05cd99;
-  --border: #e0e5f2;
-  --shadow: 0 10px 40px rgba(0, 102, 255, 0.08);
-  --radius: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --border: #f4f7fe;
+  --shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+  --radius: 18px;
+  --radius-lg: 28px;
+  --radius-xl: 35px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(224, 229, 242, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 .dark {
@@ -38,7 +38,7 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: #ffffff;
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;

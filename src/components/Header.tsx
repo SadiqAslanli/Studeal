@@ -12,7 +12,8 @@ import {
   LogOut,
   ChevronDown,
   Menu,
-  X
+  X,
+  Heart
 } from 'lucide-react';
 import styles from '@/app/page.module.css';
 
@@ -93,6 +94,9 @@ export default function Header() {
       <Link href="/feedback" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
         <MessageSquare size={18} className={styles.navIcon} /> {t.nav.feedback}
       </Link>
+      <Link href="/favorites" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
+        <Heart size={18} className={styles.navIcon} /> Favorilərim
+      </Link>
     </nav>
   );
 
@@ -129,7 +133,7 @@ export default function Header() {
         >
           <X size={24} />
         </button>
-        <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '30px' }}>
+        <div className={styles.mobileMenuContent}>
           <NavLinks />
           <LangSelector />
           <AuthButtons />

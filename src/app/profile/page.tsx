@@ -367,7 +367,7 @@ export default function ProfilePage() {
                     <div className={styles.statCard}>
                         <span className={styles.statIcon}>🛍️</span>
                         <div className={styles.statInfo}>
-                            <span className={styles.statValue}>12</span>
+                            <span className={styles.statValue}>{user.usedDealsCount || 0}</span>
                             <span className={styles.statLabel}>{t.profile.usedDeals}</span>
                         </div>
                     </div>

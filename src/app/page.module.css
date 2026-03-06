@@ -34,7 +34,7 @@
   gap: 16px;
   padding-right: 8px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 102, 255, 0.1) transparent;
+  scrollbar-color: rgba(67, 24, 255, 0.1) transparent;
 }
 
 .adsList::-webkit-scrollbar {
@@ -42,7 +42,7 @@
 }
 
 .adsList::-webkit-scrollbar-thumb {
-  background: rgba(0, 102, 255, 0.1);
+  background: rgba(67, 24, 255, 0.1);
   border-radius: 4px;
 }
 
@@ -62,6 +62,32 @@
 
 .adLabelIcon {
   color: var(--primary);
+}
+
+.adRequestBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(67, 24, 255, 0.05);
+  border: 1px solid rgba(67, 24, 255, 0.1);
+  color: var(--primary);
+  padding: 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  margin-left: 12px;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.adRequestBtn:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(67, 24, 255, 0.15);
 }
 
 .adCard {
@@ -116,6 +142,22 @@
   border-radius: 12px;
   z-index: 2;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.newDiscountBadge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1b2559;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
 .adCardBody {
@@ -202,7 +244,19 @@
 
 .adCtaBtn:hover {
   filter: brightness(1.1);
-  box-shadow: 0 10px 25px -5px rgba(0, 102, 255, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(67, 24, 255, 0.3);
+}
+
+.placeholderAd {
+  border: 2px dashed rgba(67, 24, 255, 0.2) !important;
+  background: rgba(67, 24, 255, 0.02) !important;
+  box-shadow: none !important;
+}
+
+.placeholderAd:hover {
+  border-color: var(--primary) !important;
+  background: rgba(67, 24, 255, 0.05) !important;
+  transform: translateY(-4px);
 }
 
 @media (max-width: 1600px) {
@@ -306,18 +360,27 @@
   top: 0;
   right: -100%;
   width: 100%;
-  /* Take full width on mobile for better UX */
   max-width: 320px;
   height: 100vh;
   background: white;
   z-index: 3001;
-  padding: 80px 20px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  justify-content: center;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+.mobileMenu::-webkit-scrollbar {
+  display: none;
+}
+
+.mobileMenuContent {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .mobileMenuOpen {
@@ -467,20 +530,19 @@
 
 .mobileMenu .mainNav {
   flex-direction: column;
-  gap: 25px;
+  gap: 10px;
 }
 
 .mobileMenu .navLink {
-  font-size: 18px;
-  /* Slightly smaller for better fit */
+  font-size: 15px;
   font-weight: 700;
   color: #1b2559;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: #f4f7fe;
-  border-radius: 16px;
+  border-radius: 12px;
   transition: all 0.3s ease;
   width: 100%;
 }
@@ -525,24 +587,55 @@
 .mobileMenu .authBtns {
   flex-direction: column;
   align-items: stretch;
-  gap: 15px;
+  gap: 10px;
   border-top: 1px solid #e0e5f2;
-  padding-top: 30px;
+  padding-top: 15px;
 }
 
 .mobileMenu .langSelector {
   justify-content: center;
   padding: 10px;
   background: #f4f7fe;
+  border-radius: 16px;
+}
+
+.mobileMenu .userWrapper {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.mobileMenu .userName {
+  width: 100%;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-radius: 16px;
+}
+
+.mobileMenu .userDropdown {
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  box-shadow: none;
+  background: #f8fafc;
+  border: 1px solid #e0e5f2;
+  animation: fadeIn 0.3s ease;
+  margin-top: -5px;
+}
+
+.mobileMenu .dropdownItem {
+  padding: 14px 20px;
+  font-size: 15px;
 }
 
 .langSelector {
   display: flex;
   gap: 4px;
-  background: rgba(0, 102, 255, 0.05);
+  background: rgba(67, 24, 255, 0.05);
   padding: 4px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 102, 255, 0.05);
+  border: 1px solid rgba(67, 24, 255, 0.05);
 }
 
 .langBtn {
@@ -637,6 +730,18 @@
   gap: 5px;
   z-index: 1000;
   animation: slideInUp 0.3s ease;
+}
+
+.mobileMenu .userDropdown {
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  box-shadow: none;
+  background: #f8fafc;
+  border: 1px solid #e0e5f2;
+  margin-top: 5px;
+  animation: fadeIn 0.3s ease;
 }
 
 @keyframes slideInUp {
@@ -891,10 +996,10 @@
 
 .closeBtn {
   position: absolute;
-  top: 30px;
-  right: 30px;
-  width: 45px;
-  height: 45px;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
   background: white;
   border: 1px solid #e0e5f2;
   border-radius: 50%;

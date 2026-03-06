@@ -151,20 +151,55 @@
 }
 
 @media (max-width: 600px) {
+    .filters {
+        padding: 20px 0;
+    }
+
+    .label {
+        margin-bottom: 20px;
+    }
+
     .filterList {
         grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .filterItem {
+        padding: 16px;
+        gap: 8px;
+        border-radius: 20px;
+    }
+
+    .icon {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+
+    .name {
+        font-size: 13px;
     }
 
     .secondaryFilters {
         flex-direction: column;
         align-items: stretch;
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .subTags {
+        justify-content: center;
     }
 
     .sortWrapper {
         justify-content: center;
+        padding: 4px;
+        border-radius: 14px;
     }
 
     .sortBtn {
         flex: 1;
+        padding: 10px 8px;
+        font-size: 12px;
     }
 }

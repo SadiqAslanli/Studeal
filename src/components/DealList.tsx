@@ -1,9 +1,11 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Star, Heart, Tag, ArrowUpRight, Check } from 'lucide-react';
+import { Star, Heart, Tag, ArrowUpRight, Check, GraduationCap, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './DealList.module.css';
+import { staticDeals } from '@/utils/dealsData';
 
 interface DealListProps {
   activeCategoryId: number;
@@ -14,28 +16,33 @@ interface DealListProps {
 export default function DealList({ activeCategoryId, searchQuery, sortOption }: DealListProps) {
   const { t } = useLanguage();
   const { user, toggleFavorite, addNotification } = useAuth();
+  const router = useRouter();
 
   const [userRatings, setUserRatings] = useState<Record<number, number>>({});
   const [hoverRating, setHoverRating] = useState<Record<number, number>>({});
   const [dynamicDeals, setDynamicDeals] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   useEffect(() => {
     const savedRatings = localStorage.getItem('studeal_user_ratings');
     if (savedRatings) {
       setUserRatings(JSON.parse(savedRatings));
     }
-
-    // Also load dynamic deals from somewhere if needed, currently empty
-    // const savedDeals = localStorage.getItem('studeal_dynamic_deals');
-    // if (savedDeals) setDynamicDeals(JSON.parse(savedDeals));
   }, []);
+
+  useEffect(() => {
+    if (currentPage > 1) {
+      document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [currentPage]);
 
   const handleRate = (e: React.MouseEvent, dealId: number, star: number) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
-      alert(t.auth.loginNow || "Puan vermək üçün daxil olun");
+      router.push('/login');
       return;
     }
 
@@ -45,7 +52,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
   };
 
   const getDisplayRating = (deal: any) => {
-    const baseRating = deal.rating || 4.5;
+    const baseRating = deal.rating || 0;
     const baseCount = deal.ratingsCount || 0;
 
     if (userRatings[deal.id]) {
@@ -53,7 +60,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
       const totalCount = baseCount + 1;
       return (totalScore / totalCount).toFixed(1);
     }
-    return baseRating.toFixed(1);
+    return baseRating > 0 ? baseRating.toFixed(1) : "0.0";
   };
 
   const getDisplayCount = (deal: any) => {
@@ -61,131 +68,6 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     return userRatings[deal.id] ? baseCount + 1 : baseCount;
   };
 
-  const staticDeals = [
-    {
-      id: 1,
-      title: 'KFC Tələbə Menyu',
-      company: 'KFC Azerbaijan',
-      discount: '20%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#ff4d4d',
-      image: 'https://images.unsplash.com/photo-1513639776629-7b61b0ac49cb?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 2,
-      title: 'Nike Tələbə Kartı',
-      company: 'Nike Store',
-      discount: '15%',
-      type: t.categories.shop,
-      typeId: 2,
-      color: '#1a1a1a',
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 3,
-      title: 'IELTS Hazırlığı',
-      company: 'CELT Colleges',
-      discount: '30%',
-      type: t.categories.education,
-      typeId: 3,
-      color: '#0066ff',
-      image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 4,
-      title: 'Sinema Bileti',
-      company: 'CinemaPlus',
-      discount: '50%',
-      type: t.categories.entertainment,
-      typeId: 4,
-      color: '#9c27b0',
-      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 5,
-      title: 'MacBook Pro',
-      company: 'Alma Store',
-      discount: '10%',
-      type: t.categories.tech,
-      typeId: 5,
-      color: '#607d8b',
-      image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 6,
-      title: 'Pizza Festivalı',
-      company: 'Pizza Mizza',
-      discount: '25%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#ff9800',
-      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 7,
-      title: 'McDonalds Tələbə Kombo',
-      company: 'McDonalds',
-      discount: '15%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#ffbc0d',
-      image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 8,
-      title: 'Mado Səhər Yeməyi',
-      company: 'Mado',
-      discount: '10%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#8b4513',
-      image: 'https://images.unsplash.com/photo-1484723088339-fe28233e562e?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 9,
-      title: 'Starbucks Coffee',
-      company: 'Starbucks',
-      discount: '15%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#00704a',
-      image: 'https://images.unsplash.com/photo-1544787210-282aa5ac739d?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 10,
-      title: 'Fryday Menyu',
-      company: 'Fryday',
-      discount: '20%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#e31837',
-      image: 'https://images.unsplash.com/photo-1534422298391-e4f8c170db06?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 11,
-      title: 'Vapiano Pasta',
-      company: 'Vapiano',
-      discount: '10%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#df0615',
-      image: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: 12,
-      title: 'Entree Bakery',
-      company: 'Entree',
-      discount: '20%',
-      type: t.categories.restaurant,
-      typeId: 1,
-      color: '#e6bd1a',
-      image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800'
-    },
-    { id: 13, title: 'Baku Book Center', company: 'BBC', discount: '15%', type: t.categories.shop, typeId: 2, color: '#4b3621', image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&q=80&w=800' },
-    { id: 14, title: 'Ali & Nino', company: 'Ali & Nino', discount: '10%', type: t.categories.shop, typeId: 2, color: '#ed1c24', image: 'https://images.unsplash.com/photo-1491849593786-b44c3ec82135?auto=format&fit=crop&q=80&w=800' },
-    { id: 15, title: 'Bravo Market', company: 'Bravo', discount: '5%', type: t.categories.shop, typeId: 2, color: '#f7931e', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800' },
-  ];
 
   const allDeals = [...staticDeals, ...dynamicDeals];
 
@@ -224,120 +106,155 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     });
   }
 
+  const totalPages = Math.ceil((filteredDeals.length + 1) / itemsPerPage);
+  const paginatedDeals = filteredDeals.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const showComingSoonCard = paginatedDeals.length < itemsPerPage && currentPage === totalPages;
+
   return (
     <section className={styles.dealList}>
-      <div className="container">
+      <div className="container" id="deals">
         <div className={styles.grid}>
-          {filteredDeals.length > 0 ? (
-            filteredDeals.map((deal, index) => {
-              const isFavorite = user?.favorites?.includes(deal.id);
-              const displayRating = getDisplayRating(deal);
-              return (
-                <div
-                  key={deal.id}
-                  className={styles.card}
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <div className={styles.cardImage}>
-                    {deal.image ? (
-                      <img src={deal.image} alt={deal.title} className={styles.mainImg} />
-                    ) : (
-                      <div className={styles.placeholderImg} style={{ backgroundColor: deal.color + '10' }}>
-                        <Tag size={32} style={{ color: deal.color }} />
-                      </div>
-                    )}
-                    <div className={styles.overlay}></div>
-                    <div className={styles.ratingBubble}>
-                      <Star size={12} fill="#ffae00" color="#ffae00" />
-                      <span>{displayRating}</span>
+          {paginatedDeals.map((deal, index) => {
+            const isFavorite = user?.favorites?.includes(deal.id);
+            const displayRating = getDisplayRating(deal);
+            return (
+              <div
+                key={deal.id}
+                className={styles.card}
+                style={{ animationDelay: `${index * 0.05}s` }}
+                onClick={() => router.push(user ? `/company/${deal.id}` : '/login')}
+              >
+                <div className={styles.cardImage}>
+                  {deal.image ? (
+                    <img src={deal.image} alt={deal.title} className={styles.mainImg} />
+                  ) : (
+                    <div className={styles.placeholderImg} style={{ backgroundColor: deal.color + '10' }}>
+                      <Tag size={32} style={{ color: deal.color }} />
                     </div>
-                    <div className={styles.discountBadge}>-{deal.discount}</div>
-                    {deal.studentCardRequired && <div className={styles.cardCardBadge} title="Tələbə Kartı Tələb Olunur">🪪</div>}
-                    <button
-                      className={`${styles.favoriteBtn} ${isFavorite ? styles.isFavorite : ''}`}
-                      onClick={(e) => handleFavorite(e, deal.id, deal.title)}
-                    >
-                      <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
-                    </button>
+                  )}
+                  <div className={styles.overlay}></div>
+                  <div className={styles.ratingBubble}>
+                    <Star size={12} fill="#ffae00" color="#ffae00" />
+                    <span>{displayRating}</span>
                   </div>
-                  <div className={styles.cardContent}>
-                    <div className={styles.cardTop}>
-                      <span className={styles.typeBadge}>{deal.type}</span>
-                      <div className={styles.ratingBox}>
-                        <Star size={13} color="#ffae00" fill="#ffae00" />
-                        <span className={styles.ratingValue}>
-                          {getDisplayRating(deal)}
-                        </span>
-                        <span className={styles.ratingsCount}>
-                          ({getDisplayCount(deal)})
-                        </span>
+                  <div className={styles.discountBadge}>-{deal.discount}</div>
+                  {deal.studentCardRequired && <div className={styles.cardCardBadge} title="Tələbə Kartı Tələb Olunur">🪪</div>}
+                  <button
+                    className={`${styles.favoriteBtn} ${isFavorite ? styles.isFavorite : ''}`}
+                    onClick={(e) => handleFavorite(e, deal.id, deal.title)}
+                  >
+                    <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+                  </button>
+                </div>
+                <div className={styles.cardContent}>
+                  <div className={styles.cardTop}>
+                    <span className={styles.typeBadge}>{deal.type}</span>
+                    <div className={styles.ratingBox}>
+                      <Star size={13} color="#ffae00" fill="#ffae00" />
+                      <span className={styles.ratingValue}>{displayRating}</span>
+                      <span className={styles.ratingsCount}>({getDisplayCount(deal)})</span>
+                    </div>
+                  </div>
+                  <h3>{deal.title}</h3>
+                  <p className={styles.company}>{deal.company}</p>
+
+                  <div className={styles.starRatingRow}>
+                    <div className={styles.ratePrompt}>
+                      <span className={styles.starRatingLabel}>
+                        {userRatings[deal.id] ? t.rating.updatePrompt : t.rating.ratePrompt}
+                      </span>
+                      <div className={styles.stars}>
+                        {[1, 2, 3, 4, 5].map(star => {
+                          const isUserRating = star <= (userRatings[deal.id] ?? 0);
+                          const isHovering = star <= (hoverRating[deal.id] ?? 0);
+                          const active = isHovering || (isUserRating && !hoverRating[deal.id]);
+
+                          return (
+                            <button
+                              key={star}
+                              className={styles.starBtn}
+                              onMouseEnter={() => setHoverRating(prev => ({ ...prev, [deal.id]: star }))}
+                              onMouseLeave={() => setHoverRating(prev => ({ ...prev, [deal.id]: 0 }))}
+                              onClick={(e) => handleRate(e, deal.id, star)}
+                            >
+                              <Star
+                                size={20}
+                                color={active ? "#ffae00" : "#cbd5e1"}
+                                fill={active ? "#ffae00" : "none"}
+                              />
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
-                    <h3>{deal.title}</h3>
-                    <div className={styles.cardInfo}>
-                      <span className={styles.company}>{deal.company}</span>
-                    </div>
+                  </div>
 
-                    <div className={styles.starRatingRow}>
-                      {userRatings[deal.id] ? (
-                        <div className={styles.ratedState}>
-                          <div className={styles.ratedStars}>
-                            {[1, 2, 3, 4, 5].map(s => (
-                              <Star
-                                key={s}
-                                size={15}
-                                color={s <= userRatings[deal.id] ? "#ffae00" : "#e2e8f0"}
-                                fill={s <= userRatings[deal.id] ? "#ffae00" : "none"}
-                              />
-                            ))}
-                          </div>
-                          <span className={styles.ratedBadge}>Puanlandı <Check size={12} style={{ display: 'inline' }} /></span>
-                        </div>
-                      ) : (
-                        <div className={styles.ratePrompt}>
-                          <span className={styles.starRatingLabel}>Puan ver</span>
-                          <div className={styles.stars}>
-                            {[1, 2, 3, 4, 5].map(star => {
-                              const active = star <= (hoverRating[deal.id] ?? 0);
-                              return (
-                                <button
-                                  key={star}
-                                  className={styles.starBtn}
-                                  onMouseEnter={() => setHoverRating(prev => ({ ...prev, [deal.id]: star }))}
-                                  onMouseLeave={() => setHoverRating(prev => ({ ...prev, [deal.id]: 0 }))}
-                                  onClick={(e) => handleRate(e, deal.id, star)}
-                                  aria-label={`${star} ulduz`}
-                                >
-                                  <Star
-                                    size={20}
-                                    color={active ? "#ffae00" : "#cbd5e1"}
-                                    fill={active ? "#ffae00" : "none"}
-                                    style={{ transition: 'all 0.12s ease', display: 'block' }}
-                                  />
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                    </div>
 
-                    <div className={styles.cardFooter}>
-                      <Link href={`/company/${deal.id}`} className={styles.btnView}>
-                        {t.deals.view}
-                        <ArrowUpRight size={18} className={styles.arrow} />
-                      </Link>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.studentNotice}>
+                      <GraduationCap size={14} /> {t.dealList.studentCard}
                     </div>
+                    <Link href={user ? `/company/${deal.id}` : '/login'} className={styles.btnView}>
+                      {t.common.showMore}
+                    </Link>
                   </div>
                 </div>
-              );
-            })
-          ) : (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '100px 0' }}>
-              <p style={{ color: 'var(--text-light)', fontSize: '18px' }}>{t.fav.noResults}</p>
+              </div>
+            );
+          })}
+
+          {showComingSoonCard && (
+            <div className={`${styles.card} ${styles.comingSoonCard}`}>
+              <div className={styles.comingSoonContent}>
+                <div className={styles.comingSoonIcon}>✨</div>
+                <h3>{t.dealList.comingSoon}</h3>
+                <p>{t.dealList.comingSoonDesc}</p>
+                <Link href="/partners/ad-request" className={styles.adLink}>{t.footerSection.partnerWithUs}</Link>
+              </div>
             </div>
           )}
         </div>
+
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              className={styles.navPageBtn}
+              onClick={() => {
+                if (currentPage > 1) {
+                  setCurrentPage(prev => prev - 1);
+                }
+              }}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                className={`${styles.pageBtn} ${currentPage === i + 1 ? styles.activePage : ''}`}
+                onClick={() => {
+                  setCurrentPage(i + 1);
+                  document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              className={styles.navPageBtn}
+              onClick={() => {
+                if (currentPage < totalPages) {
+                  setCurrentPage(prev => prev + 1);
+                }
+              }}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -320,8 +320,182 @@
     opacity: 0.7;
 }
 
+.studentNotice {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 10px;
+    letter-spacing: -0.2px;
+    transition: all 0.3s ease;
+}
+
+.card:hover .studentNotice {
+    background: #eef2ff;
+    color: var(--primary);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 60px;
+}
+
+.pageBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: white;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pageBtn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f0f7ff;
+}
+
+.activePage {
+    background: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+}
+
+.navPageBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.navPageBtn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: #f0f7ff;
+    transform: scale(1.05);
+}
+
+.navPageBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: #f8fafc;
+}
+
+.comingSoonCard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    border: 1px solid #e2e8f0 !important;
+    min-height: 420px;
+}
+
+.comingSoonContent {
+    text-align: center;
+    padding: 32px;
+}
+
+.comingSoonIcon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.comingSoonContent h3 {
+    margin-bottom: 12px !important;
+    font-size: 22px !important;
+}
+
+.comingSoonContent p {
+    color: #64748b;
+    margin-bottom: 28px;
+    font-weight: 600;
+}
+
+.adLink {
+    display: inline-block;
+    padding: 12px 28px;
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 14px;
+    font-weight: 800;
+    transition: all 0.2s ease;
+}
+
+.adLink:hover {
+    background: var(--primary);
+    color: white;
+}
+
 @media (max-width: 600px) {
+    .dealList {
+        padding: 20px 0 60px;
+    }
+
     .grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .card {
+        border-radius: 24px;
+    }
+
+    .cardImage {
+        height: 200px;
+    }
+
+    .cardContent {
+        padding: 16px;
+    }
+
+    .cardContent h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .typeBadge {
+        font-size: 10px;
+    }
+
+    .ratingBox {
+        padding: 2px 6px;
+    }
+
+    .studentNotice {
+        padding: 4px 10px;
+    }
+
+    .btnView {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .pagination {
+        margin-top: 40px;
+        gap: 8px;
+    }
+
+    .pageBtn, .navPageBtn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        font-size: 14px;
     }
 }

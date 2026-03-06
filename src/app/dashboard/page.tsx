@@ -5,14 +5,17 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
-import { Trash2, Edit, Plus, Image as ImageIcon } from 'lucide-react';
+import { Trash2, Edit, Plus, Image as ImageIcon, Upload, LogOut, BarChart3, Tag as TagIcon, Settings, Eye, Users, CheckCircle2, Heart, MessageSquare, Menu, X } from 'lucide-react';
 
 export default function CompanyDashboard() {
     const { t } = useLanguage();
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, logout, isLoading } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState('deals');
+    const [activeTab, setActiveTab] = useState('overview');
     const [showAddDeal, setShowAddDeal] = useState(false);
+    const [complaints, setComplaints] = useState<any[]>([]);
+    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Form State
     const [newDeal, setNewDeal] = useState({
@@ -24,12 +27,53 @@ export default function CompanyDashboard() {
         image: '',
         studentCardRequired: false
     });
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
+        if (isLoading) return;
         if (!user || user.isAdmin) {
             router.push('/login');
+            return;
         }
-    }, [user]);
+
+        // Fetch complaints related to this company
+        const allFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
+        const companyComplaints = allFeedback.filter((f: any) => 
+            f.message.toLowerCase().includes(user.name.toLowerCase()) ||
+            f.type === 'complaint' && f.message.toLowerCase().includes(user.name.toLowerCase())
+        );
+        setComplaints(companyComplaints);
+
+        // Fetch all users to calculate favorites
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        setAllUsers(users);
+    }, [user, isLoading]);
+
+    const getFavoriteCount = (dealId: number) => {
+        return allUsers.reduce((count, u) => {
+            if (u.favorites?.includes(dealId)) {
+                return count + 1;
+            }
+            return count;
+        }, 0);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+        let file: File | null = null;
+        if ('files' in e.target && e.target.files) {
+            file = e.target.files[0];
+        } else if ('dataTransfer' in e && (e as React.DragEvent).dataTransfer.files) {
+            file = (e as React.DragEvent).dataTransfer.files[0];
+        }
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setNewDeal(prev => ({ ...prev, image: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleAddDeal = (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,106 +114,219 @@ export default function CompanyDashboard() {
     const userDeals = (user as any)?.deals || [];
 
     return (
-        <div className={`container ${styles.dashboardLayout}`}>
-            {/* Sidebar */}
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarHeader}>
-                    <h3>{t.dashboard.overview}</h3>
-                </div>
-                <nav className={styles.navMenu}>
-                    <button
-                        className={`${styles.navItem} ${activeTab === 'overview' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('overview')}
-                    >
-                        <span className={styles.navIcon}>📊</span>
-                        {t.dashboard.overview}
-                    </button>
-                    <button
-                        className={`${styles.navItem} ${activeTab === 'deals' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('deals')}
-                    >
-                        <span className={styles.navIcon}>🏷️</span>
-                        {t.dashboard.myDeals}
-                    </button>
-                    <button
-                        className={`${styles.navItem} ${activeTab === 'analytics' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('analytics')}
-                    >
-                        <span className={styles.navIcon}>📈</span>
-                        {t.dashboard.analytics}
-                    </button>
-                    <button
-                        className={`${styles.navItem} ${activeTab === 'settings' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('settings')}
-                    >
-                        <span className={styles.navIcon}>⚙️</span>
-                        {t.dashboard.settings}
-                    </button>
-                </nav>
-            </aside>
+        <div className={styles.adminDashboard}>
+            {/* Mobile Actions */}
+            <button className={styles.mobileMenuBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
+                {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+
+            {sidebarOpen && <div className={styles.overlay} onClick={() => setSidebarOpen(false)} />}
+
+            <div className={styles.dashboardLayout}>
+                {/* Sidebar */}
+                <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
+                    <div className={styles.logo}>
+                        <img src="/logo.png" alt="Studeal" className={styles.logoImg} />
+                        <span>Partner</span>
+                    </div>
+
+                    <nav className={styles.nav}>
+                        <button
+                            className={`${styles.navItem} ${activeTab === 'overview' ? styles.activeNavItem : ''}`}
+                            onClick={() => { setActiveTab('overview'); setSidebarOpen(false); }}
+                        >
+                            <BarChart3 size={20} /> <span>{t.dashboard.overview}</span>
+                        </button>
+                        <button
+                            className={`${styles.navItem} ${activeTab === 'deals' ? styles.activeNavItem : ''}`}
+                            onClick={() => { setActiveTab('deals'); setSidebarOpen(false); }}
+                        >
+                            <TagIcon size={20} /> <span>{t.dashboard.myDeals}</span>
+                        </button>
+                        <button
+                            className={`${styles.navItem} ${activeTab === 'complaints' ? styles.activeNavItem : ''}`}
+                            onClick={() => { setActiveTab('complaints'); setSidebarOpen(false); }}
+                        >
+                            <MessageSquare size={20} /> <span>Rəylər & Şikayətlər</span>
+                        </button>
+                        <button
+                            className={`${styles.navItem} ${activeTab === 'settings' ? styles.activeNavItem : ''}`}
+                            onClick={() => { setActiveTab('settings'); setSidebarOpen(false); }}
+                        >
+                            <Settings size={20} /> <span>{t.dashboard.settings}</span>
+                        </button>
+                    </nav>
+
+                    <div className={styles.sidebarFooter}>
+                        <button className={styles.logoutBtn} onClick={logout}>
+                            <LogOut size={20} /> <span>{t.dashboard.logout}</span>
+                        </button>
+                    </div>
+                </aside>
 
             {/* Main Content */}
             <main className={styles.mainContent}>
                 <header className={styles.dashboardHeader}>
-                    <div>
-                        <h1>{t.dashboard.welcomeMsg}, {user?.name}</h1>
+                    <div className={styles.headerInfo}>
+                        <div className={styles.welcomeBadge}>Hoş gəldiniz 👋</div>
+                        <h1>{user?.name}</h1>
                         <p>{t.dashboard.statsSub}</p>
                     </div>
-                    <button className="btn-primary" onClick={() => setShowAddDeal(true)}>
-                        <Plus size={18} style={{ marginRight: '8px' }} />
-                        Yeni Endirim Menyu
-                    </button>
+                    <div className={styles.headerActions}>
+                        <button className={styles.addBtn} onClick={() => setShowAddDeal(true)}>
+                            <Plus size={20} />
+                            <span>Yeni Menyu</span>
+                        </button>
+                    </div>
                 </header>
 
                 {activeTab === 'overview' && (
-                    <section className={styles.statsGrid}>
-                        <div className={styles.statCard}>
-                            <div className={styles.statIconBox}>🏷️</div>
-                            <div className={styles.statInfo}>
-                                <span className={styles.statLabel}>Aktiv Endirimlər</span>
-                                <span className={styles.statValue}>{userDeals.length}</span>
+                    <div className={styles.overviewSection}>
+                        <section className={styles.statsGrid}>
+                            <div className={`${styles.statCard} ${styles.statPurple}`}>
+                                <div className={styles.statIconBox}>
+                                    <TagIcon size={24} />
+                                </div>
+                                <div className={styles.statInfo}>
+                                    <span className={styles.statLabel}>Aktiv Endirimlər</span>
+                                    <span className={styles.statValue}>{userDeals.length}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className={styles.statCard}>
-                            <div className={styles.statIconBox}>👁️</div>
-                            <div className={styles.statInfo}>
-                                <span className={styles.statLabel}>Baxış Sayı</span>
-                                <span className={styles.statValue}>0</span>
+                            <div className={`${styles.statCard} ${styles.statBlue}`}>
+                                <div className={styles.statIconBox}>
+                                    <Users size={24} />
+                                </div>
+                                <div className={styles.statInfo}>
+                                    <span className={styles.statLabel}>İzləyici Sayı</span>
+                                    <span className={styles.statValue}>
+                                        {allUsers.filter((u: any) => 
+                                            u.favorites?.some((fid: number) => 
+                                                userDeals.some((d: any) => d.id === fid)
+                                            )
+                                        ).length}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    </section>
+                            <div className={`${styles.statCard} ${styles.statGreen}`}>
+                                <div className={styles.statIconBox}>
+                                    <CheckCircle2 size={24} />
+                                </div>
+                                <div className={styles.statInfo}>
+                                    <span className={styles.statLabel}>İstifadə Sayı</span>
+                                    <span className={styles.statValue}>{(user as any)?.usageCount || 0}</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className={styles.quickDeals}>
+                            <div className={styles.sectionHeader}>
+                                <h2>Son Əlavə Olunanlar</h2>
+                                <button onClick={() => setActiveTab('deals')}>Hamısına bax</button>
+                            </div>
+                            <div className={styles.miniDealGrid}>
+                                {userDeals.slice(0, 3).map((deal: any) => (
+                                    <div key={deal.id} className={styles.miniDealCard}>
+                                        <img src={deal.image} alt={deal.title} />
+                                        <div className={styles.miniDealInfo}>
+                                            <h4>{deal.title}</h4>
+                                            <span>{deal.price} AZN</span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {userDeals.length === 0 && <p className={styles.emptyText}>Hələ heç bir menyu əlavə olunmayıb.</p>}
+                            </div>
+                        </section>
+                    </div>
                 )}
 
                 {activeTab === 'deals' && (
                     <section className={styles.dealsList}>
-                        <h2>Mənim Endirimlərim</h2>
+                        <div className={styles.sectionHeader}>
+                            <h2>Mənim Endirimlərim</h2>
+                            <button className={styles.addBtnSmall} onClick={() => setShowAddDeal(true)}>
+                                <Plus size={16} />
+                                <span>Əlavə et</span>
+                            </button>
+                        </div>
                         <div className={styles.dealGrid}>
-                            {userDeals.map((deal: any) => (
-                                <div key={deal.id} className={styles.dealItemCard}>
-                                    <div className={styles.dealItemImg}>
-                                        {deal.image ? <img src={deal.image} alt={deal.title} /> : <div className={styles.placeholderImg}><ImageIcon /></div>}
-                                        <div className={styles.dealItemDiscount}>-{deal.discount}%</div>
-                                    </div>
-                                    <div className={styles.dealItemContent}>
-                                        <h3>{deal.title}</h3>
-                                        <p className={styles.dealPrice}>{deal.price} AZN</p>
-                                        <p className={styles.dealDesc}>{deal.description}</p>
-                                        <div className={styles.dealMeta}>
-                                            <span>{deal.studentCardRequired ? "🪪 Tələbə kartı lazımdır" : "✅ Sərbəst giriş"}</span>
+                            {userDeals.map((deal: any) => {
+                                const favCount = getFavoriteCount(deal.id);
+                                return (
+                                    <div key={deal.id} className={styles.dealItemCard}>
+                                        <div className={styles.dealItemImg}>
+                                            {deal.image ? <img src={deal.image} alt={deal.title} /> : <div className={styles.placeholderImg}><ImageIcon /></div>}
+                                            <div className={styles.dealItemDiscount}>-{deal.discount}%</div>
+                                            <div className={styles.dealItemFavCount}>
+                                                <Heart size={14} fill="currentColor" />
+                                                <span>{favCount}</span>
+                                            </div>
                                         </div>
-                                        <div className={styles.dealActions}>
-                                            <button className={styles.deleteBtn} onClick={() => handleDeleteDeal(deal.id)}><Trash2 size={16} /></button>
+                                        <div className={styles.dealItemContent}>
+                                            <h3>{deal.title}</h3>
+                                            <p className={styles.dealPrice}>{deal.price} AZN</p>
+                                            <p className={styles.dealDesc}>{deal.description}</p>
+                                            <div className={styles.dealMeta}>
+                                                <span>{deal.studentCardRequired ? "🪪 Tələbə kartı lazımdır" : "✅ Sərbəst giriş"}</span>
+                                            </div>
+                                            <div className={styles.dealActions}>
+                                                <button className={styles.deleteBtn} onClick={() => handleDeleteDeal(deal.id)} title="Sil"><Trash2 size={18} /></button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             {userDeals.length === 0 && (
                                 <div className={styles.noDeals}>Hələ heç bir endirim əlavə edilməyib.</div>
                             )}
                         </div>
                     </section>
                 )}
+
+                {activeTab === 'complaints' && (
+                    <section className={styles.complaintsContainer}>
+                        <div className={styles.sectionHeader}>
+                            <h2>Müştəri Rəyləri və Şikayətlər</h2>
+                            <span className={styles.feedbackCount}>{complaints.length} Mesaj</span>
+                        </div>
+                        <div className={styles.complaintsList}>
+                            {complaints.map((item: any) => (
+                                <div key={item.id} className={styles.complaintCard}>
+                                    <div className={styles.complaintHeader}>
+                                        <div className={styles.complaintUser}>
+                                            <div className={styles.userAvatar}>{item.name[0]}</div>
+                                            <div>
+                                                <h4>{item.name}</h4>
+                                                <span>{item.date}</span>
+                                            </div>
+                                        </div>
+                                        <div className={`${styles.complaintBadge} ${item.type === 'complaint' ? styles.badgeRed : styles.badgeBlue}`}>
+                                            {item.type === 'complaint' ? '⚠️ Şikayət' : '💡 Təklif'}
+                                        </div>
+                                    </div>
+                                    <p className={styles.complaintMsg}>"{item.message}"</p>
+                                </div>
+                            ))}
+                            {complaints.length === 0 && (
+                                <div className={styles.emptyComplaints}>
+                                    <MessageSquare size={48} />
+                                    <p>Sizin haqqınızda hələ heç bir rəy və ya şikayət yoxdur.</p>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                )}
+
+                {activeTab === 'settings' && (
+                    <section className={styles.settingsSection}>
+                        <div className={styles.comingSoonBox}>
+                            <Settings size={48} className={styles.spinningIcon} />
+                            <h2>Tənzimləmələr</h2>
+                            <p>Tezliklə aktiv olacaq! Burada profil və şirkət məlumatlarınızı yeniləyə biləcəksiniz.</p>
+                        </div>
+                    </section>
+                )}
             </main>
+            </div>
 
             {/* Modal */}
             {showAddDeal && (
@@ -212,14 +369,39 @@ export default function CompanyDashboard() {
                                         required
                                     />
                                 </div>
-                                <div className={styles.formGroup}>
-                                    <label>Şəkil URL</label>
-                                    <input
-                                        type="text"
-                                        placeholder="https://..."
-                                        value={newDeal.image}
-                                        onChange={(e) => setNewDeal({ ...newDeal, image: e.target.value })}
-                                    />
+                                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                                    <label>Menyu Şəkli</label>
+                                    <div 
+                                        className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
+                                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                        onDragLeave={() => setIsDragging(false)}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            setIsDragging(false);
+                                            handleFileSelect(e);
+                                        }}
+                                        onClick={() => document.getElementById('dealFile')?.click()}
+                                    >
+                                        <input 
+                                            type="file" 
+                                            id="dealFile" 
+                                            hidden 
+                                            accept="image/*"
+                                            onChange={handleFileSelect}
+                                        />
+                                        {newDeal.image ? (
+                                            <div className={styles.dropzonePreviewWrapper}>
+                                                <img src={newDeal.image} alt="Preview" className={styles.dropzonePreview} />
+                                                <div className={styles.dropzoneOverlay}>Şəkli dəyişmək üçün klikləyin</div>
+                                            </div>
+                                        ) : (
+                                            <div className={styles.dropzoneText}>
+                                                <Upload size={32} />
+                                                <span>Şəkli seçin və ya bura sürüşdürün</span>
+                                                <p>JPG, PNG, WEBP formatları (Max. 5MB)</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

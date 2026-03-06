@@ -16,6 +16,8 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
+
 export const metadata: Metadata = {
   title: "StuDeal - Tələbə Endirimləri Platforması",
   description: "Tələbələr üçün ən eksklüziv endirimlər və imkanlar platforması.",
@@ -34,13 +36,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <LanguageProvider>
           <AuthProvider>
-            <ScrollToTop />
-            <ContactFloat />
-            <Header />
-            <main style={{ minHeight: '60vh' }}>
+            <ClientLayoutWrapper>
               {children}
-            </main>
-            <Footer />
+            </ClientLayoutWrapper>
           </AuthProvider>
         </LanguageProvider>
       </body>

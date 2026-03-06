@@ -279,6 +279,43 @@ export const translations = {
             deal2Desc: "2 ədəd klassik sandviç və böyük fri ilə dostlarınızla dadın.",
             deal3Title: "Gecə Endirimi",
             deal3Desc: "Saat 22:00-dan sonra bütün menyuya endirim."
+        },
+        favPage: {
+            title: "Həyatını",
+            titleSpan: "Endirimlə",
+            titleEnd: "Yaşa ❤️",
+            subTitle: "Bütün sevimli restoran və menyularınız bir yerdə.",
+            restaurants: "Sevimli Restoranlar",
+            menus: "Sevimli Menyular",
+            noFavs: "Hələ heç bir restoranı favorilərinizə əlavə etməmisiniz.",
+            noMenuFavs: "Hələ heç bir menyunu favorilərinizə əlavə etməmisiniz.",
+            loginReq: "Favorilərinizi görmək üçün identifikasiyadan keçməlisiniz.",
+            loginBtn: "Daxil Ol",
+            loginHeader: "Xahiş edirik daxil olun"
+        },
+        featured: {
+            title: "Seçilmiş Endirimlər",
+            getNow: "İndi yararlan",
+            limited: "Məhdud zaman",
+            deal1Title: "KFC Zinger Menyu",
+            deal1Desc: "Tələbələr üçün özəl 20% endirim kampaniyası davam edir!",
+            deal2Title: "Nike Air Max",
+            deal2Desc: "Yeni sezon kolleksiyasında tələbə kartı ilə 15% endirim.",
+            deal3Title: "CinemaPlus",
+            deal3Desc: "Həftə içi hər seansa tələbələrə 50% endirim!"
+        },
+        rating: {
+            updated: "Rəy yeniləndi",
+            received: "Təşəkkür edirik!",
+            updatePrompt: "Rəyinizi yeniləyin",
+            ratePrompt: "Qiymətləndir"
+        },
+        dealList: {
+            studentCard: "Tələbə kartı",
+            comingSoon: "Tezliklə daha çoxu!",
+            comingSoonDesc: "Yeni endirimlər əlavə olunur.",
+            orderNow: "Sifariş et",
+            contactUs: "Əlaqə saxla"
         }
     },
     en: {
@@ -561,6 +598,43 @@ export const translations = {
             deal2Desc: "2 classic sandwiches and large fries. Perfect for sharing with friends.",
             deal3Title: "Late Night Deal",
             deal3Desc: "Discount on the entire menu after 10:00 PM."
+        },
+        favPage: {
+            title: "Live your life with",
+            titleSpan: "Discounts",
+            titleEnd: "❤️",
+            subTitle: "All your favorite restaurants and menus in one place.",
+            restaurants: "Favorite Restaurants",
+            menus: "Favorite Menus",
+            noFavs: "You haven't added any restaurants to your favorites yet.",
+            noMenuFavs: "You haven't added any menus to your favorites yet.",
+            loginReq: "You must be identified to see your favorites.",
+            loginBtn: "Login",
+            loginHeader: "Please login"
+        },
+        featured: {
+            title: "Featured Deals",
+            getNow: "Get it now",
+            limited: "Limited time",
+            deal1Title: "KFC Zinger Menu",
+            deal1Desc: "The special 20% discount campaign for students continues!",
+            deal2Title: "Nike Air Max",
+            deal2Desc: "15% discount with student card in the new season collection.",
+            deal3Title: "CinemaPlus",
+            deal3Desc: "50% discount for students on every session during the week!"
+        },
+        rating: {
+            updated: "Rating updated",
+            received: "Thank you!",
+            updatePrompt: "Update your rating",
+            ratePrompt: "Rate it"
+        },
+        dealList: {
+            studentCard: "Student card",
+            comingSoon: "More coming soon!",
+            comingSoonDesc: "New deals are being added.",
+            orderNow: "Order now",
+            contactUs: "Contact us"
         }
     }
 };

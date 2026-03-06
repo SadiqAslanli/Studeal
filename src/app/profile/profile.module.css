@@ -1,7 +1,7 @@
 .profileLayout {
     display: flex;
     gap: 30px;
-    padding: 50px 0;
+    padding: 140px 0 50px;
 }
 
 .sidebar {
@@ -12,7 +12,7 @@
     box-shadow: 0 10px 40px rgba(112, 144, 176, 0.08);
     height: fit-content;
     position: sticky;
-    top: 100px;
+    top: 130px;
 }
 
 .sidebarHeader h3 {

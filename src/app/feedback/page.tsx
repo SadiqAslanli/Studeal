@@ -7,13 +7,13 @@ import Link from 'next/link';
 import {
     ArrowLeft,
     Sparkles,
-    ShieldCheck,
-    Zap,
-    Gift,
+    Shield,
+    History,
+    Award,
     User,
     Mail,
-    Folder,
-    MessageSquare,
+    ClipboardList,
+    MessageSquareText,
     Send
 } from 'lucide-react';
 import styles from './feedback.module.css';
@@ -33,8 +33,16 @@ export default function FeedbackPage() {
         e.preventDefault();
         if (!formData.message.trim()) return;
 
-        // Simulate API call
-        console.log('Feedback submitted:', formData);
+        // Save to localStorage for admin
+        const savedFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
+        const newFeedback = {
+            ...formData,
+            id: Date.now().toString(),
+            date: new Date().toLocaleDateString('az-AZ'),
+            status: 'unread'
+        };
+        savedFeedback.unshift(newFeedback);
+        localStorage.setItem('userFeedback', JSON.stringify(savedFeedback));
 
         addNotification({
             title: t.feedback.successTitle,
@@ -72,18 +80,9 @@ export default function FeedbackPage() {
 
     return (
         <div className={styles.feedbackPage}>
-            {/* Mesh Background */}
-            <div className={styles.meshBg}>
-                <div className={styles.meshOrb1}></div>
-                <div className={styles.meshOrb2}></div>
-                <div className={styles.meshOrb3}></div>
-            </div>
 
             <header className={styles.header}>
                 <div className="container">
-                    <Link href="/" className={styles.backLink}>
-                        <ArrowLeft size={18} /> {t.common.backHome}
-                    </Link>
                     <div className={styles.headerContent}>
                         <div className={styles.badge}>{t.nav.feedback}</div>
                         <h1>{t.feedback.title}</h1>
@@ -98,7 +97,7 @@ export default function FeedbackPage() {
                     <div className={styles.infoCol}>
                         <div className={styles.infoCard}>
                             <div className={styles.infoIcon}>
-                                <ShieldCheck size={28} color="#4318ff" />
+                                <Shield size={26} color="#4318ff" />
                             </div>
                             <div className={styles.infoText}>
                                 <h4>Məxfilik</h4>
@@ -107,7 +106,7 @@ export default function FeedbackPage() {
                         </div>
                         <div className={styles.infoCard} style={{ animationDelay: '0.1s' }}>
                             <div className={styles.infoIcon}>
-                                <Zap size={28} color="#ffb547" fill="#ffb547" />
+                                <History size={26} color="#ffb547" />
                             </div>
                             <div className={styles.infoText}>
                                 <h4>Sürətli Cavab</h4>
@@ -116,7 +115,7 @@ export default function FeedbackPage() {
                         </div>
                         <div className={styles.infoCard} style={{ animationDelay: '0.2s' }}>
                             <div className={styles.infoIcon}>
-                                <Gift size={28} color="#01b574" />
+                                <Award size={26} color="#01b574" />
                             </div>
                             <div className={styles.infoText}>
                                 <h4>Xal Qazan</h4>
@@ -158,7 +157,7 @@ export default function FeedbackPage() {
 
                             <div className={styles.formGroup}>
                                 <label>
-                                    <Folder size={16} /> {t.feedback.labelType}
+                                    <ClipboardList size={16} /> {t.feedback.labelType}
                                 </label>
                                 <div className={styles.selectWrapper}>
                                     <select
@@ -174,7 +173,7 @@ export default function FeedbackPage() {
 
                             <div className={styles.formGroup}>
                                 <label>
-                                    <MessageSquare size={16} /> {t.feedback.labelMessage}
+                                    <MessageSquareText size={16} /> {t.feedback.labelMessage}
                                 </label>
                                 <textarea
                                     rows={5}

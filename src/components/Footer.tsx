@@ -32,7 +32,7 @@ export default function Footer() {
                     <div className={styles.footerCol}>
                         <h4 className={styles.footerTitle}>{t.footerSection.platform}</h4>
                         <ul className={styles.footerLinks}>
-                            <li><Link href="/deals">{t.footerSection.allDeals}</Link></li>
+                            <li><Link href="/#deals">{t.footerSection.allDeals}</Link></li>
                             <li><Link href="/categories">{t.categories.label}</Link></li>
                             <li><Link href="/brands">{t.footerSection.brands}</Link></li>
                             <li><Link href="/partners">{t.footerSection.partnerWithUs}</Link></li>
@@ -42,8 +42,6 @@ export default function Footer() {
                     <div className={styles.footerCol}>
                         <h4 className={styles.footerTitle}>{t.footerSection.support}</h4>
                         <ul className={styles.footerLinks}>
-                            <li><Link href="/faq">{t.footerSection.helpCenter}</Link></li>
-                            <li><Link href="/verify">{t.footerSection.studentVerification}</Link></li>
                             <li><Link href="/terms">{t.footerSection.terms}</Link></li>
                             <li><Link href="/privacy">{t.footerSection.privacy}</Link></li>
                         </ul>

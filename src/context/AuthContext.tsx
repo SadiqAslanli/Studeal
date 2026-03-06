@@ -31,64 +31,137 @@ export type User = {
     favorites?: number[]; // Array of deal IDs
     notifications?: Notification[];
     transactions?: Transaction[];
+    usedDealsCount?: number;
+    viewCount?: number;
+    usageCount?: number;
     plan?: string;
+    isActive?: boolean;
+    password?: string;
+    deals?: any[];
 };
 
 type AuthContextType = {
     user: User | null;
+    isLoading: boolean;
     login: (email: string, password: string) => boolean;
+    loginWithUser: (user: User) => void;
     register: (user: User) => void;
     updateUser: (updatedUser: Partial<User>) => void;
     logout: () => void;
     toggleFavorite: (dealId: number) => void;
     addNotification: (notification: Omit<Notification, 'id' | 'date' | 'isRead'>) => void;
     addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
+    loginWithGoogle: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true); // <-- NEW: starts as loading
     const router = useRouter();
 
     // Load user from localStorage on mount
     useEffect(() => {
-        const savedUser = localStorage.getItem('loggedUser');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
+        try {
+            const savedUser = localStorage.getItem('loggedUser');
+            if (savedUser) {
+                setUser(JSON.parse(savedUser));
+            }
+        } catch (e) {
+            console.error('Failed to restore session', e);
+        } finally {
+            setIsLoading(false); // <-- session restore is done
         }
     }, []);
 
+    const loginWithUser = (userToLogin: User) => {
+        const sessionUser = { ...userToLogin };
+        delete sessionUser.password;
+        setUser(sessionUser);
+        localStorage.setItem('loggedUser', JSON.stringify(sessionUser));
+    };
+
     const login = (email: string, password: string) => {
+        const inputEmail = String(email || "").trim().toLowerCase();
+        const inputPass = String(password || "").trim();
+
+        if (!inputEmail) return false;
+
         // Hardcoded System Admin
-        if (email === 'admin@gmail.com' && password === 'admin123') {
+        if (inputEmail === 'admin@gmail.com' && inputPass === 'admin123') {
             const adminUser: User = {
                 name: 'System Admin',
                 email: 'admin@gmail.com',
                 isCompany: false,
                 isAdmin: true
             };
-            setUser(adminUser);
-            localStorage.setItem('loggedUser', JSON.stringify(adminUser));
+            loginWithUser(adminUser);
             return true;
         }
 
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const foundUser = users.find((u: any) => u.email === email && (!u.password || u.password === password));
+        try {
+            const usersData = localStorage.getItem('users');
+            let usersArr = JSON.parse(usersData || '[]');
+            if (!Array.isArray(usersArr)) usersArr = [];
 
-        if (foundUser) {
-            setUser(foundUser);
-            localStorage.setItem('loggedUser', JSON.stringify(foundUser));
-            return true;
+            const uniqueUsers = new Map();
+            usersArr.forEach((u: any) => {
+                if (u && u.email) uniqueUsers.set(String(u.email).trim().toLowerCase(), u);
+            });
+            const validUsers = Array.from(uniqueUsers.values());
+
+            const foundUser = validUsers.find((u: any) => {
+                const uEmail = String(u.email).trim().toLowerCase();
+                const uPass = String(u.password || "").trim();
+                return uEmail === inputEmail && uPass === inputPass;
+            });
+
+            if (foundUser) {
+                if (foundUser.isActive === false) {
+                    alert("Sizin hesabınız admin tərəfindən dondurulub!");
+                    return false;
+                }
+                loginWithUser(foundUser);
+                return true;
+            }
+        } catch (err) {
+            console.error("Login process error:", err);
         }
+        
         return false;
     };
 
     const register = (newUser: User) => {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userToSave = { ...newUser, points: 0 };
-        users.push(userToSave);
-        localStorage.setItem('users', JSON.stringify(users));
+        try {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const normalizedEmail = String(newUser.email || "").trim().toLowerCase();
+            const trimmedPass = String(newUser.password || "").trim();
+            
+            if (users.some((u: any) => u && u.email && String(u.email).trim().toLowerCase() === normalizedEmail)) {
+                return;
+            }
+
+            const userToSave = {
+                ...newUser,
+                email: normalizedEmail,
+                password: trimmedPass,
+                points: newUser.points || 1240,
+                usedDealsCount: newUser.usedDealsCount || 0,
+                viewCount: newUser.viewCount || 0,
+                usageCount: newUser.usageCount || 0,
+                deals: newUser.deals || [],
+                isActive: newUser.isActive !== undefined ? newUser.isActive : true,
+                notifications: newUser.notifications || [],
+                transactions: newUser.transactions || [],
+                favorites: newUser.favorites || []
+            };
+
+            const updatedUsers = [...users, userToSave];
+            localStorage.setItem('users', JSON.stringify(updatedUsers));
+        } catch (err) {
+            console.error("Register error:", err);
+        }
     };
 
     const updateUser = (updatedFields: Partial<User>) => {
@@ -156,6 +229,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    const loginWithGoogle = async () => {
+        // Simulating Google Auth process
+        return new Promise<boolean>((resolve) => {
+            setTimeout(() => {
+                const googleUser: User = {
+                    name: 'Google User',
+                    email: 'user@google.com',
+                    isCompany: false,
+                    isAdmin: false,
+                    points: 1240,
+                    favorites: [],
+                    notifications: [],
+                    transactions: [],
+                    usedDealsCount: 0,
+                    viewCount: 0,
+                    usageCount: 0
+                };
+                
+                // Add to users list if not exists
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                if (!users.some((u: any) => u.email === googleUser.email)) {
+                    users.push({ ...googleUser, password: 'google_oauth_dummy' });
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                loginWithUser(googleUser);
+                resolve(true);
+            }, 1000);
+        });
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('loggedUser');
@@ -163,7 +267,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, updateUser, logout, toggleFavorite, addNotification, addTransaction }}>
+        <AuthContext.Provider value={{
+            user,
+            isLoading,
+            login,
+            loginWithUser,
+            register,
+            updateUser,
+            logout,
+            toggleFavorite,
+            addNotification,
+            addTransaction,
+            loginWithGoogle
+        }}>
             {children}
         </AuthContext.Provider>
     );

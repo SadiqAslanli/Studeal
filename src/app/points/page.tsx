@@ -44,7 +44,10 @@ export default function PointsPage() {
     const handleScan = () => {
         if (!user) return;
         const bonus = 500;
-        updateUser({ points: (user.points || 0) + bonus });
+        updateUser({
+            points: (user.points || 0) + bonus,
+            usedDealsCount: (user.usedDealsCount || 0) + 1
+        });
 
         addTransaction({
             title: 'QR Kod Skanı (Test)',
@@ -73,7 +76,10 @@ export default function PointsPage() {
     const confirmActivation = () => {
         if (!selectedItem || !user) return;
 
-        updateUser({ points: (user.points || 0) - selectedItem.cost });
+        updateUser({
+            points: (user.points || 0) - selectedItem.cost,
+            usedDealsCount: (user.usedDealsCount || 0) + 1
+        });
 
         const expiry = Date.now() + 10 * 60 * 1000;
         setActiveGifts(prev => ({ ...prev, [selectedItem.id]: expiry }));

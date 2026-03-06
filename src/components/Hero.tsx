@@ -14,15 +14,6 @@ interface HeroProps {
 export default function Hero({ onSearch, onCategoryChange, userName }: HeroProps) {
   const { t } = useLanguage();
   const displayUserName = userName || t.user;
-
-  const trendingTags = [
-    { id: 'fast', name: t.tags.fast, catId: 1 },
-    { id: 'cafe', name: t.tags.cafe, catId: 1 },
-    { id: 'cloth', name: t.tags.cloth, catId: 2 },
-    { id: 'book', name: t.tags.book, catId: 3 },
-    { id: 'cinema', name: t.tags.cinema, catId: 4 },
-  ];
-
   return (
     <section className={styles.hero}>
       {/* Background with abstract graphic */}
@@ -58,23 +49,6 @@ export default function Hero({ onSearch, onCategoryChange, userName }: HeroProps
           <button className={styles.searchBtn}>{t.searchBtn}</button>
         </div>
 
-        <div className={styles.trending}>
-          <span className={styles.trendingLabel}>{t.trendingLabel}</span>
-          <div className={styles.tagList}>
-            {trendingTags.map((tag) => (
-              <button
-                key={tag.id}
-                className={styles.trendingTag}
-                onClick={() => {
-                  onSearch(tag.name);
-                  if (onCategoryChange) onCategoryChange(tag.catId);
-                }}
-              >
-                #{tag.name}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );
