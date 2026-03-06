@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,7 @@ import styles from '../auth.module.css';
 
 export default function LoginPage() {
   const { t } = useLanguage();
-  const { login, loginWithGoogle } = useAuth();
+  const { user, login, loginWithGoogle, isLoading } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -18,6 +18,20 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isCapsLock, setIsCapsLock] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Redirection logic when user is authenticated
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (user.isAdmin) {
+        router.push('/admin');
+      } else if (user.isCompany) {
+        router.push('/dashboard');
+      } else {
+        router.push('/');
+      }
+    }
+  }, [user, isLoading, router]);
 
   const checkCapsLock = (e: React.KeyboardEvent) => {
     if (e.getModifierState('CapsLock')) {
@@ -27,36 +41,25 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(email, password);
-
-    if (success) {
-      const loggedUser = JSON.parse(localStorage.getItem('loggedUser') || '{}');
-      if (loggedUser.isAdmin) {
-        router.push('/admin');
-      } else if (loggedUser.isCompany) {
-        router.push('/dashboard');
-      } else {
-        router.push('/');
+    setError('');
+    setSubmitting(true);
+    
+    try {
+      const success = await login(email, password);
+      if (!success) {
+        setError(t.auth.error);
       }
-    } else {
-      setError(t.auth.error);
+    } catch (err: any) {
+      setError(err.message || t.auth.error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const success = await loginWithGoogle();
-    if (success) {
-      const loggedUser = JSON.parse(localStorage.getItem('loggedUser') || '{}');
-      if (loggedUser.isAdmin) {
-        router.push('/admin');
-      } else if (loggedUser.isCompany) {
-        router.push('/dashboard');
-      } else {
-        router.push('/');
-      }
-    }
+  const handleGoogleLogin = () => {
+    loginWithGoogle();
   };
 
   return (
@@ -124,8 +127,8 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-          <button type="submit" className={styles.btnBlock}>
-            {t.login}
+          <button type="submit" className={styles.btnBlock} disabled={submitting}>
+            {submitting ? "..." : t.login}
           </button>
         </form>
 

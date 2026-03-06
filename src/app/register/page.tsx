@@ -1,16 +1,16 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Lock, Building, ArrowLeft, ShoppingBag, Check } from 'lucide-react';
+import { User, Mail, Lock, Building, ArrowLeft, ShoppingBag, Check, AlertCircle } from 'lucide-react';
 import styles from '../auth.module.css';
 
 export default function RegisterPage() {
   const { t } = useLanguage();
-  const { register, login } = useAuth();
+  const { user, register, login, isLoading } = useAuth();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -19,18 +19,40 @@ export default function RegisterPage() {
     password: '',
     isCompany: false
   });
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    register(formData);
-    // Auto login after registration
-    const success = login(formData.email, formData.password);
-    if (success) {
-      if (formData.isCompany) {
+  // Redirection logic when user is authenticated
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (user.isCompany) {
         router.push('/dashboard');
       } else {
         router.push('/');
       }
+    }
+  }, [user, isLoading, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+
+    try {
+      const registerSuccess = await register(formData);
+      if (registerSuccess) {
+        // Auto login after registration
+        const loginSuccess = await login(formData.email, formData.password);
+        if (!loginSuccess) {
+          setError(t.auth.error);
+        }
+      } else {
+        setError("Registration failed. Please check your details.");
+      }
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -48,6 +70,13 @@ export default function RegisterPage() {
         <p>
           {t.auth.haveAccount} <Link href="/login">{t.auth.loginNow}</Link>
         </p>
+
+        {error && (
+          <div className={styles.errorMsg}>
+            <AlertCircle size={18} />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -109,8 +138,8 @@ export default function RegisterPage() {
             <span>{t.auth.companyRegister}</span>
           </div>
 
-          <button type="submit" className={styles.btnBlock}>
-            {t.register}
+          <button type="submit" className={styles.btnBlock} disabled={submitting}>
+            {submitting ? "..." : t.register}
           </button>
         </form>
       </div>

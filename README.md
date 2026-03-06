@@ -34,3 +34,11 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Changes
+### 2026-03-07 - Integrated Auth Package
+- Migrated authentication to `@zhmdff/auth-react` package.
+- Connected frontend to the ASP.NET Core backend auth endpoints.
+- Implemented `AuthContext.tsx` as a compatibility bridge for Studeal-specific features (Points, Favorites, Notifications).
+- Added `.env.local` for backend URL configuration.
+- Updated Login and Register pages to use async backend authentication.

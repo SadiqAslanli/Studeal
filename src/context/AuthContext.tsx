@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth as usePackageAuth, User as PackageUser } from "@zhmdff/auth-react";
 
 export type Notification = {
     id: string;
@@ -19,181 +20,187 @@ export type Transaction = {
     type: 'earn' | 'spend';
 };
 
-export type User = {
-    name: string;
-    email: string;
+// Merged User type
+export type User = PackageUser & {
+    name: string; // Map from fullName or username
     isCompany: boolean;
-    isAdmin?: boolean;
-    points?: number;
+    isAdmin: boolean;
+    points: number;
     university?: string;
     course?: string;
     phone?: string;
-    favorites?: number[]; // Array of deal IDs
-    notifications?: Notification[];
-    transactions?: Transaction[];
-    usedDealsCount?: number;
-    viewCount?: number;
-    usageCount?: number;
-    plan?: string;
-    isActive?: boolean;
-    password?: string;
+    favorites: number[];
+    notifications: Notification[];
+    transactions: Transaction[];
+    usedDealsCount: number;
+    viewCount: number;
+    usageCount: number;
+    plan: string;
     deals?: any[];
 };
 
 type AuthContextType = {
     user: User | null;
     isLoading: boolean;
-    login: (email: string, password: string) => boolean;
-    loginWithUser: (user: User) => void;
-    register: (user: User) => void;
+    login: (email: string, password: string) => Promise<boolean>;
+    loginWithUser: (user: any) => void;
+    register: (userData: any) => Promise<boolean>;
     updateUser: (updatedUser: Partial<User>) => void;
     logout: () => void;
     toggleFavorite: (dealId: number) => void;
     addNotification: (notification: Omit<Notification, 'id' | 'date' | 'isRead'>) => void;
     addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
-    loginWithGoogle: () => Promise<boolean>;
+    loginWithGoogle: () => void;
+    authUrl: string;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true); // <-- NEW: starts as loading
+    const { 
+        user: packageUser, 
+        isLoading: packageLoading, 
+        logout: packageLogout, 
+        loginWithGoogle: packageGoogleLogin,
+        setAccessToken,
+        setUser: setPackageUser
+    } = usePackageAuth();
+    
+    const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://localhost:7187/auth";
+    const [studealData, setStudealData] = useState<Partial<User>>({});
     const router = useRouter();
 
-    // Load user from localStorage on mount
+    // Load extra data from localStorage when package user changes
     useEffect(() => {
-        try {
-            const savedUser = localStorage.getItem('loggedUser');
-            if (savedUser) {
-                setUser(JSON.parse(savedUser));
+        if (packageUser) {
+            const savedData = localStorage.getItem(`studeal_meta_${packageUser.id}`);
+            if (savedData) {
+                setStudealData(JSON.parse(savedData));
+            } else {
+                // Initialize default meta for new backend user
+                const defaultMeta = {
+                    points: 1240,
+                    favorites: [],
+                    notifications: [],
+                    transactions: [],
+                    usedDealsCount: 0,
+                    viewCount: 0,
+                    usageCount: 0,
+                    plan: 'bronze',
+                    deals: []
+                };
+                setStudealData(defaultMeta);
+                localStorage.setItem(`studeal_meta_${packageUser.id}`, JSON.stringify(defaultMeta));
             }
-        } catch (e) {
-            console.error('Failed to restore session', e);
-        } finally {
-            setIsLoading(false); // <-- session restore is done
+        } else {
+            setStudealData({});
         }
-    }, []);
+    }, [packageUser]);
 
-    const loginWithUser = (userToLogin: User) => {
-        const sessionUser = { ...userToLogin };
-        delete sessionUser.password;
-        setUser(sessionUser);
-        localStorage.setItem('loggedUser', JSON.stringify(sessionUser));
+    // Computed user object
+    const mergedUser = useMemo(() => {
+        if (!packageUser) return null;
+
+        return {
+            ...packageUser,
+            ...studealData,
+            name: packageUser.fullName || packageUser.username || packageUser.email || "User",
+            isAdmin: packageUser.roles?.includes('Admin') || packageUser.role === 'Admin',
+            isCompany: packageUser.roles?.includes('Company') || packageUser.role === 'Company' || !!packageUser.username?.includes('rest'),
+            // Ensure defaults
+            points: studealData.points ?? 0,
+            favorites: studealData.favorites ?? [],
+            notifications: studealData.notifications ?? [],
+            transactions: studealData.transactions ?? [],
+            usedDealsCount: studealData.usedDealsCount ?? 0,
+            viewCount: studealData.viewCount ?? 0,
+            usageCount: studealData.usageCount ?? 0,
+            plan: studealData.plan ?? 'bronze',
+        } as User;
+    }, [packageUser, studealData]);
+
+    const saveStudealMeta = (updated: Partial<User>) => {
+        if (!packageUser) return;
+        const newData = { ...studealData, ...updated };
+        setStudealData(newData);
+        localStorage.setItem(`studeal_meta_${packageUser.id}`, JSON.stringify(newData));
     };
 
-    const login = (email: string, password: string) => {
-        const inputEmail = String(email || "").trim().toLowerCase();
-        const inputPass = String(password || "").trim();
-
-        if (!inputEmail) return false;
-
-        // Hardcoded System Admin
-        if (inputEmail === 'admin@gmail.com' && inputPass === 'admin123') {
-            const adminUser: User = {
-                name: 'System Admin',
-                email: 'admin@gmail.com',
-                isCompany: false,
-                isAdmin: true
-            };
-            loginWithUser(adminUser);
-            return true;
-        }
-
+    const login = async (identifier: string, password: string) => {
         try {
-            const usersData = localStorage.getItem('users');
-            let usersArr = JSON.parse(usersData || '[]');
-            if (!Array.isArray(usersArr)) usersArr = [];
-
-            const uniqueUsers = new Map();
-            usersArr.forEach((u: any) => {
-                if (u && u.email) uniqueUsers.set(String(u.email).trim().toLowerCase(), u);
-            });
-            const validUsers = Array.from(uniqueUsers.values());
-
-            const foundUser = validUsers.find((u: any) => {
-                const uEmail = String(u.email).trim().toLowerCase();
-                const uPass = String(u.password || "").trim();
-                return uEmail === inputEmail && uPass === inputPass;
+            const res = await fetch(`${authUrl}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ 
+                    identifier: identifier, 
+                    password: password 
+                }),
             });
 
-            if (foundUser) {
-                if (foundUser.isActive === false) {
-                    alert("Sizin hesabınız admin tərəfindən dondurulub!");
-                    return false;
-                }
-                loginWithUser(foundUser);
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.errorMessage || errorData.message || "Login failed");
+            }
+
+            const json = await res.json();
+            if (json.success && json.accessToken && json.user) {
+                setAccessToken(json.accessToken);
+                setPackageUser(json.user);
                 return true;
             }
-        } catch (err) {
-            console.error("Login process error:", err);
+            throw new Error(json.errorMessage || "Login failed");
+        } catch (err: any) {
+            console.error("Login failed:", err);
+            throw err;
         }
-        
-        return false;
     };
 
-    const register = (newUser: User) => {
+    const register = async (formData: any) => {
         try {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const normalizedEmail = String(newUser.email || "").trim().toLowerCase();
-            const trimmedPass = String(newUser.password || "").trim();
-            
-            if (users.some((u: any) => u && u.email && String(u.email).trim().toLowerCase() === normalizedEmail)) {
-                return;
+            const res = await fetch(`${authUrl}/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    identifier: formData.email,
+                    password: formData.password,
+                    fullName: formData.name,
+                    username: formData.email.split('@')[0], // Simplified
+                    role: formData.isCompany ? "Company" : "Student"
+                }),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                // Check for validation errors array
+                const validationErrors = errorData.errors ? Object.values(errorData.errors).flat().join(", ") : null;
+                throw new Error(validationErrors || errorData.errorMessage || errorData.message || "Registration failed");
             }
 
-            const userToSave = {
-                ...newUser,
-                email: normalizedEmail,
-                password: trimmedPass,
-                points: newUser.points || 1240,
-                usedDealsCount: newUser.usedDealsCount || 0,
-                viewCount: newUser.viewCount || 0,
-                usageCount: newUser.usageCount || 0,
-                deals: newUser.deals || [],
-                isActive: newUser.isActive !== undefined ? newUser.isActive : true,
-                notifications: newUser.notifications || [],
-                transactions: newUser.transactions || [],
-                favorites: newUser.favorites || []
-            };
-
-            const updatedUsers = [...users, userToSave];
-            localStorage.setItem('users', JSON.stringify(updatedUsers));
-        } catch (err) {
-            console.error("Register error:", err);
+            const json = await res.json();
+            if (!json.success) {
+                throw new Error(json.errorMessage || "Registration failed");
+            }
+            return true;
+        } catch (err: any) {
+            console.error("Registration failed:", err);
+            throw err;
         }
     };
 
     const updateUser = (updatedFields: Partial<User>) => {
-        setUser(prev => {
-            if (!prev) return null;
-            const updatedUser = { ...prev, ...updatedFields };
-            localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
-
-            // Also update in the global users list
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const userIndex = users.findIndex((u: any) => u.email === prev.email);
-            if (userIndex !== -1) {
-                users[userIndex] = updatedUser;
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-            return updatedUser;
-        });
+        saveStudealMeta(updatedFields);
     };
 
     const toggleFavorite = (dealId: number) => {
-        setUser(prev => {
-            if (!prev) return null;
-            const currentFavs = prev.favorites || [];
-            const isFav = currentFavs.includes(dealId);
-            const newFavs = isFav
-                ? currentFavs.filter(id => id !== dealId)
-                : [...currentFavs, dealId];
-
-            const updatedUser = { ...prev, favorites: newFavs };
-            localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
-            return updatedUser;
-        });
+        const currentFavs = studealData.favorites || [];
+        const isFav = currentFavs.includes(dealId);
+        const newFavs = isFav
+            ? currentFavs.filter(id => id !== dealId)
+            : [...currentFavs, dealId];
+        
+        saveStudealMeta({ favorites: newFavs });
     };
 
     const addNotification = (notif: Omit<Notification, 'id' | 'date' | 'isRead'>) => {
@@ -203,14 +210,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             date: new Date().toLocaleDateString('az-AZ'),
             isRead: false
         };
-
-        setUser(prev => {
-            if (!prev) return null;
-            const currentNotifs = prev.notifications || [];
-            const updatedUser = { ...prev, notifications: [newNotification, ...currentNotifs] };
-            localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
-            return updatedUser;
-        });
+        const currentNotifs = studealData.notifications || [];
+        saveStudealMeta({ notifications: [newNotification, ...currentNotifs] });
     };
 
     const addTransaction = (trans: Omit<Transaction, 'id' | 'date'>) => {
@@ -219,57 +220,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: Date.now().toString(),
             date: new Date().toLocaleDateString('az-AZ'),
         };
-
-        setUser(prev => {
-            if (!prev) return null;
-            const currentTransactions = prev.transactions || [];
-            const updatedUser = { ...prev, transactions: [newTransaction, ...currentTransactions] };
-            localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
-            return updatedUser;
-        });
+        const currentTransactions = studealData.transactions || [];
+        saveStudealMeta({ transactions: [newTransaction, ...currentTransactions] });
     };
 
-    const loginWithGoogle = async () => {
-        // Simulating Google Auth process
-        return new Promise<boolean>((resolve) => {
-            setTimeout(() => {
-                const googleUser: User = {
-                    name: 'Google User',
-                    email: 'user@google.com',
-                    isCompany: false,
-                    isAdmin: false,
-                    points: 1240,
-                    favorites: [],
-                    notifications: [],
-                    transactions: [],
-                    usedDealsCount: 0,
-                    viewCount: 0,
-                    usageCount: 0
-                };
-                
-                // Add to users list if not exists
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                if (!users.some((u: any) => u.email === googleUser.email)) {
-                    users.push({ ...googleUser, password: 'google_oauth_dummy' });
-                    localStorage.setItem('users', JSON.stringify(users));
-                }
-                
-                loginWithUser(googleUser);
-                resolve(true);
-            }, 1000);
-        });
+    const loginWithUser = (userToLogin: any) => {
+        setPackageUser(userToLogin);
     };
 
     const logout = () => {
-        setUser(null);
-        localStorage.removeItem('loggedUser');
+        packageLogout();
         router.push('/');
     };
 
     return (
         <AuthContext.Provider value={{
-            user,
-            isLoading,
+            user: mergedUser,
+            isLoading: packageLoading,
             login,
             loginWithUser,
             register,
@@ -278,7 +245,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             toggleFavorite,
             addNotification,
             addTransaction,
-            loginWithGoogle
+            loginWithGoogle: () => packageGoogleLogin(window.location.origin),
+            authUrl
         }}>
             {children}
         </AuthContext.Provider>
