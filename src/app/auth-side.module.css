@@ -1,0 +1,582 @@
+.authContainer {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.mainCard {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    min-height: 650px;
+    height: clamp(650px, 85vh, 800px);
+    background-color: #24242e;
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* Left Side - Image Section */
+.imageSection {
+    flex: 1.1;
+    position: relative;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-size: cover;
+    background-position: center;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url("/auth-bg.png");
+    color: white;
+}
+
+.imageSection::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(16, 16, 22, 0.8) 0%, transparent 60%);
+    z-index: 1;
+}
+
+.sideHeader {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo span {
+    color: #4f46e5;
+}
+
+.backLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.backLink:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.imageFooter {
+    position: relative;
+    z-index: 2;
+}
+
+.footerTitle {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+    max-width: 350px;
+}
+
+.sliderLines {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.line {
+    height: 3px;
+    width: 30px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+}
+
+.lineActive {
+    background: white;
+    width: 45px;
+}
+
+/* Right Side - Form Section */
+.formSection {
+    flex: 1;
+    padding: 4rem 3.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.formHeader {
+    margin-bottom: 2.5rem;
+}
+
+.formHeader h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.formHeader p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+}
+
+.formHeader p a {
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.25rem;
+}
+
+.formHeader p a:hover {
+    text-decoration: underline;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.gridRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputWrapper {
+    position: relative;
+}
+
+.inputField {
+    width: 100%;
+    height: 3.5rem;
+    background-color: #31313d;
+    border: 2px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0 1.25rem;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.inputField:focus {
+    border-color: #6366f1;
+    background-color: #24242e;
+}
+
+.inputField::placeholder {
+    color: #64748b;
+    opacity: 0.5;
+}
+
+.eyeIcon {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+}
+
+.checkboxContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    margin: 0.5rem 0;
+}
+
+.checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    background: #31313d;
+    border: 1px solid #475569;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.checkboxChecked {
+    background: #6366f1;
+    border-color: #6366f1;
+}
+
+.checkboxText {
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+.checkboxText a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.submitBtn {
+    width: 100%;
+    height: 3.5rem;
+    background-color: #6366f1;
+    color: white;
+    border-radius: 0.75rem;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.submitBtn:hover {
+    background-color: #4f46e5;
+    transform: translateY(-2px);
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.line {
+    flex: 1;
+    height: 1px;
+    background: #334155;
+}
+
+.divText {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.socialGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.socialFull {
+    width: 100%;
+}
+
+.socialFull .socialBtn {
+    width: 100%;
+}
+
+.socialBtn {
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: none;
+    border: 1px solid #334155;
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.socialBtn:hover {
+    background: #334155;
+    transform: translateY(-2px);
+}
+
+.errorBox {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.capsWarn {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+    .authContainer {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background-color: #f8fafc;
+        overflow-y: auto;
+    }
+
+    .imageSection {
+        display: flex;
+        flex: none;
+        height: 160px;
+        padding: 1.25rem;
+        border-radius: 0;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url("/auth-bg.png");
+    }
+
+    .imageSection::after {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+    }
+
+    .footerTitle, .sliderLines {
+        display: none;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .mainCard {
+        max-width: 440px;
+        width: 100%;
+        height: auto;
+        max-height: 90vh;
+        min-height: unset;
+        border-radius: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        background-color: #ffffff;
+        overflow: hidden;
+    }
+
+    .formSection {
+        flex: 1;
+        padding: 2rem 1.75rem 2.5rem;
+        justify-content: flex-start;
+        overflow-y: auto;
+        background-color: #ffffff;
+    }
+
+    .formSection::before {
+        display: none;
+    }
+
+    .formHeader {
+        margin-bottom: 1.5rem;
+    }
+
+    .formHeader h2 {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+    }
+
+    .formHeader p {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .formHeader p a {
+        color: #6366f1;
+    }
+
+    .authForm {
+        gap: 1rem;
+    }
+
+    /* Stack the first/last name grid vertically on mobile */
+    .gridRow {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .inputField {
+        height: 3.25rem;
+        font-size: 1rem;
+        border-radius: 0.875rem;
+        padding: 0 1rem;
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        color: #1e293b;
+    }
+
+    .inputField:focus {
+        border-color: #6366f1;
+        background-color: #ffffff;
+    }
+
+    .inputField::placeholder {
+        color: #94a3b8;
+        opacity: 1;
+    }
+
+    .eyeIcon {
+        right: 1rem;
+    }
+
+    .submitBtn {
+        height: 3.25rem;
+        margin-top: 0.75rem;
+        font-size: 1rem;
+        border-radius: 0.875rem;
+    }
+
+    .divider {
+        margin: 1.25rem 0;
+    }
+
+    .socialBtn {
+        height: 3.25rem;
+        border-radius: 0.875rem;
+        font-size: 0.95rem;
+        border-color: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .socialBtn:hover {
+        background: #f1f5f9;
+    }
+
+    .divText {
+        color: #94a3b8;
+    }
+
+    .checkboxContainer {
+        margin: 0.25rem 0;
+    }
+
+    .checkboxText {
+        font-size: 0.875rem;
+    }
+
+    .errorBox {
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Small phones (e.g. iPhone SE) */
+@media (max-width: 390px) {
+    .authContainer {
+        padding: 1rem;
+    }
+
+    .formSection {
+        padding: 1.5rem 1.25rem 2rem;
+    }
+
+    .formSection::before {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .formHeader h2 {
+        font-size: 1.5rem;
+    }
+
+    .inputField {
+        height: 3rem;
+    }
+
+    .submitBtn {
+        height: 3rem;
+    }
+
+    .socialBtn {
+        height: 3rem;
+    }
+}
+
+/* Short screens (landscape) */
+@media (max-height: 700px) and (max-width: 900px) {
+    .authContainer {
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    .formSection {
+        padding: 1.25rem 1.75rem 1.75rem;
+    }
+
+    .formSection::before {
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+    }
+
+    .formHeader {
+        margin-bottom: 1rem;
+    }
+
+    .formHeader h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .authForm {
+        gap: 0.75rem;
+    }
+
+    .inputField {
+        height: 2.875rem;
+    }
+
+    .submitBtn {
+        height: 2.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .divider {
+        margin: 0.875rem 0;
+    }
+
+    .socialBtn {
+        height: 2.875rem;
+    }
+}

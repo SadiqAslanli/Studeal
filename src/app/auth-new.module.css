@@ -1,0 +1,340 @@
+.authWrapper {
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    flex-direction: column;
+    overflow-x: hidden;
+    background-color: #f6f6f8;
+}
+
+.topIllustration {
+    height: 35vh;
+    width: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("/auth-bg.png");
+}
+
+.bottomContainer {
+    flex: 1;
+    margin-top: -2rem;
+    position: relative;
+}
+
+.contentCard {
+    background-color: #0f172a; /* slate-900 */
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+    min-height: 100%;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the form horizontally */
+    gap: 1.5rem;
+}
+
+.innerContent {
+    width: 100%;
+    max-width: 480px; /* Standard form width */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.handleDecoration {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.handle {
+    height: 0.375rem;
+    width: 3rem;
+    border-radius: 9999px;
+    background-color: #334155; /* slate-700 */
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.header h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
+}
+
+.header p {
+    color: #94a3b8; /* slate-400 */
+    font-size: 0.95rem;
+}
+
+.header p a {
+    color: #1337ec;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.header p a:hover {
+    text-decoration: underline;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.gridRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.label {
+    color: #cbd5e1; /* slate-300 */
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.inputField {
+    width: 100%;
+    border-radius: 1rem;
+    background-color: #1e293b; /* slate-800 */
+    border: 2px solid transparent;
+    color: white;
+    height: 3.5rem;
+    padding: 0 1.25rem;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inputField:focus {
+    border-color: #1337ec; /* primary */
+    background-color: #0f172a;
+    box-shadow: 0 0 0 4px rgba(19, 55, 236, 0.1);
+}
+
+.inputField::placeholder {
+    color: #64748b; /* slate-500 */
+    opacity: 0.6;
+}
+
+.iconButton {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    cursor: pointer;
+    background: none;
+    border: none;
+    display: flex;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+}
+
+.checkboxGroup:hover .checkboxLabel {
+    color: #cbd5e1;
+}
+
+.customCheckbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #334155;
+    background-color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.customCheckbox.checked {
+    background-color: #1337ec;
+    border-color: #1337ec;
+}
+
+.checkboxLabel {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    transition: color 0.2s;
+}
+
+.submitBtn {
+    width: 100%;
+    background-color: #1337ec;
+    color: white;
+    font-weight: 700;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 10px 15px -3px rgba(19, 55, 236, 0.2);
+    margin-top: 0.5rem;
+}
+
+.submitBtn:hover {
+    background-color: rgba(19, 55, 236, 0.9);
+}
+
+.submitBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.divider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.dividerLine {
+    flex: 1;
+    height: 1px;
+    background-color: #1e293b;
+}
+
+.dividerText {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.socialGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding-bottom: 2rem;
+}
+
+.socialBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.googleBtn {
+    background-color: white;
+    color: #0f172a;
+}
+
+.googleBtn:hover {
+    background-color: #f1f5f9;
+}
+
+.appleBtn {
+    background-color: #1e293b;
+    color: white;
+}
+
+.appleBtn:hover {
+    background-color: #334155;
+}
+
+.footerText {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    color: #94a3b8;
+    font-size: 0.875rem;
+}
+
+.footerText a {
+    color: #1337ec;
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 0.25rem;
+}
+
+.footerText a:hover {
+    text-decoration: underline;
+}
+
+.errorMsg {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: #ef4444;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.capsWarn {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.backBtn {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    z-index: 20;
+    transition: background-color 0.2s;
+}
+
+.backBtn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}

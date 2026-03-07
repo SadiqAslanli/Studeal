@@ -52,6 +52,7 @@ type AuthContextType = {
     addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
     loginWithGoogle: () => void;
     authUrl: string;
+    apiUrl: string;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,7 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser: setPackageUser
     } = usePackageAuth();
     
-    const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://localhost:7187/auth";
+    const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://127.0.0.1:5129/auth";
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5129/api";
     const [studealData, setStudealData] = useState<Partial<User>>({});
     const router = useRouter();
 
@@ -138,12 +140,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }),
             });
 
+            const json = await res.json().catch(() => ({}));
+            
             if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.errorMessage || errorData.message || "Login failed");
+                console.error("Backend Error Response:", json);
+                const errorMessage = json.errorMessage || json.message || (json.errors ? Object.values(json.errors).flat().join(", ") : "Login failed");
+                throw new Error(errorMessage);
             }
 
-            const json = await res.json();
             if (json.success && json.accessToken && json.user) {
                 setAccessToken(json.accessToken);
                 setPackageUser(json.user);
@@ -163,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({
-                    identifier: formData.email,
+                    email: formData.email,
                     password: formData.password,
                     fullName: formData.name,
                     username: formData.email.split('@')[0], // Simplified
@@ -246,7 +250,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             addNotification,
             addTransaction,
             loginWithGoogle: () => packageGoogleLogin(window.location.origin),
-            authUrl
+            authUrl,
+            apiUrl
         }}>
             {children}
         </AuthContext.Provider>
