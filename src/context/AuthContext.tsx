@@ -107,8 +107,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ...packageUser,
             ...studealData,
             name: packageUser.fullName || packageUser.username || packageUser.email || "User",
-            isAdmin: packageUser.roles?.includes('Admin') || packageUser.role === 'Admin',
-            isCompany: packageUser.roles?.includes('Company') || packageUser.role === 'Company' || !!packageUser.username?.includes('rest'),
+            isAdmin: (packageUser.roles || []).some(r => r === 'Admin' || r === 'SuperAdmin') || packageUser.role === 'Admin' || packageUser.role === 'SuperAdmin',
+            isCompany: (packageUser.roles || []).includes('Company') || packageUser.role === 'Company' || !!packageUser.username?.includes('rest'),
             // Ensure defaults
             points: studealData.points ?? 0,
             favorites: studealData.favorites ?? [],
@@ -150,7 +150,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (json.success && json.accessToken && json.user) {
                 setAccessToken(json.accessToken);
-                setPackageUser(json.user);
+                // Ensure roles are present in the user object even if they came from the top level
+                const userWithRoles = {
+                    ...json.user,
+                    roles: (json.user.roles && json.user.roles.length > 0) ? json.user.roles : (json.roles || [])
+                };
+                setPackageUser(userWithRoles);
                 return true;
             }
             throw new Error(json.errorMessage || "Login failed");

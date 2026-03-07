@@ -30,10 +30,19 @@ export default function ClientLayoutWrapper({
         // Skip restriction for auth pages (so they can logout or switch)
         if (isAuthPage) return;
 
-        if (user.isAdmin && !isAdminPage) {
-            router.push('/admin');
-        } else if (user.isCompany && !isDashboard) {
-            router.push('/dashboard');
+        if (user.isAdmin) {
+            // Admins can go anywhere, no restrictions
+            return;
+        } else if (user.isCompany) {
+            // Companies are restricted to dashboard
+            if (!isDashboard && !isAuthPage) {
+                router.push('/dashboard');
+            }
+        } else {
+            // Students/Guests - kick out of restricted pages
+            if (isAdminPage || isDashboard) {
+                router.push('/');
+            }
         }
     }, [user, pathname, isAdminPage, isDashboard, isAuthPage, isLoading, router]);
 

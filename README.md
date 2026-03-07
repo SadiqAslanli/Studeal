@@ -36,6 +36,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## Changes
+### 2026-03-08 - RBAC and SuperAdmin Support
+- Enhanced RBAC system to support `SuperAdmin` role and properly merge roles from backend response.
+- Updated route protection: Admins/SuperAdmins can now browse all routes (including homepage).
+- Maintained strict dashboard isolation for Company users.
+- Bumped version to 0.1.6.
+
 ### 2026-03-07 - Registration Cleanup
 - Removed `username` from registration payload to match updated backend requirements.
 - Bumped version to 0.1.4.
