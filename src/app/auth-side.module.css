@@ -373,7 +373,8 @@
         background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
     }
 
-    .footerTitle, .sliderLines {
+    .footerTitle,
+    .sliderLines {
         display: none;
     }
 
@@ -579,4 +580,36 @@
     .socialBtn {
         height: 2.875rem;
     }
+}
+
+.passwordRequirements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: -0.25rem;
+    padding: 0 0.25rem;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.requirement.valid {
+    color: #10b981;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #475569;
+}
+
+.requirement.valid .dot {
+    background-color: #10b981;
 }

@@ -36,7 +36,20 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## Changes
-### 2026-03-07 - Integrated Auth Package
+### 2026-03-07 - Registration Cleanup
+- Removed `username` from registration payload to match updated backend requirements.
+- Bumped version to 0.1.4.
+
+### 2026-03-07 - Password Visibility and UI
+- Added "eye" icon to toggle password visibility on both Login and Register pages.
+- Bumped version to 0.1.3.
+
+### 2026-03-07 - Registration Improvements
+- Changed registration flow to redirect to `/login` instead of auto-login, ensuring proper session initialization on first sign-in.
+- Added password complexity validation (8+ characters, 1 uppercase, 1 symbol) with real-time UI checkboxes in the registration form.
+- Bumped version to 0.1.2.
+
+### 2026-03-07 - Fixed Registration Payload
 - Migrated authentication to `@zhmdff/auth-react` package.
 - Connected frontend to the ASP.NET Core backend auth endpoints.
 - Implemented `AuthContext.tsx` as a compatibility bridge for Studeal-specific features (Points, Favorites, Notifications).

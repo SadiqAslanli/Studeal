@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Lock, Building, ArrowLeft, ShoppingBag, Check, AlertCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Check, Eye, EyeOff } from 'lucide-react';
 import styles from '../auth-side.module.css';
 
 export default function RegisterPage() {
@@ -21,6 +21,7 @@ export default function RegisterPage() {
     isCompany: false
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Redirection logic when user is authenticated
@@ -34,9 +35,28 @@ export default function RegisterPage() {
     }
   }, [user, isLoading, router]);
 
+  const validatePassword = (pass: string) => {
+    const hasLength = pass.length >= 8;
+    const hasUpper = /[A-Z]/.test(pass);
+    const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+    return hasLength && hasUpper && hasSymbol;
+  };
+
+  const passwordValidation = {
+    hasLength: formData.password.length >= 8,
+    hasUpper: /[A-Z]/.test(formData.password),
+    hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!validatePassword(formData.password)) {
+      setError("Please ensure your password meets all requirements.");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -45,11 +65,8 @@ export default function RegisterPage() {
         name: `${formData.firstName} ${formData.lastName}`.trim(),
       });
       if (registerSuccess) {
-        // Auto login after registration
-        const loginSuccess = await login(formData.email, formData.password);
-        if (!loginSuccess) {
-          setError(t.auth.error);
-        }
+        // Redirect to login after successful registration as requested
+        router.push('/login');
       } else {
         setError("Registration failed. Please check your details.");
       }
@@ -141,14 +158,38 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <input
-                type="password"
-                className={styles.inputField}
-                placeholder="Şifrəniz"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-              />
+              <div className={styles.inputWrapper}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={styles.inputField}
+                  placeholder="Şifrəniz"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.eyeIcon}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.passwordRequirements}>
+              <div className={`${styles.requirement} ${passwordValidation.hasLength ? styles.valid : ''}`}>
+                {passwordValidation.hasLength ? <Check size={14} /> : <div className={styles.dot} />}
+                8+ simvol
+              </div>
+              <div className={`${styles.requirement} ${passwordValidation.hasUpper ? styles.valid : ''}`}>
+                {passwordValidation.hasUpper ? <Check size={14} /> : <div className={styles.dot} />}
+                1 böyük hərf
+              </div>
+              <div className={`${styles.requirement} ${passwordValidation.hasSymbol ? styles.valid : ''}`}>
+                {passwordValidation.hasSymbol ? <Check size={14} /> : <div className={styles.dot} />}
+                1 xüsusi simvol
+              </div>
             </div>
 
 

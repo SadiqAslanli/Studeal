@@ -175,11 +175,11 @@ export default function PointsPage() {
                     <div className={styles.miniStats}>
                         <div className={styles.miniStatCard}>
                             <span className={styles.miniLabel}>Bu ay qazanılıb</span>
-                            <span className={styles.miniValue}>+180</span>
+                            <span className={styles.miniValue}>+0</span>
                         </div>
                         <div className={styles.miniStatCard}>
                             <span className={styles.miniLabel}>Ümumi qazanc</span>
-                            <span className={styles.miniValue}>1,240</span>
+                            <span className={styles.miniValue}>0</span>
                         </div>
                     </div>
                 </div>

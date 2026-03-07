@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else {
                 // Initialize default meta for new backend user
                 const defaultMeta = {
-                    points: 1240,
+                    points: 0,
                     favorites: [],
                     notifications: [],
                     transactions: [],
@@ -167,10 +167,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({
-                    email: formData.email,
+                    identifier: formData.email,
                     password: formData.password,
                     fullName: formData.name,
-                    username: formData.email.split('@')[0], // Simplified
                     role: formData.isCompany ? "Company" : "Student"
                 }),
             });
