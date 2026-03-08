@@ -4,11 +4,15 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './points.module.css';
 
+import LoadingScreen from '@/components/LoadingScreen';
+
 export default function PointsPage() {
-    const { user, updateUser, addNotification, addTransaction } = useAuth();
+    const { user, updateUser, addNotification, addTransaction, isLoading } = useAuth();
     const { t } = useLanguage();
+    const router = useRouter();
     const [activeGifts, setActiveGifts] = useState<Record<number, number>>({}); // id -> expiry
 
     useEffect(() => {
@@ -108,6 +112,13 @@ export default function PointsPage() {
         { id: 6, title: 'Kontakt Home 20 AZN Endirim Kuponu', cost: 1500, icon: '🔌', category: 'Texnika' },
     ];
 
+    useEffect(() => {
+        if (!isLoading && !user) {
+            router.push('/login');
+        }
+    }, [user, isLoading, router]);
+
+    if (isLoading) return <LoadingScreen />;
     if (!user) return null;
 
     const allTransactions = user.transactions || [];
@@ -136,7 +147,6 @@ export default function PointsPage() {
             )}
             <header className={styles.header}>
                 <div className="container">
-                    <Link href="/" className={styles.backLink}>← {t.common.backHome}</Link>
                     <div className={styles.headerContent}>
                         <h1>{t.points.title}</h1>
                         <p>{t.points.subTitle}</p>

@@ -37,51 +37,57 @@ export default function Header() {
     </div>
   );
 
-  const AuthButtons = () => (
-    <div className={styles.authBtns}>
-      {user ? (
-        <div className={styles.userWrapper}>
-          <Link href="/points" className={styles.pointsBadge}>
-            <Star size={14} className={styles.pointsIcon} fill="currentColor" />
-            <span className={styles.pointsCount}>{user.points || 0}</span>
-          </Link>
-          <div className={styles.userDropdownTrigger} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
-            <div className={styles.userName}>
-              {user.name}
-              <ChevronDown size={14} className={styles.chevron} />
-            </div>
-          </div>
+  const AuthButtons = () => {
+    const { user, isLoading } = useAuth();
+    
+    if (isLoading) return <div style={{ width: '100px' }} />; // Placeholder to prevent jump
 
-          {isUserMenuOpen && (
-            <div className={styles.userDropdown}>
-              <Link
-                href={user.isCompany ? "/dashboard" : "/profile"}
-                className={styles.dropdownItem}
-                onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}
-              >
-                <User size={18} /> {user.isCompany ? t.dashboard.overview : t.nav.home}
-              </Link>
-              <button
-                onClick={() => { logout(); setIsUserMenuOpen(false); setIsMenuOpen(false); }}
-                className={`${styles.dropdownItem} ${styles.logoutItem}`}
-              >
-                <LogOut size={18} /> {t.dashboard.logout}
-              </button>
+    return (
+      <div className={styles.authBtns}>
+        {user ? (
+          <div className={styles.userWrapper}>
+            <Link href="/points" className={styles.pointsBadge}>
+              <Star size={14} className={styles.pointsIcon} fill="currentColor" />
+              <span className={styles.pointsCount}>{user.points || 0}</span>
+            </Link>
+            <div className={styles.userDropdownTrigger} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
+              <div className={styles.userName}>
+                {user.name}
+                <ChevronDown size={14} className={styles.chevron} />
+              </div>
             </div>
-          )}
-        </div>
-      ) : (
-        <Link
-          href="/login"
-          className="btn-primary"
-          style={{ borderRadius: '50px', padding: '10px 25px' }}
-          onClick={() => setIsMenuOpen(false)}
-        >
-          {t.login}
-        </Link>
-      )}
-    </div>
-  );
+
+            {isUserMenuOpen && (
+              <div className={styles.userDropdown}>
+                <Link
+                  href={user.isCompany ? "/dashboard" : "/profile"}
+                  className={styles.dropdownItem}
+                  onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}
+                >
+                  <User size={18} /> {user.isCompany ? t.dashboard.overview : t.profile.personalInfo}
+                </Link>
+                <button
+                  onClick={() => { logout(); setIsUserMenuOpen(false); setIsMenuOpen(false); }}
+                  className={`${styles.dropdownItem} ${styles.logoutItem}`}
+                >
+                  <LogOut size={18} /> {t.dashboard.logout}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="btn-primary"
+            style={{ borderRadius: '50px', padding: '10px 25px' }}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            {t.login}
+          </Link>
+        )}
+      </div>
+    );
+  };
 
   const NavLinks = () => (
     <nav className={styles.mainNav}>
@@ -95,7 +101,13 @@ export default function Header() {
         <MessageSquare size={18} className={styles.navIcon} /> {t.nav.feedback}
       </Link>
       <Link href="/favorites" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
-        <Heart size={18} className={styles.navIcon} /> Favorilərim
+        <div className={styles.iconWithBadge}>
+          <Heart size={18} className={styles.navIcon} />
+          {user && (user.favorites?.length || 0) > 0 && (
+            <span className={styles.badgeCount}>{user.favorites.length}</span>
+          )}
+        </div>
+        {t.favPage.title}
       </Link>
     </nav>
   );

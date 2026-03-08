@@ -107,12 +107,6 @@ export default function ProfilePage() {
                         💎 {t.profile.plans}
                     </button>
                     <button
-                        className={`${styles.navItem} ${activeTab === 'favorites' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('favorites')}
-                    >
-                        ❤️ {t.profile.myFavs}
-                    </button>
-                    <button
                         className={`${styles.navItem} ${activeTab === 'notifications' ? styles.activeTab : ''}`}
                         onClick={() => setActiveTab('notifications')}
                     >
@@ -237,57 +231,6 @@ export default function ProfilePage() {
                                     </button>
                                 </div>
                             ))}
-                        </div>
-                    </section>
-                )}
-
-                {activeTab === 'favorites' && (
-                    <section className={styles.favSection}>
-                        <h2>❤️ {t.profile.myFavs}</h2>
-                        <div className={styles.favGrid}>
-                            {(user.favorites || []).length > 0 ? (
-                                user.favorites?.map(favId => {
-                                    // Normally fetch from API, but for demo:
-                                    const deals = [
-                                        { id: 1, title: 'KFC Tələbə Menyu', company: 'KFC Azerbaijan', image: 'https://images.unsplash.com/photo-1513639776629-7b61b0ac49cb?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 2, title: 'Nike Tələbə Kartı', company: 'Nike Store', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 3, title: 'IELTS Hazırlığı', company: 'CELT Colleges', image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 4, title: 'Sinema Bileti', company: 'CinemaPlus', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 5, title: 'MacBook Pro', company: 'Alma Store', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 6, title: 'Pizza Festivalı', company: 'Pizza Mizza', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 7, title: 'McDonalds Tələbə Kombo', company: 'McDonalds', image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 8, title: 'Mado Səhər Yeməyi', company: 'Mado', image: 'https://images.unsplash.com/photo-1484723088339-fe28233e562e?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 9, title: 'Starbucks Coffee', company: 'Starbucks', image: 'https://images.unsplash.com/photo-1544787210-282aa5ac739d?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 10, title: 'Fryday Menyu', company: 'Fryday', image: 'https://images.unsplash.com/photo-1534422298391-e4f8c170db06?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 11, title: 'Vapiano Pasta', company: 'Vapiano', image: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 12, title: 'Entree Bakery', company: 'Entree', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 13, title: 'Baku Book Center', company: 'BBC', image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 14, title: 'Ali & Nino', company: 'Ali & Nino', image: 'https://images.unsplash.com/photo-1491849593786-b44c3ec82135?auto=format&fit=crop&q=80&w=800' },
-                                        { id: 15, title: 'Bravo Market', company: 'Bravo', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800' }
-                                    ];
-                                    const favDeal = deals.find(d => d.id === favId);
-                                    if (!favDeal) return null;
-
-                                    return (
-                                        <div key={favId} className={styles.favItem}>
-                                            <div className={styles.favIcon}>
-                                                {favDeal.image ? (
-                                                    <img src={favDeal.image} alt={favDeal.title} className={styles.favImg} />
-                                                ) : (
-                                                    '🛍️'
-                                                )}
-                                            </div>
-                                            <div className={styles.favInfo}>
-                                                <h4>{favDeal.title}</h4>
-                                                <p>{favDeal.company}</p>
-                                            </div>
-                                            <button className={styles.removeBtn} onClick={() => toggleFavorite(favId)}>✕</button>
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <p className={styles.emptyMsg}>{t.profile.noFavs}</p>
-                            )}
                         </div>
                     </section>
                 )}

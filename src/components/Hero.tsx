@@ -30,7 +30,7 @@ export default function Hero({ onSearch, onCategoryChange, userName }: HeroProps
 
       <div className={styles.heroContent}>
         <div className={styles.welcomeBadge}>
-          👋 {t.welcome}
+          <span className={styles.waveEmoji}>👋</span> {t.welcome}
         </div>
         <h1>
           Salam, <span className={styles.nameHighlight}>{displayUserName}!</span>

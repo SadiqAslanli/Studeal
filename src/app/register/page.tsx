@@ -22,6 +22,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isCapsLock, setIsCapsLock] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Redirection logic when user is authenticated
@@ -34,6 +35,14 @@ export default function RegisterPage() {
       }
     }
   }, [user, isLoading, router]);
+
+  const checkCapsLock = (e: React.KeyboardEvent) => {
+    if (e.getModifierState('CapsLock')) {
+      setIsCapsLock(true);
+    } else {
+      setIsCapsLock(false);
+    }
+  };
 
   const validatePassword = (pass: string) => {
     const hasLength = pass.length >= 8;
@@ -165,8 +174,15 @@ export default function RegisterPage() {
                   placeholder="Şifrəniz"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onKeyUp={checkCapsLock}
+                  onKeyDown={checkCapsLock}
                   required
                 />
+                {isCapsLock && (
+                  <div className={styles.capsWarn}>
+                    Caps Lock
+                  </div>
+                )}
                 <button
                   type="button"
                   className={styles.eyeIcon}

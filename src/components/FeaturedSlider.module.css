@@ -236,17 +236,17 @@
     .controls {
         display: none;
     }
-    
+
     .dots {
         margin-top: 16px;
         gap: 6px;
     }
-    
+
     .dot {
         width: 16px;
         height: 4px;
     }
-    
+
     .activeDot {
         width: 32px;
     }

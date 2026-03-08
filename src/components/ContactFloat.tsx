@@ -15,19 +15,19 @@ export default function ContactFloat() {
         message: ''
     });
 
-    // Show greeting bubble after 2 seconds on first visit
     useEffect(() => {
-        const timer = setTimeout(() => {
+        // Show greeting bubble 1 second after loading screen ends (3s + 1s = 4s)
+        const greetingTimer = setTimeout(() => {
             setShowGreeting(true);
-        }, 2000);
+        }, 4000);
 
-        // Hide greeting after 6 seconds
+        // Hide greeting after 12 seconds
         const hideTimer = setTimeout(() => {
             setShowGreeting(false);
-        }, 8000);
+        }, 12000);
 
         return () => {
-            clearTimeout(timer);
+            clearTimeout(greetingTimer);
             clearTimeout(hideTimer);
         };
     }, []);

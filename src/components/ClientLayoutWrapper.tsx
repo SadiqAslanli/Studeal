@@ -49,7 +49,7 @@ export default function ClientLayoutWrapper({
     return (
         <div suppressHydrationWarning>
             <ScrollToTop />
-            {!hideLayout && <ContactFloat />}
+            {pathname === '/' && <ContactFloat />}
             {!hideLayout && <Header />}
             <main style={{ minHeight: !hideLayout ? '60vh' : 'auto' }}>
                 {children}

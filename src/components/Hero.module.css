@@ -1,15 +1,17 @@
 .hero {
     position: relative;
-    min-height: 580px;
+    min-height: 620px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 100px 80px;
+    text-align: center;
+    padding: 100px 24px;
     border-radius: 48px;
     background: #0f172a;
     overflow: hidden;
     margin-bottom: 60px;
-    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.25);
 }
 
 .heroBackground {
@@ -23,7 +25,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%;
+    object-position: center;
     transition: transform 1.5s ease-out;
 }
 
@@ -43,7 +45,7 @@
 .parallaxOrb1 {
     width: 300px;
     height: 300px;
-    background: #4318ff;
+    background: #3b82f6;
     top: -100px;
     right: -20px;
 }
@@ -51,7 +53,7 @@
 .parallaxOrb2 {
     width: 250px;
     height: 250px;
-    background: #6366f1;
+    background: #60a5fa;
     bottom: -80px;
     left: -20px;
 }
@@ -59,7 +61,10 @@
 .heroContent {
     position: relative;
     z-index: 10;
-    max-width: 720px;
+    max-width: 850px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -78,7 +83,7 @@
 .welcomeBadge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(8px);
     color: white;
@@ -90,56 +95,82 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.waveEmoji {
+    display: inline-block;
+    font-size: 18px;
+    animation: wave 2.5s infinite;
+    transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+    0% { transform: rotate( 0.0deg) }
+   10% { transform: rotate(14.0deg) }
+   20% { transform: rotate(-8.0deg) }
+   30% { transform: rotate(14.0deg) }
+   40% { transform: rotate(-4.0deg) }
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
+
 .heroContent h1 {
-    font-size: 64px;
-    font-weight: 900;
+    font-size: 72px;
+    font-weight: 950;
     color: white;
-    line-height: 1.1;
-    margin-bottom: 20px;
-    letter-spacing: -3px;
-    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    line-height: 1.05;
+    margin-bottom: 24px;
+    letter-spacing: -4px;
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 .nameHighlight {
-    background: linear-gradient(135deg, #4318ff 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #0066ff 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .heroContent p {
-    font-size: 19px;
-    color: #cbd5e1;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.85);
     margin-bottom: 48px;
     line-height: 1.6;
-    max-width: 550px;
+    max-width: 600px;
 }
 
 /* ─── Search Section ─── */
 .searchSection {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(24px);
-    padding: 10px;
-    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    padding: 8px;
+    border-radius: 32px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
-    gap: 12px;
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+    gap: 8px;
+    box-shadow: 0 40px 60px -15px rgba(0, 0, 0, 0.4);
     width: 100%;
+    max-width: 680px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.searchSection:focus-within {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(59, 130, 246, 0.5);
+    transform: translateY(-4px) scale(1.02);
 }
 
 .searchBar {
     flex: 1;
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 14px;
+    padding: 0 24px;
+    gap: 16px;
 }
 
 .searchIcon {
-    font-size: 20px;
-    color: white;
-    opacity: 0.6;
+    font-size: 22px;
+    color: #3b82f6;
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
 }
 
 .searchBar input {
@@ -158,7 +189,7 @@
 }
 
 .searchBtn {
-    background: #4318ff;
+    background: #3b82f6;
     color: white;
     padding: 0 36px;
     border-radius: 20px;
@@ -167,104 +198,132 @@
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: none;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(67, 24, 255, 0.2);
+    box-shadow: 0 8px 10px rgba(59, 130, 246, 0.2);
 }
 
 .searchBtn:hover {
     transform: translateY(-2px);
-    background: #3311cc;
-    box-shadow: 0 12px 28px rgba(67, 24, 255, 0.35);
+    background: #2563eb;
+    box-shadow: 0 12px 28px rgba(59, 130, 246, 0.35);
 }
 
 /* ─── Media Queries ─── */
 @media (max-width: 1024px) {
     .hero {
-        padding: 80px 40px;
-        min-height: 520px;
+        padding: 80px 24px;
+        min-height: 550px;
     }
-    
+
     .heroContent h1 {
-        font-size: 48px;
+        font-size: 56px;
+        letter-spacing: -3px;
     }
 }
 
 @media (max-width: 768px) {
     .hero {
-        padding: 60px 24px;
-        min-height: 480px;
-        border-radius: 36px;
-        margin-bottom: 40px;
-    }
-
-    .welcomeBadge {
-        font-size: 13px;
-        margin-bottom: 20px;
+        padding: 60px 20px;
+        min-height: 500px;
+        border-radius: 40px;
     }
 
     .heroContent h1 {
-        font-size: 40px;
-        letter-spacing: -1.5px;
+        font-size: 42px;
+        letter-spacing: -2px;
     }
 
     .heroContent p {
-        font-size: 16px;
-        margin-bottom: 40px;
+        font-size: 17px;
+        margin-bottom: 35px;
+    }
+
+    .searchSection {
+        padding: 6px;
+        border-radius: 24px;
+        gap: 6px;
+    }
+
+    .searchBar {
+        padding: 0 16px;
+        gap: 10px;
+    }
+
+    .searchBtn {
+        padding: 0 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 500px) {
+    .hero {
+        padding: 40px 16px 40px;
+        min-height: 520px;
+        border-radius: 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end; /* Move content to bottom */
+        align-items: center;
+    }
+
+    .heroContent {
+        width: 100%;
+    }
+
+    .welcomeBadge {
+        font-size: 11px;
+        padding: 4px 12px;
+        margin-bottom: 12px;
+    }
+
+    .heroContent h1 {
+        font-size: 26px;
+        letter-spacing: -1px;
+        margin-bottom: 8px;
+    }
+
+    .heroContent p {
+        font-size: 14px;
+        margin-bottom: 24px;
+        line-height: 1.4;
+        max-width: 280px;
     }
 
     .searchSection {
         flex-direction: column;
-        background: transparent;
-        padding: 0;
+        background: none;
         border: none;
         backdrop-filter: none;
         box-shadow: none;
-        gap: 16px;
+        padding: 0;
+        gap: 10px;
     }
 
     .searchBar {
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        padding: 6px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 18px;
+        width: 100%;
+        padding: 0 15px;
+    }
+
+    .searchBar input {
+        font-size: 13px;
+        height: 48px;
     }
 
     .searchBtn {
         width: 100%;
-        height: 60px;
-        border-radius: 24px;
-        font-size: 16px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        font-size: 14px;
+        box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
     }
-
+    
     .heroBackground img {
-        object-position: right center;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero {
-        padding: 50px 20px;
-        min-height: 450px;
-    }
-
-    .heroContent h1 {
-        font-size: 34px;
-        letter-spacing: -1px;
-    }
-
-    .heroContent p {
-        font-size: 15px;
-        line-height: 1.5;
-        margin-bottom: 32px;
-    }
-
-    .searchBar {
-        border-radius: 20px;
-    }
-
-    .searchBtn {
-        height: 56px;
-        border-radius: 20px;
-        font-size: 15px;
+        object-position: center 20%; /* Show the upper/middle part of the person */
     }
 }
