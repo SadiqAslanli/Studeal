@@ -30,6 +30,7 @@ export type User = PackageUser & {
     course?: string;
     phone?: string;
     favorites: number[];
+    companyFavorites: number[];
     notifications: Notification[];
     transactions: Transaction[];
     usedDealsCount: number;
@@ -48,6 +49,7 @@ type AuthContextType = {
     updateUser: (updatedUser: Partial<User>) => void;
     logout: () => void;
     toggleFavorite: (dealId: number) => void;
+    toggleCompanyFavorite: (companyId: number) => void;
     addNotification: (notification: Omit<Notification, 'id' | 'date' | 'isRead'>) => void;
     addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
     loginWithGoogle: () => void;
@@ -83,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const defaultMeta = {
                     points: 0,
                     favorites: [],
+                    companyFavorites: [],
                     notifications: [],
                     transactions: [],
                     usedDealsCount: 0,
@@ -112,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Ensure defaults
             points: studealData.points ?? 0,
             favorites: studealData.favorites ?? [],
+            companyFavorites: studealData.companyFavorites ?? [],
             notifications: studealData.notifications ?? [],
             transactions: studealData.transactions ?? [],
             usedDealsCount: studealData.usedDealsCount ?? 0,
@@ -144,6 +148,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
             if (!res.ok) {
                 console.error("Backend Error Response:", json);
+                if (res.status === 404 || json.message?.includes("not found") || json.errorMessage?.includes("not found")) {
+                    throw new Error("user_not_found");
+                }
                 const errorMessage = json.errorMessage || json.message || (json.errors ? Object.values(json.errors).flat().join(", ") : "Login failed");
                 throw new Error(errorMessage);
             }
@@ -211,6 +218,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         saveStudealMeta({ favorites: newFavs });
     };
 
+    const toggleCompanyFavorite = (companyId: number) => {
+        const currentFavs = studealData.companyFavorites || [];
+        const isFav = currentFavs.includes(companyId);
+        const newFavs = isFav
+            ? currentFavs.filter(id => id !== companyId)
+            : [...currentFavs, companyId];
+        
+        saveStudealMeta({ companyFavorites: newFavs });
+    };
+
     const addNotification = (notif: Omit<Notification, 'id' | 'date' | 'isRead'>) => {
         const newNotification: Notification = {
             ...notif,
@@ -251,6 +268,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             updateUser,
             logout,
             toggleFavorite,
+            toggleCompanyFavorite,
             addNotification,
             addTransaction,
             loginWithGoogle: () => packageGoogleLogin(window.location.origin),

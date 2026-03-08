@@ -79,7 +79,7 @@
 }
 
 .activeNavItem {
-    background: #4318FF !important;
+    background: #3b82f6 !important;
     color: white !important;
     box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
 }
@@ -131,7 +131,7 @@
     border-radius: 50px;
     font-size: 12px;
     font-weight: 800;
-    color: #4318FF;
+    color: #3b82f6;
     display: inline-block;
     margin-bottom: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
@@ -151,7 +151,7 @@
 }
 
 .addBtn {
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     border: none;
     padding: 14px 28px;
@@ -208,7 +208,7 @@
 }
 
 .statGreen .statIconBox { background: rgba(5, 205, 153, 0.1); color: #05cd99; }
-.statBlue .statIconBox { background: rgba(67, 24, 255, 0.1); color: #4318ff; }
+.statBlue .statIconBox { background: rgba(67, 24, 255, 0.1); color: #3b82f6; }
 .statRed .statIconBox { background: rgba(238, 93, 80, 0.1); color: #ee5d50; }
 .statYellow .statIconBox { background: rgba(255, 177, 0, 0.1); color: #ffb100; }
 .statCyan .statIconBox { background: rgba(0, 102, 255, 0.1); color: #0066ff; }
@@ -286,7 +286,7 @@
     top: 25px;
     left: 25px;
     z-index: 1100;
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     border: none;
     width: 50px;
@@ -344,7 +344,7 @@
 
 /* --- MISC --- */
 .welcomeBanner {
-    background: linear-gradient(135deg, #4318ff 0%, #11047a 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #11047a 100%);
     padding: 50px 40px;
     border-radius: 30px;
     color: white;
@@ -375,7 +375,7 @@
 }
 
 .dropzone:hover {
-    border-color: #4318FF;
+    border-color: #3b82f6;
     background: #f0f4ff;
 }
 

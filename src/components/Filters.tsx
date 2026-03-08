@@ -33,14 +33,6 @@ export default function Filters({ onCategoryChange, onSortChange }: FiltersProps
     onSortChange(id);
   };
 
-  const subFilters = [
-    { id: 'fast', name: t.tags.fast, parent: 1 },
-    { id: 'cafe', name: t.tags.cafe, parent: 1 },
-    { id: 'cloth', name: t.tags.cloth, parent: 2 },
-    { id: 'book', name: t.tags.book, parent: 3 },
-    { id: 'cinema', name: t.tags.cinema, parent: 4 },
-  ];
-
   const sortOptions = [
     { id: 'new', name: t.sort.new },
     { id: 'popular', name: t.sort.popular },
@@ -72,14 +64,6 @@ export default function Filters({ onCategoryChange, onSortChange }: FiltersProps
 
         {/* Detailed Secondary Filters */}
         <div className={styles.secondaryFilters}>
-          <div className={styles.subTags}>
-            {subFilters.filter(sub => activeCat === 6 || sub.parent === activeCat).map((tag) => (
-              <button key={tag.id} className={styles.tagBtn}>
-                #{tag.name}
-              </button>
-            ))}
-          </div>
-
           <div className={styles.sortWrapper}>
             <span className={styles.sortLabel}>{t.sort.label}</span>
             <div className={styles.sortList}>

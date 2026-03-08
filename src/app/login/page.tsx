@@ -52,7 +52,11 @@ export default function LoginPage() {
         setError(t.auth.error);
       }
     } catch (err: any) {
-      setError(err.message || t.auth.error);
+      if (err.message === 'user_not_found') {
+        setError(t.auth.userNotFound);
+      } else {
+        setError(err.message || t.auth.error);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -104,11 +108,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {isCapsLock && (
-            <div className={styles.capsWarn}>
-              <span>Caps Lock aktivdir</span>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className={styles.authForm}>
             <div className={styles.inputGroup}>
@@ -131,8 +130,14 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyUp={checkCapsLock}
+                  onKeyDown={checkCapsLock}
                   required
                 />
+                {isCapsLock && (
+                  <div className={styles.capsWarn}>
+                    Caps Lock
+                  </div>
+                )}
                 <button
                   type="button"
                   className={styles.eyeIcon}

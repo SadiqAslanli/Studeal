@@ -79,7 +79,7 @@
 }
 
 .activeNavItem {
-    background: #4318FF !important;
+    background: #3b82f6 !important;
     color: white !important;
     box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
 }
@@ -131,7 +131,7 @@
     border-radius: 50px;
     font-size: 12px;
     font-weight: 800;
-    color: #4318FF;
+    color: #3b82f6;
     display: inline-block;
     margin-bottom: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
@@ -151,7 +151,7 @@
 }
 
 .addBtn {
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     border: none;
     padding: 14px 28px;
@@ -207,8 +207,8 @@
     background: #f4f7fe;
 }
 
-.statPurple .statIconBox { background: rgba(117, 81, 255, 0.1); color: #7551FF; }
-.statBlue .statIconBox { background: rgba(67, 24, 255, 0.1); color: #4318ff; }
+.statPurple .statIconBox { background: rgba(96, 165, 250, 0.1); color: #60a5fa; }
+.statBlue .statIconBox { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 .statGreen .statIconBox { background: rgba(5, 205, 153, 0.1); color: #05cd99; }
 .statRed .statIconBox { background: rgba(238, 93, 80, 0.1); color: #ee5d50; }
 .statYellow .statIconBox { background: rgba(255, 177, 0, 0.1); color: #ffb100; }
@@ -252,7 +252,7 @@
 .sectionHeader button {
     background: #f4f7fe;
     border: none;
-    color: #4318FF;
+    color: #3b82f6;
     padding: 8px 16px;
     border-radius: 12px;
     font-weight: 700;
@@ -298,7 +298,7 @@
 .miniDealInfo span {
     font-size: 13px;
     font-weight: 800;
-    color: #4318FF;
+    color: #3b82f6;
 }
 
 /* --- DEALS LIST --- */
@@ -390,7 +390,7 @@
 .dealPrice {
     font-size: 24px;
     font-weight: 800;
-    color: #4318FF;
+    color: #3b82f6;
     margin-bottom: 12px;
 }
 
@@ -484,7 +484,7 @@
 .userAvatar {
     width: 45px;
     height: 45px;
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -516,7 +516,7 @@
 }
 
 .badgeRed { background: #fff5f5; color: #ee5d50; }
-.badgeBlue { background: #f0f4ff; color: #4318FF; }
+.badgeBlue { background: #f0f4ff; color: #3b82f6; }
 
 .complaintMsg {
     font-size: 15px;
@@ -637,7 +637,7 @@
     font-size: 16px !important;
     font-weight: 800 !important;
     border-radius: 18px !important;
-    background: #4318FF !important;
+    background: #3b82f6 !important;
     color: white !important;
     margin-top: 10px;
     box-shadow: 0 10px 20px rgba(67, 24, 255, 0.2);
@@ -651,7 +651,7 @@
     top: 25px;
     left: 25px;
     z-index: 1100;
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     border: none;
     width: 50px;
@@ -705,7 +705,7 @@
 
 /* --- MISC --- */
 .welcomeBanner {
-    background: linear-gradient(135deg, #4318ff 0%, #11047a 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
     padding: 50px 40px;
     border-radius: 30px;
     color: white;
@@ -719,14 +719,14 @@
     border-radius: 50px;
     font-size: 12px;
     font-weight: 800;
-    color: #4318FF;
+    color: #3b82f6;
     display: inline-block;
     margin-bottom: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 
 .addBtnSmall {
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     border: none;
     padding: 10px 18px;
@@ -739,7 +739,7 @@
 }
 
 .feedbackCount {
-    background: #4318FF;
+    background: #3b82f6;
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -764,7 +764,7 @@
 
 .checkboxGroup label {
     font-weight: 800;
-    color: #4318FF;
+    color: #3b82f6;
 }
 
 .placeholderImg {

@@ -23,7 +23,8 @@ export const translations = {
         common: {
             backHome: "Ana Səhifəyə qayıt",
             showMore: "Ətraflı bax ↓",
-            hide: "Gizlət"
+            hide: "Gizlət",
+            loading: "Yüklənir..."
         },
         categories: {
             restaurant: "Restoran",
@@ -52,7 +53,8 @@ export const translations = {
             emailPlaceholder: "nümunə@mail.com",
             namePlaceholder: "Ad Soyad",
             companyPlaceholder: "Şirkət adı",
-            error: "E-poçt və ya şifrə yanlışdır"
+            error: "E-poçt və ya şifrə yanlışdır",
+            userNotFound: "Belə hesab yoxdur"
         },
         deals: {
             view: "Bax",
@@ -151,7 +153,9 @@ export const translations = {
             title: "Tərəfdaşlarımız",
             subtitle: "Bizimlə əməkdaşlıq edən ən populyar brendlər",
             becomePartner: "Tərəfdaş olmaq istəyirsiniz?",
-            contactUs: "Bizimlə əlaqə saxlayın"
+            contactUs: "Bizimlə əlaqə saxlayın",
+            partnerAds: "PARTNYOR REKLAMLARI",
+            noAdsYet: "Hələ reklam yoxdur"
         },
         points: {
             title: "Xallarım & Bonuslar",
@@ -225,6 +229,7 @@ export const translations = {
             contact: "Əlaqə",
             rules: "Qaydalar",
             social: "Sosial Media",
+            followUs: "BİZİ İZLƏYİN",
             newsletter: "Yeniliklər",
             newsletterDesc: "Hər həftə ən yaxşı endirimləri e-poçt ünvanınıza alın.",
             emailPlaceholder: "E-poçtunuz",
@@ -253,13 +258,6 @@ export const translations = {
                 partner: "🤝 Tərəfdaşlıq"
             }
         },
-        tags: {
-            fast: "Fast Food",
-            cafe: "Kofe",
-            cloth: "Geyim",
-            book: "Kitablar",
-            cinema: "Kino"
-        },
         contactForm: {
             title: "Bizə yazın 👋",
             subtitle: "Məlumatları doldurun, sizə geri dönək.",
@@ -281,17 +279,23 @@ export const translations = {
             deal3Desc: "Saat 22:00-dan sonra bütün menyuya endirim."
         },
         favPage: {
-            title: "Həyatını",
-            titleSpan: "Endirimlə",
-            titleEnd: "Yaşa ❤️",
-            subTitle: "Bütün sevimli restoran və menyularınız bir yerdə.",
-            restaurants: "Sevimli Restoranlar",
-            menus: "Sevimli Menyular",
-            noFavs: "Hələ heç bir restoranı favorilərinizə əlavə etməmisiniz.",
-            noMenuFavs: "Hələ heç bir menyunu favorilərinizə əlavə etməmisiniz.",
+            allInOne: "HƏR ŞEY BİR YERDƏ",
+            title: "Favoriləriniz",
+            subTitle: "Yadda saxladığınız bütün fürsətlərə və məkanlara buradan baxa bilərsiniz.",
+            savedVenues: "Yadda saxlanılan məkanlar",
+            favoriteDeals: "Favori Fürsətlər",
+            favoriteMenus: "Yadda saxlanılan menyular",
+            noFavs: "Hələ heç bir fürsət yoxdur",
+            exploring: "Endirimləri kəşf etməyə başlayın və sevdiklərinizi bura əlavə edin.",
+            exploreBtn: "Kəşf et",
+            tabs: {
+                all: "Hamısı",
+                venues: "Məkanlar",
+                menus: "Menyular"
+            },
+            loginHeader: "Xahiş edirik daxil olun",
             loginReq: "Favorilərinizi görmək üçün identifikasiyadan keçməlisiniz.",
-            loginBtn: "Daxil Ol",
-            loginHeader: "Xahiş edirik daxil olun"
+            loginBtn: "Daxil Ol"
         },
         featured: {
             title: "Seçilmiş Endirimlər",
@@ -316,6 +320,75 @@ export const translations = {
             comingSoonDesc: "Yeni endirimlər əlavə olunur.",
             orderNow: "Sifariş et",
             contactUs: "Əlaqə saxla"
+        },
+        termsPage: {
+            title: "İstifadə Qaydaları",
+            lastUpdated: "Son yenilənmə tarixi: 2026",
+            intro: "StuDeal platformasına xoş gəlmisiniz. Bu platformadan istifadə etməklə aşağıdakı qaydalarla razılaşmış olursunuz.",
+            sections: [
+                {
+                    title: "1. Platformanın məqsədi",
+                    content: "StuDeal tələbələri və biznesləri bir araya gətirən rəqəmsal platformadır. Platforma vasitəsilə tələbələr müxtəlif şirkətlər tərəfindən təqdim olunan endirimlərdən faydalana və xüsusi təklifləri kəşf edə bilərlər."
+                },
+                {
+                    title: "2. Hesabın yaradılması",
+                    content: "Platformadan istifadə etmək üçün istifadəçilər düzgün və aktual məlumatlarla qeydiyyatdan keçməlidirlər. İstifadəçi hesabının təhlükəsizliyi istifadəçinin öz məsuliyyətindədir."
+                },
+                {
+                    title: "3. Tələbə identifikasiyası",
+                    content: "StuDeal yalnız tələbələr üçün nəzərdə tutulmuş endirimlər təqdim edir. Platforma tələbə statusunu təsdiqləmək üçün istifadəçilərdən əlavə məlumat və ya doğrulama tələb edə bilər."
+                },
+                {
+                    title: "4. Endirimlər və təkliflər",
+                    content: "Platformada göstərilən endirimlər tərəfdaş şirkətlər tərəfindən təqdim edilir. StuDeal endirimlərin şərtlərində edilən dəyişikliklərə görə məsuliyyət daşımır."
+                },
+                {
+                    title: "5. Qadağan olunmuş istifadə",
+                    content: "Aşağıdakı hallara icazə verilmir: Platformadan saxta məlumatlarla istifadə etmək, Sistemə zərər verə biləcək fəaliyyətlər, Başqa istifadəçilərin hesablarına icazəsiz giriş cəhdləri. Bu qaydaların pozulması hesabın bloklanması ilə nəticələnə bilər."
+                },
+                {
+                    title: "6. Xidmət dəyişiklikləri",
+                    content: "StuDeal platformanın funksiyalarını istənilən vaxt dəyişdirmək və ya yeniləmək hüququnu özündə saxlayır."
+                },
+                {
+                    title: "7. Əlaqə",
+                    content: "Hər hansı sual və ya problem yarandıqda bizimlə əlaqə bölməsi vasitəsilə əlaqə saxlaya bilərsiniz."
+                }
+            ]
+        },
+        privacyPage: {
+            title: "Məxfilik Siyasəti",
+            intro: "StuDeal istifadəçilərin şəxsi məlumatlarının qorunmasına böyük önəm verir. Bu siyasət məlumatların necə toplandığını və istifadə edildiyini izah edir.",
+            sections: [
+                {
+                    title: "1. Toplanan məlumatlar",
+                    content: "Platformadan istifadə zamanı aşağıdakı məlumatlar toplana bilər: Ad və soyad, Email ünvanı, Universitet və tələbə məlumatları, Platforma daxilində fəaliyyət məlumatları."
+                },
+                {
+                    title: "2. Məlumatların istifadə məqsədi",
+                    content: "Toplanan məlumatlar aşağıdakı məqsədlərlə istifadə olunur: İstifadəçi hesabının yaradılması və idarə olunması, Endirim və kampaniyalar haqqında bildirişlər göndərilməsi, Platformanın təhlükəsizliyinin təmin edilməsi, İstifadəçi təcrübəsinin yaxşılaşdırılması."
+                },
+                {
+                    title: "3. Məlumatların paylaşılması",
+                    content: "StuDeal istifadəçi məlumatlarını üçüncü tərəflərlə satmır və paylaşmır. Məlumatlar yalnız xidmətlərin təmin edilməsi üçün tərəfdaş sistemlərlə istifadə oluna bilər."
+                },
+                {
+                    title: "4. Məlumatların təhlükəsizliyi",
+                    content: "İstifadəçi məlumatlarını qorumaq üçün müasir təhlükəsizlik texnologiyalarından istifadə olunur."
+                },
+                {
+                    title: "5. Cookies istifadəsi",
+                    content: "Platforma istifadəçi təcrübəsini yaxşılaşdırmaq üçün cookies texnologiyasından istifadə edə bilər."
+                },
+                {
+                    title: "6. İstifadəçi hüquqları",
+                    content: "İstifadəçilər öz məlumatlarını görmək, dəyişdirmək və silmək üçün platforma ilə əlaqə saxlaya bilərlər."
+                },
+                {
+                    title: "7. Siyasətdə dəyişikliklər",
+                    content: "StuDeal bu məxfilik siyasətini zaman-zaman yeniləyə bilər. Yenilənmiş versiya platformada yayımlandığı andan qüvvəyə minir."
+                }
+            ]
         }
     },
     en: {
@@ -342,7 +415,8 @@ export const translations = {
         common: {
             backHome: "Back to Home",
             showMore: "Show more ↓",
-            hide: "Hide"
+            hide: "Hide",
+            loading: "Loading..."
         },
         categories: {
             restaurant: "Restaurant",
@@ -371,7 +445,8 @@ export const translations = {
             emailPlaceholder: "example@mail.com",
             namePlaceholder: "Full Name",
             companyPlaceholder: "Company Name",
-            error: "Email or password incorrect"
+            error: "Email or password incorrect",
+            userNotFound: "Account does not exist"
         },
         deals: {
             view: "View",
@@ -470,7 +545,9 @@ export const translations = {
             title: "Our Partners",
             subtitle: "The most popular brands collaborating with us",
             becomePartner: "Want to become a partner?",
-            contactUs: "Contact Us"
+            contactUs: "Contact Us",
+            partnerAds: "PARTNER ADS",
+            noAdsYet: "No ads yet"
         },
         points: {
             title: "My Points & Rewards",
@@ -544,6 +621,7 @@ export const translations = {
             contact: "Contact",
             rules: "Rules",
             social: "Social Media",
+            followUs: "Follow us",
             newsletter: "Newsletter",
             newsletterDesc: "Get the best deals delivered to your inbox weekly.",
             emailPlaceholder: "Your email",
@@ -572,13 +650,6 @@ export const translations = {
                 partner: "🤝 Partnership"
             }
         },
-        tags: {
-            fast: "Fast Food",
-            cafe: "Coffee",
-            cloth: "Clothing",
-            book: "Books",
-            cinema: "Cinema"
-        },
         contactForm: {
             title: "Contact us 👋",
             subtitle: "Fill in the details, we will get back to you.",
@@ -600,17 +671,23 @@ export const translations = {
             deal3Desc: "Discount on the entire menu after 10:00 PM."
         },
         favPage: {
-            title: "Live your life with",
-            titleSpan: "Discounts",
-            titleEnd: "❤️",
-            subTitle: "All your favorite restaurants and menus in one place.",
-            restaurants: "Favorite Restaurants",
-            menus: "Favorite Menus",
-            noFavs: "You haven't added any restaurants to your favorites yet.",
-            noMenuFavs: "You haven't added any menus to your favorites yet.",
+            allInOne: "ALL IN ONE",
+            title: "Your Favorites",
+            subTitle: "You can view all the opportunities and places you have saved here.",
+            savedVenues: "Saved Venues",
+            favoriteDeals: "Favorite Deals",
+            favoriteMenus: "Saved Menus",
+            noFavs: "No favorites yet",
+            exploring: "Start exploring discounts and add your favorites here.",
+            exploreBtn: "Explore",
+            tabs: {
+                all: "All",
+                venues: "Restaurants",
+                menus: "Menus"
+            },
+            loginHeader: "Please login",
             loginReq: "You must be identified to see your favorites.",
-            loginBtn: "Login",
-            loginHeader: "Please login"
+            loginBtn: "Login"
         },
         featured: {
             title: "Featured Deals",
@@ -635,6 +712,75 @@ export const translations = {
             comingSoonDesc: "New deals are being added.",
             orderNow: "Order now",
             contactUs: "Contact us"
+        },
+        termsPage: {
+            title: "Terms of Use",
+            lastUpdated: "Last updated: 2026",
+            intro: "Welcome to StuDeal. By using this platform, you agree to the following terms.",
+            sections: [
+                {
+                    title: "1. Purpose of the Platform",
+                    content: "StuDeal is a digital platform that connects students and businesses. Through the platform, students can benefit from discounts provided by various companies and discover special offers."
+                },
+                {
+                    title: "2. Account Creation",
+                    content: "To use the platform, users must register with accurate and up-to-date information. The security of the user account is the user's responsibility."
+                },
+                {
+                    title: "3. Student Identification",
+                    content: "StuDeal provides discounts intended only for students. The platform may require additional information or verification from users to confirm student status."
+                },
+                {
+                    title: "4. Discounts and Offers",
+                    content: "Discounts shown on the platform are provided by partner companies. StuDeal is not responsible for changes made to the terms of discounts."
+                },
+                {
+                    title: "5. Prohibited Use",
+                    content: "The following cases are not allowed: Use of the platform with fake information, activities that may harm the system, unauthorized access attempts to other users' accounts. Violation of these rules may result in account blocking."
+                },
+                {
+                    title: "6. Service Changes",
+                    content: "StuDeal reserves the right to change or update the platform's functions at any time."
+                },
+                {
+                    title: "7. Contact",
+                    content: "If any questions or problems arise, you can contact us through the contact section."
+                }
+            ]
+        },
+        privacyPage: {
+            title: "Privacy Policy",
+            intro: "StuDeal attaches great importance to the protection of users' personal data. This policy explains how data is collected and used.",
+            sections: [
+                {
+                    title: "1. Collected Data",
+                    content: "The following data may be collected during use of the platform: Name and surname, Email address, University and student information, Activity data within the platform."
+                },
+                {
+                    title: "2. Purpose of Data Use",
+                    content: "Collected data is used for the following purposes: Creation and management of user account, sending notifications about discounts and campaigns, ensuring the security of the platform, improving user experience."
+                },
+                {
+                    title: "3. Data Sharing",
+                    content: "StuDeal does not sell or share user data with third parties. Data can only be used with partner systems to provide services."
+                },
+                {
+                    title: "4. Data Security",
+                    content: "Modern security technologies are used to protect user data."
+                },
+                {
+                    title: "5. Use of Cookies",
+                    content: "The platform may use cookie technology to improve user experience."
+                },
+                {
+                    title: "6. User Rights",
+                    content: "Users can contact the platform to view, change, and delete their data."
+                },
+                {
+                    title: "7. Policy Changes",
+                    content: "StuDeal may update this privacy policy from time to time. The updated version takes effect from the moment it is published on the platform."
+                }
+            ]
         }
     }
 };

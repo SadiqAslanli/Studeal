@@ -75,7 +75,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      alert(t.fav.loginRequired);
+      router.push('/login');
       return;
     }
     const isFav = user.favorites?.includes(dealId);
@@ -143,7 +143,12 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                     className={`${styles.favoriteBtn} ${isFavorite ? styles.isFavorite : ''}`}
                     onClick={(e) => handleFavorite(e, deal.id, deal.title)}
                   >
-                    <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+                    <Heart
+                      size={20}
+                      fill={isFavorite ? "#ff4d4d" : "rgba(0,0,0,0.1)"}
+                      color={isFavorite ? "#ff4d4d" : "white"}
+                      style={{ transform: isFavorite ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.2s ease' }}
+                    />
                   </button>
                 </div>
                 <div className={styles.cardContent}>

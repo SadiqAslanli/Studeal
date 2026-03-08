@@ -16,7 +16,8 @@ import {
   ShoppingBag,
   Clapperboard,
   Utensils,
-  PlusCircle
+  PlusCircle,
+  Heart
 } from 'lucide-react';
 import Hero from "@/components/Hero";
 import Filters from "@/components/Filters";
@@ -28,7 +29,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 export default function Home() {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, toggleFavorite, addNotification } = useAuth();
   const router = useRouter();
   const [activeCategoryId, setActiveCategoryId] = useState(6);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,7 +38,7 @@ export default function Home() {
   const [adData, setAdData] = useState({ left: '', right: '' });
 
   const [dynamicAds, setDynamicAds] = useState<any[]>([]);
-  
+
   useEffect(() => {
     const savedAds = JSON.parse(localStorage.getItem('adminAdsList') || '[]');
     setDynamicAds(savedAds);
@@ -79,16 +80,16 @@ export default function Home() {
     {
       brand: 'CinemaPlus', tag: 'HƏFTƏSONU',
       discount: '50% ENDİRİM', price: '3.50 AZN', oldPrice: '7.00 AZN',
-      icon: <Clapperboard size={18} />, iconBg: '#f5f0ff', iconColor: '#7c3aed',
-      g1: '#7c3aed', g2: '#6d28d9',
+      icon: <Clapperboard size={18} />, iconBg: '#f0f4ff', iconColor: '#3b82f6',
+      g1: '#3b82f6', g2: '#2563eb',
       image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=400',
     },
     {
       isPlaceholder: true,
       brand: 'Sənin Reklamın', tag: 'İNDİ YERLƏŞDİR',
       discount: 'MÜNASİB QİYMƏT', price: 'Bizimlə əlaqə', oldPrice: '',
-      icon: <PlusCircle size={18} />, iconBg: '#f0f4ff', iconColor: '#4318ff',
-      g1: '#4318ff', g2: '#3311cc',
+      icon: <PlusCircle size={18} />, iconBg: '#eff6ff', iconColor: '#3b82f6',
+      g1: '#3b82f6', g2: '#2563eb',
       image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&q=80&w=400',
       link: '/partners/ad-request'
     }
@@ -98,7 +99,7 @@ export default function Home() {
     <aside className={styles.sideAd}>
       <p className={styles.adLabel}>
         <Megaphone size={14} className={styles.adLabelIcon} />
-        PARTNER ADS
+        {t.partnersPage.partnerAds}
       </p>
 
       <Link href="/partners/ad-request" className={styles.adRequestBtn}>
@@ -107,30 +108,60 @@ export default function Home() {
       </Link>
 
       <div className={styles.adsList}>
-        {dynamicAds.map((ad, i) => (
-          <div
-            key={ad.id || i}
-            className={styles.adCard}
-            onClick={() => {
-              if (ad.companyId) {
-                router.push(`/company/${ad.companyId}`);
-              } else if (!user) {
-                router.push('/login');
-              }
-            }}
-          >
-            <div className={styles.adImageWrapper}>
-              <img src={ad.image} alt="Partner Ad" />
-              <div className={styles.adImgOverlay} />
-              <div className={styles.newDiscountBadge}>{ad.discount}</div>
+        {dynamicAds.map((ad, i) => {
+          const isFavorite = user?.favorites?.includes(ad.id);
+          
+          const handleFavorite = (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!user) {
+              router.push('/login');
+              return;
+            }
+            toggleFavorite(ad.id);
+            if (!isFavorite) {
+              addNotification({
+                title: t.fav.added,
+                message: `${ad.brand || 'Endirim'} ${t.fav.addedMsg}`
+              });
+            }
+          };
+
+          return (
+            <div
+              key={ad.id || i}
+              className={styles.adCard}
+              onClick={() => {
+                if (ad.companyId) {
+                  router.push(`/company/${ad.companyId}`);
+                } else if (!user) {
+                  router.push('/login');
+                }
+              }}
+            >
+              <div className={styles.adImageWrapper}>
+                <img src={ad.image} alt="Partner Ad" />
+                <div className={styles.adImgOverlay} />
+                <div className={styles.newDiscountBadge}>{ad.discount}</div>
+                <button 
+                  className={`${styles.favoriteBtn} ${isFavorite ? styles.isFavorite : ''}`}
+                  onClick={handleFavorite}
+                >
+                  <Heart 
+                    size={18} 
+                    fill={isFavorite ? "white" : "none"} 
+                    strokeWidth={isFavorite ? 0 : 2.5}
+                  />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {dynamicAds.length === 0 && (
           <div className={styles.adCard} style={{ opacity: 0.5, border: '2px dashed #e0e5f2', background: 'none' }}>
             <div className={styles.adCardBody} style={{ textAlign: 'center', padding: '20px' }}>
-              <p style={{ margin: 0, fontSize: '13px', color: '#a3aed0' }}>Hələ reklam yoxdur</p>
+              <p style={{ margin: 0, fontSize: '13px', color: '#a3aed0' }}>{t.partnersPage.noAdsYet}</p>
             </div>
           </div>
         )}

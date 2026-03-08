@@ -1,22 +1,24 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import styles from './LoadingScreen.module.css';
 
 export default function LoadingScreen() {
+    const { t } = useLanguage();
     const [isVisible, setIsVisible] = useState(true);
     const [shouldRender, setShouldRender] = useState(true);
 
     useEffect(() => {
-        // Prevent scroll when loading
+        // Stop body from scrolling
         document.body.style.overflow = 'hidden';
 
         const timer = setTimeout(() => {
             setIsVisible(false);
             // Re-enable scroll
             document.body.style.overflow = 'unset';
-            setTimeout(() => setShouldRender(false), 500); // Wait for fade out animation
-        }, 1500);
+            setTimeout(() => setShouldRender(false), 800);
+        }, 2200);
 
         return () => {
             clearTimeout(timer);
@@ -28,19 +30,23 @@ export default function LoadingScreen() {
 
     return (
         <div className={`${styles.loaderWrapper} ${!isVisible ? styles.fadeOut : ''}`}>
-            <div className={styles.content}>
-                <div className={styles.logo}>
-                    Stu<span>Deal</span>
-                    <p className={styles.slogan}>Puluna bizimlə qənaət et</p>
-                </div>
-                <div className={styles.loaderLine}>
-                    <div className={styles.lineProgress}></div>
-                </div>
+            <div className={styles.bgBlur}>
+                <div className={styles.blob1} />
+                <div className={styles.blob2} />
             </div>
 
-            <div className={styles.decorations}>
-                <div className={styles.circle1}></div>
-                <div className={styles.circle2}></div>
+            <div className={styles.content}>
+                <div className={styles.logoContainer}>
+                    <h1 className={styles.logo}>
+                        Stu<span>Deal</span>
+                    </h1>
+                    <p className={styles.slogan}>{t.common.loading}</p>
+                </div>
+
+                <div className={styles.loaderRing}>
+                    <div className={styles.ringInner} />
+                    <div className={styles.centerDot} />
+                </div>
             </div>
         </div>
     );
