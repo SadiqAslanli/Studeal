@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserConfig } from '@/lib/supabase/env';
 
 export type Notification = {
     id: string;
@@ -116,9 +117,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
     const supabase = useMemo(() => createClient(), []);
-
-    const authUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const { url: supabaseUrl } = useMemo(() => getSupabaseBrowserConfig(), []);
+    const authUrl = supabaseUrl;
+    const apiUrl = supabaseUrl;
 
     useEffect(() => {
         if (!baseUser) return;
@@ -137,10 +138,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const mergedUser = useMemo(() => {
         if (!baseUser) return null;
+<<<<<<< HEAD
         return profileToUser(
             { id: baseUser.id, email: baseUser.email ?? null, full_name: baseUser.full_name ?? null, role: baseUser.role ?? null },
             studealData
         );
+=======
+        return profileToUser(baseUser, studealData);
+>>>>>>> 95e31d7443cd26e1ad1eea4ef2a750952a83b7f4
     }, [baseUser, studealData]);
 
     const saveStudealMeta = (updated: Partial<User>) => {
@@ -196,7 +201,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setBaseUser({
             id: user.id,
             email: user.email ?? null,
+<<<<<<< HEAD
             full_name: (user as any).name || (user as any).fullName || user.email || '',
+=======
+            full_name: user.name || user.fullName || user.email || '',
+>>>>>>> 95e31d7443cd26e1ad1eea4ef2a750952a83b7f4
             role: user.role || 'Company',
         });
     };
