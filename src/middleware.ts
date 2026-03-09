@@ -1,14 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseServerConfig } from "@/lib/supabase/env";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
 
+  const { url, anonKey } = getSupabaseServerConfig();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {
