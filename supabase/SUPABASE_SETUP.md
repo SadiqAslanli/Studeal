@@ -1,5 +1,28 @@
 # Supabase setup for Studeal
 
+---
+
+## Quick: Admin in 4 steps (after migrations)
+
+1. **Run the first migration** (the one that creates `profiles`).  
+   SQL Editor → paste `20260309000001_initial_profiles.sql` → Run.
+
+2. **Create the admin user in Supabase**  
+   Dashboard → **Authentication** → **Users** → **Add user** → enter an **email** (e.g. `admin@test.com`) and a **password** → Create.  
+   *(This is the same email and password you will use to log in on the app.)*
+
+3. **Make that user an Admin**  
+   SQL Editor → run (use the same email as in step 2):
+   ```sql
+   update public.profiles set role = 'Admin', updated_at = now() where email = 'admin@test.com';
+   ```
+
+4. **Log in on the app**  
+   Open your app → go to **/login** → enter the **email** and **password** from step 2 → Login.  
+   You’ll be logged in as Admin and can open the admin panel.
+
+---
+
 ## 1. Create a Supabase project
 
 1. Go to [supabase.com](https://supabase.com) and create a project.
@@ -35,13 +58,18 @@ supabase db push
 
 ## 4. Create the first Admin
 
-Admins are **not** created by the app. Create them once in Supabase, then set their role in SQL.
+The **password is set only in the Dashboard** when you add the user. The SQL below does **not** set a password — it only sets the profile role to `Admin`.
 
-### Option A – Dashboard + SQL
+### Step 1 – Create the user (this is where you set the password)
 
 1. In Supabase: **Authentication → Users → Add user**.
-2. Create a user (e.g. `admin@yourdomain.com`) with a secure password.
-3. In **SQL Editor** run (replace the email with yours):
+2. Enter **email** (e.g. `admin@yourdomain.com`) and **password**.
+3. Click **Create user**.  
+   Supabase stores the password in `auth.users`. The trigger from the first migration creates a row in `public.profiles` with role `Student`.
+
+### Step 2 – Set role to Admin (SQL only changes role, not password)
+
+In **SQL Editor** run (replace the email with the one you used in Step 1):
 
 ```sql
 update public.profiles
@@ -49,19 +77,10 @@ set role = 'Admin', updated_at = now()
 where email = 'admin@yourdomain.com';
 ```
 
-### Option B – By user id
+After this, that user can log in to the app with the **password you set in Step 1** and will have admin access.
 
-1. Create the user in **Authentication → Users**.
-2. Copy the user’s **UUID**.
-3. Run:
-
-```sql
-update public.profiles
-set role = 'Admin', updated_at = now()
-where id = 'paste-the-uuid-here';
-```
-
-After this, that user can log in to the app and will have admin access (e.g. create companies, access admin panel).
+**Alternative (by user id):** If you prefer, use the user’s UUID from **Authentication → Users** and run:  
+`update public.profiles set role = 'Admin', updated_at = now() where id = 'uuid-here';`
 
 ## 5. Auth rules summary
 
