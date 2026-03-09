@@ -22,11 +22,11 @@ export type Transaction = {
 
 export type User = {
     id: string;
-    email?: string;
-    fullName?: string;
+    email: string | null;
+    fullName: string | null;
     username?: string;
     roles?: string[];
-    role?: string;
+    role: string | null;
     name: string;
     isCompany: boolean;
     isAdmin: boolean;
@@ -90,8 +90,8 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
     const isCompany = role === 'Company';
     return {
         id: profile.id,
-        email: profile.email ?? undefined,
-        fullName: profile.full_name ?? undefined,
+        email: profile.email ?? null,
+        fullName: profile.full_name ?? null,
         name: profile.full_name || profile.email || 'User',
         role,
         roles: [role],
@@ -111,7 +111,7 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [baseUser, setBaseUser] = useState<(ProfileRow & Partial<User>) | null>(null);
+    const [baseUser, setBaseUser] = useState<ProfileRow | null>(null);
     const [studealData, setStudealData] = useState<Partial<User>>({});
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const mergedUser = useMemo(() => {
         if (!baseUser) return null;
         return profileToUser(
-            { id: baseUser.id, email: baseUser.email ?? null, full_name: baseUser.full_name ?? baseUser.fullName ?? null, role: baseUser.role ?? null },
+            { id: baseUser.id, email: baseUser.email ?? null, full_name: baseUser.full_name ?? null, role: baseUser.role ?? null },
             studealData
         );
     }, [baseUser, studealData]);
@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
                 fetchProfile(session.user.id).then((profile) => {
-                    if (profile) setBaseUser(profile as any);
+                    if (profile) setBaseUser(profile);
                     setIsLoading(false);
                 });
             } else {
@@ -196,9 +196,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setBaseUser({
             id: user.id,
             email: user.email ?? null,
-            full_name: user.name || user.fullName || user.email || '',
+            full_name: (user as any).name || (user as any).fullName || user.email || '',
             role: user.role || 'Company',
-        } as any);
+        });
     };
 
     // Only Students can register; Companies are created by Admin
