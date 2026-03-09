@@ -22,11 +22,12 @@ import {
 } from 'lucide-react';
 import styles from './admin.module.css';
 import Link from 'next/link';
+import { createCompanyUser, listCompanies, updateCompanyStatus, deleteCompanyUser } from './actions';
 
 type Tab = 'dashboard' | 'restaurants' | 'ads' | 'messages' | 'featured' | 'adRequests';
 
 export default function AdminDashboard() {
-    const { user, logout, register, isLoading } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>('dashboard');
     const [showModal, setShowModal] = useState(false);
@@ -88,9 +89,9 @@ export default function AdminDashboard() {
         setTodayVisits(visits[today] || 0);
     };
 
-    const loadRestaurants = () => {
-        const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-        setRestaurants(allUsers.filter((u: any) => u.isCompany));
+    const loadRestaurants = async () => {
+        const list = await listCompanies();
+        setRestaurants(list.map((c) => ({ id: c.id, name: c.full_name || c.email || '—', email: c.email ?? '', isActive: c.is_active !== false })));
     };
 
     const loadAds = () => {
@@ -121,71 +122,49 @@ export default function AdminDashboard() {
     };
 
 
-    const handleCreateRestaurant = (e: React.FormEvent) => {
+    const handleCreateRestaurant = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        try {
-            const normalizedEmail = newRest.email.trim().toLowerCase();
-            const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-            
-            if (allUsers.some((u: any) => u && u.email && String(u.email).trim().toLowerCase() === normalizedEmail)) {
-                alert("Bu e-poçt artıq istifadə olunub!");
-                return;
-            }
-
-            register({
-                name: newRest.name.trim(),
-                email: normalizedEmail,
-                password: newRest.password.trim(),
-                isCompany: true,
-                isAdmin: false,
-                isActive: true
-            });
-            
+        const name = newRest.name.trim();
+        const email = newRest.email.trim().toLowerCase();
+        const password = newRest.password.trim();
+        if (!name || !email || !password) {
+            alert("Ad, e-poçt və parol tələb olunur.");
+            return;
+        }
+        const result = await createCompanyUser(name, email, password);
+        if (result.ok) {
             setNewRest({ name: '', email: '', password: '' });
             setShowModal(false);
-            
-            // Give a small delay to ensure localStorage is updated before reloading
-            setTimeout(() => {
-                loadRestaurants();
-                alert("Restoran admini uğurla yaradıldı!");
-            }, 100);
-        } catch (err) {
-            console.error("Restoran yaradılarkən xəta:", err);
-            alert("Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.");
+            await loadRestaurants();
+            alert("Restoran uğurla yaradıldı!");
+        } else {
+            alert(result.error || "Xəta baş verdi.");
         }
     };
 
-    const toggleRestaurantStatus = (email: string) => {
-        const rest = restaurants.find(r => r.email === email);
-        const action = rest?.isActive === false ? 'Yandırmaq' : 'Söndürmək';
-        
+    const toggleRestaurantStatus = (rest: { id: string; isActive?: boolean }) => {
+        const newActive = !(rest.isActive !== false);
         setConfirmDialog({
             open: true,
             title: 'Statusu Dəyiş',
-            message: `Bu restoranı ${action} istədiyinizə əminsiniz?`,
-            onConfirm: () => {
-                const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-                const updated = allUsers.map((u: any) => 
-                    u.email === email ? { ...u, isActive: u.hasOwnProperty('isActive') ? !u.isActive : false } : u
-                );
-                localStorage.setItem('users', JSON.stringify(updated));
-                loadRestaurants();
+            message: `Bu restoranı ${newActive ? 'yandırmaq' : 'söndürmək'} istədiyinizə əminsiniz?`,
+            onConfirm: async () => {
+                const result = await updateCompanyStatus(rest.id, newActive);
+                if (result.ok) await loadRestaurants();
                 setConfirmDialog(prev => ({ ...prev, open: false }));
             }
         });
     };
 
-    const handleDeleteRestaurant = (email: string) => {
+    const handleDeleteRestaurant = (rest: { id: string; name: string }) => {
         setConfirmDialog({
             open: true,
             title: 'Restoranı Sil',
             message: 'Bu restoranı tamamilə silmək istədiyinizə əminsiniz? Bu geri qaytarıla bilməz.',
-            onConfirm: () => {
-                const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-                const filtered = allUsers.filter((u: any) => u.email !== email);
-                localStorage.setItem('users', JSON.stringify(filtered));
-                loadRestaurants();
+            onConfirm: async () => {
+                const result = await deleteCompanyUser(rest.id);
+                if (result.ok) await loadRestaurants();
+                else alert(result.error);
                 setConfirmDialog(prev => ({ ...prev, open: false }));
             }
         });
@@ -193,12 +172,9 @@ export default function AdminDashboard() {
 
     const { loginWithUser } = useAuth(); // Import central login function
 
-    const handleLoginAsRestaurant = (rest: any) => {
-        loginWithUser(rest);
-        // Small delay to ensure Auth state is captured before redirect
-        setTimeout(() => {
-            router.push('/dashboard');
-        }, 300);
+    const handleLoginAsRestaurant = (rest: { id: string; name: string; email: string }) => {
+        loginWithUser({ id: rest.id, email: rest.email, name: rest.name, role: 'Company' });
+        setTimeout(() => router.push('/dashboard'), 300);
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
@@ -530,7 +506,7 @@ export default function AdminDashboard() {
                                                             Giriş et
                                                         </button>
                                                         <button 
-                                                            onClick={() => toggleRestaurantStatus(rest.email)}
+                                                            onClick={() => toggleRestaurantStatus(rest)}
                                                             style={{ 
                                                                 color: rest.isActive !== false ? '#ee5d50' : '#10b981',
                                                                 cursor: 'pointer',
@@ -546,7 +522,7 @@ export default function AdminDashboard() {
                                                             {rest.isActive !== false ? 'Söndür' : 'Yandır'}
                                                         </button>
                                                         <button 
-                                                            onClick={() => handleDeleteRestaurant(rest.email)}
+                                                            onClick={() => handleDeleteRestaurant(rest)}
                                                             style={{ 
                                                                 color: '#a3aed0', 
                                                                 cursor: 'pointer',
