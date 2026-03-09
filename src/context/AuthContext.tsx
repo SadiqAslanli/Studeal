@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth as usePackageAuth, User as PackageUser } from "@zhmdff/auth-react";
 
 export type Notification = {
     id: string;
@@ -20,9 +19,15 @@ export type Transaction = {
     type: 'earn' | 'spend';
 };
 
-// Merged User type
-export type User = PackageUser & {
-    name: string; // Map from fullName or username
+// Standalone User type (no external auth package). Wire Supabase session to this shape via loginWithUser().
+export type User = {
+    id: string;
+    email?: string;
+    fullName?: string;
+    username?: string;
+    roles?: string[];
+    role?: string;
+    name: string;
     isCompany: boolean;
     isAdmin: boolean;
     points: number;
@@ -44,7 +49,7 @@ type AuthContextType = {
     user: User | null;
     isLoading: boolean;
     login: (email: string, password: string) => Promise<boolean>;
-    loginWithUser: (user: any) => void;
+    loginWithUser: (user: Partial<User> & { id: string }) => void;
     register: (userData: any) => Promise<boolean>;
     updateUser: (updatedUser: Partial<User>) => void;
     logout: () => void;
@@ -59,149 +64,102 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const defaultStudealMeta = {
+    points: 0,
+    favorites: [] as number[],
+    companyFavorites: [] as number[],
+    notifications: [] as Notification[],
+    transactions: [] as Transaction[],
+    usedDealsCount: 0,
+    viewCount: 0,
+    usageCount: 0,
+    plan: 'bronze',
+    deals: [] as any[],
+};
+
+function buildUser(base: Partial<User> & { id: string }, meta: Partial<User>): User {
+    const roles = base.roles ?? (base.role ? [base.role] : []);
+    const isAdmin = roles.some(r => r === 'Admin' || r === 'SuperAdmin') || base.role === 'Admin' || base.role === 'SuperAdmin';
+    const isCompany = roles.includes('Company') || base.role === 'Company' || !!base.username?.includes('rest');
+    return {
+        id: base.id,
+        email: base.email,
+        fullName: base.fullName,
+        username: base.username,
+        roles,
+        role: base.role,
+        name: base.fullName || base.username || base.email || base.name || 'User',
+        isCompany,
+        isAdmin,
+        points: meta.points ?? 0,
+        university: meta.university ?? base.university,
+        course: meta.course ?? base.course,
+        phone: meta.phone ?? base.phone,
+        favorites: meta.favorites ?? [],
+        companyFavorites: meta.companyFavorites ?? [],
+        notifications: meta.notifications ?? [],
+        transactions: meta.transactions ?? [],
+        usedDealsCount: meta.usedDealsCount ?? 0,
+        viewCount: meta.viewCount ?? 0,
+        usageCount: meta.usageCount ?? 0,
+        plan: meta.plan ?? 'bronze',
+        deals: meta.deals ?? base.deals ?? [],
+    };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const { 
-        user: packageUser, 
-        isLoading: packageLoading, 
-        logout: packageLogout, 
-        loginWithGoogle: packageGoogleLogin,
-        setAccessToken,
-        setUser: setPackageUser
-    } = usePackageAuth();
-    
-    const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://127.0.0.1:5129/auth";
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5129/api";
+    const [baseUser, setBaseUser] = useState<(Partial<User> & { id: string }) | null>(null);
     const [studealData, setStudealData] = useState<Partial<User>>({});
+    const [isLoading] = useState(false);
     const router = useRouter();
 
-    // Load extra data from localStorage when package user changes
+    const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+
+    // Load Studeal metadata from localStorage when base user changes
     useEffect(() => {
-        if (packageUser) {
-            const savedData = localStorage.getItem(`studeal_meta_${packageUser.id}`);
+        if (baseUser) {
+            const savedData = localStorage.getItem(`studeal_meta_${baseUser.id}`);
             if (savedData) {
-                setStudealData(JSON.parse(savedData));
+                try {
+                    setStudealData(JSON.parse(savedData));
+                } catch {
+                    setStudealData(defaultStudealMeta);
+                }
             } else {
-                // Initialize default meta for new backend user
-                const defaultMeta = {
-                    points: 0,
-                    favorites: [],
-                    companyFavorites: [],
-                    notifications: [],
-                    transactions: [],
-                    usedDealsCount: 0,
-                    viewCount: 0,
-                    usageCount: 0,
-                    plan: 'bronze',
-                    deals: []
-                };
-                setStudealData(defaultMeta);
-                localStorage.setItem(`studeal_meta_${packageUser.id}`, JSON.stringify(defaultMeta));
+                setStudealData(defaultStudealMeta);
+                localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(defaultStudealMeta));
             }
         } else {
             setStudealData({});
         }
-    }, [packageUser]);
+    }, [baseUser?.id]);
 
-    // Computed user object
     const mergedUser = useMemo(() => {
-        if (!packageUser) return null;
-
-        return {
-            ...packageUser,
-            ...studealData,
-            name: packageUser.fullName || packageUser.username || packageUser.email || "User",
-            isAdmin: (packageUser.roles || []).some(r => r === 'Admin' || r === 'SuperAdmin') || packageUser.role === 'Admin' || packageUser.role === 'SuperAdmin',
-            isCompany: (packageUser.roles || []).includes('Company') || packageUser.role === 'Company' || !!packageUser.username?.includes('rest'),
-            // Ensure defaults
-            points: studealData.points ?? 0,
-            favorites: studealData.favorites ?? [],
-            companyFavorites: studealData.companyFavorites ?? [],
-            notifications: studealData.notifications ?? [],
-            transactions: studealData.transactions ?? [],
-            usedDealsCount: studealData.usedDealsCount ?? 0,
-            viewCount: studealData.viewCount ?? 0,
-            usageCount: studealData.usageCount ?? 0,
-            plan: studealData.plan ?? 'bronze',
-        } as User;
-    }, [packageUser, studealData]);
+        if (!baseUser) return null;
+        return buildUser(baseUser, studealData);
+    }, [baseUser, studealData]);
 
     const saveStudealMeta = (updated: Partial<User>) => {
-        if (!packageUser) return;
+        if (!baseUser) return;
         const newData = { ...studealData, ...updated };
         setStudealData(newData);
-        localStorage.setItem(`studeal_meta_${packageUser.id}`, JSON.stringify(newData));
+        localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(newData));
     };
 
-    const login = async (identifier: string, password: string) => {
-        try {
-            const res = await fetch(`${authUrl}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ 
-                    identifier: identifier, 
-                    password: password 
-                }),
-            });
-
-            const json = await res.json().catch(() => ({}));
-            
-            if (!res.ok) {
-                console.error("Backend Error Response:", json);
-                if (res.status === 404 || json.message?.includes("not found") || json.errorMessage?.includes("not found")) {
-                    throw new Error("user_not_found");
-                }
-                const errorMessage = json.errorMessage || json.message || (json.errors ? Object.values(json.errors).flat().join(", ") : "Login failed");
-                throw new Error(errorMessage);
-            }
-
-            if (json.success && json.accessToken && json.user) {
-                setAccessToken(json.accessToken);
-                // Ensure roles are present in the user object even if they came from the top level
-                const userWithRoles = {
-                    ...json.user,
-                    roles: (json.user.roles && json.user.roles.length > 0) ? json.user.roles : (json.roles || [])
-                };
-                setPackageUser(userWithRoles);
-                return true;
-            }
-            throw new Error(json.errorMessage || "Login failed");
-        } catch (err: any) {
-            console.error("Login failed:", err);
-            throw err;
-        }
+    // No-op until you wire Supabase: sign in with Supabase then call loginWithUser(mappedUser)
+    const login = async (_identifier: string, _password: string): Promise<boolean> => {
+        return false;
     };
 
-    const register = async (formData: any) => {
-        try {
-            const res = await fetch(`${authUrl}/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                    identifier: formData.email,
-                    password: formData.password,
-                    fullName: formData.name,
-                    role: formData.isCompany ? "Company" : "Student"
-                }),
-            });
+    // Call this with the user from your Supabase session (mapped to User shape)
+    const loginWithUser = (user: Partial<User> & { id: string }) => {
+        setBaseUser(user);
+    };
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                // Check for validation errors array
-                const validationErrors = errorData.errors ? Object.values(errorData.errors).flat().join(", ") : null;
-                throw new Error(validationErrors || errorData.errorMessage || errorData.message || "Registration failed");
-            }
-
-            const json = await res.json();
-            if (!json.success) {
-                throw new Error(json.errorMessage || "Registration failed");
-            }
-            return true;
-        } catch (err: any) {
-            console.error("Registration failed:", err);
-            throw err;
-        }
+    // No-op until you wire Supabase auth
+    const register = async (_formData: any): Promise<boolean> => {
+        return false;
     };
 
     const updateUser = (updatedFields: Partial<User>) => {
@@ -209,22 +167,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const toggleFavorite = (dealId: number) => {
-        const currentFavs = studealData.favorites || [];
+        const currentFavs = studealData.favorites ?? [];
         const isFav = currentFavs.includes(dealId);
-        const newFavs = isFav
-            ? currentFavs.filter(id => id !== dealId)
-            : [...currentFavs, dealId];
-        
+        const newFavs = isFav ? currentFavs.filter(id => id !== dealId) : [...currentFavs, dealId];
         saveStudealMeta({ favorites: newFavs });
     };
 
     const toggleCompanyFavorite = (companyId: number) => {
-        const currentFavs = studealData.companyFavorites || [];
+        const currentFavs = studealData.companyFavorites ?? [];
         const isFav = currentFavs.includes(companyId);
-        const newFavs = isFav
-            ? currentFavs.filter(id => id !== companyId)
-            : [...currentFavs, companyId];
-        
+        const newFavs = isFav ? currentFavs.filter(id => id !== companyId) : [...currentFavs, companyId];
         saveStudealMeta({ companyFavorites: newFavs });
     };
 
@@ -233,9 +185,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ...notif,
             id: Date.now().toString(),
             date: new Date().toLocaleDateString('az-AZ'),
-            isRead: false
+            isRead: false,
         };
-        const currentNotifs = studealData.notifications || [];
+        const currentNotifs = studealData.notifications ?? [];
         saveStudealMeta({ notifications: [newNotification, ...currentNotifs] });
     };
 
@@ -245,36 +197,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: Date.now().toString(),
             date: new Date().toLocaleDateString('az-AZ'),
         };
-        const currentTransactions = studealData.transactions || [];
+        const currentTransactions = studealData.transactions ?? [];
         saveStudealMeta({ transactions: [newTransaction, ...currentTransactions] });
     };
 
-    const loginWithUser = (userToLogin: any) => {
-        setPackageUser(userToLogin);
-    };
-
     const logout = () => {
-        packageLogout();
+        setBaseUser(null);
+        setStudealData({});
         router.push('/');
     };
 
+    const loginWithGoogle = () => {
+        // No-op until you wire Supabase OAuth
+    };
+
     return (
-        <AuthContext.Provider value={{
-            user: mergedUser,
-            isLoading: packageLoading,
-            login,
-            loginWithUser,
-            register,
-            updateUser,
-            logout,
-            toggleFavorite,
-            toggleCompanyFavorite,
-            addNotification,
-            addTransaction,
-            loginWithGoogle: () => packageGoogleLogin(window.location.origin),
-            authUrl,
-            apiUrl
-        }}>
+        <AuthContext.Provider
+            value={{
+                user: mergedUser,
+                isLoading,
+                login,
+                loginWithUser,
+                register,
+                updateUser,
+                logout,
+                toggleFavorite,
+                toggleCompanyFavorite,
+                addNotification,
+                addTransaction,
+                loginWithGoogle,
+                authUrl,
+                apiUrl,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
