@@ -1,15 +1,20 @@
--- Create the first Admin user
--- Step 1: Create the user in Supabase Dashboard (Authentication -> Add user)
---   Email: your-admin@example.com
---   Password: (set a secure password)
--- Step 2: Copy the user's UUID from Authentication -> Users
--- Step 3: Run this migration AFTER replacing the placeholder UUID below.
+-- =============================================================================
+-- FIRST ADMIN: password is set in the Dashboard, not here
+-- =============================================================================
+-- This migration does NOT create the admin user. Supabase stores the password
+-- in auth.users when you create the user (Dashboard or API). This file only
+-- updates the profile role after you have created the user.
 --
--- Or run this single statement after you have the admin user id:
---   update public.profiles set role = 'Admin' where id = 'YOUR-ADMIN-UUID';
+-- STEP 1 (Dashboard – here you set the password):
+--   Supabase → Authentication → Users → "Add user" →
+--   Enter email (e.g. admin@yourdomain.com) and password → Create.
+--   The trigger from 20260309000001 will create a profile with role 'Student'.
+--
+-- STEP 2 (SQL – only set role to Admin):
+--   Run the statement below in SQL Editor, replacing the email with the one
+--   you used in Step 1. This does not touch the password (it stays as set in
+--   the Dashboard).
+-- =============================================================================
 
--- Example (uncomment and replace YOUR-ADMIN-UUID with real uuid from Dashboard):
--- update public.profiles set role = 'Admin', updated_at = now() where id = 'YOUR-ADMIN-UUID';
-
--- If you prefer to run a one-off in SQL Editor after creating the user in Dashboard:
--- update public.profiles set role = 'Admin' where email = 'admin@yourdomain.com';
+-- Uncomment and run in SQL Editor after creating the user in Dashboard (replace email):
+-- update public.profiles set role = 'Admin', updated_at = now() where email = 'admin@yourdomain.com';
