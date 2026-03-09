@@ -281,11 +281,11 @@ export default function AdminDashboard() {
     const handleLogout = () => {
         setConfirmDialog({
             open: true,
-            title: 'Çıxış',
-            message: 'Hesabdan çıxmaq istədiyinizə əminsiniz?',
-            onConfirm: () => {
-                logout();
+            title: 'Çıxış edin',
+            message: 'Sistemdən çıxmaq istədiyinizə əminsiniz? Bütün sessiya məlumatları təmizlənəcək.',
+            onConfirm: async () => {
                 setConfirmDialog(prev => ({ ...prev, open: false }));
+                await logout();
             }
         });
     };
@@ -970,35 +970,23 @@ export default function AdminDashboard() {
             {/* Confirmation Dialog */}
             {confirmDialog.open && (
                 <div className={styles.modalOverlay} onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
-                    <div className={styles.modalContent} style={{ maxWidth: '400px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalIcon} style={{ 
-                            width: '64px', 
-                            height: '64px', 
-                            background: '#fff5f5', 
-                            color: '#ee5d50', 
-                            borderRadius: '50%', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            margin: '0 auto 20px',
-                            fontSize: '30px'
-                        }}>
-                            !
-                        </div>
-                        <h2 style={{ fontSize: '20px', marginBottom: '10px', color: '#1b2559' }}>{confirmDialog.title}</h2>
-                        <p style={{ color: '#8f9bba', marginBottom: '24px', lineHeight: '1.5' }}>{confirmDialog.message}</p>
-                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                    <div className={`${styles.modalContent} ${styles.confirmModal}`} style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.confirmIcon}>!</div>
+                        <h2 className={styles.confirmTitle}>{confirmDialog.title}</h2>
+                        <p className={styles.confirmMessage}>{confirmDialog.message}</p>
+                        <div className={styles.confirmActions}>
                             <button 
-                                className={styles.closeBtn} 
-                                style={{ padding: '12px 24px', background: '#f4f7fe', color: '#1b2559', borderRadius: '12px', fontWeight: 700 }}
+                                className={styles.cancelBtn} 
                                 onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
                             >
                                 Ləğv et
                             </button>
                             <button 
-                                className="btn-primary" 
-                                style={{ padding: '12px 24px', background: '#ee5d50', boxShadow: '0 8px 16px rgba(238, 93, 80, 0.2)' }}
-                                onClick={confirmDialog.onConfirm}
+                                type="button"
+                                className={styles.confirmBtn} 
+                                onClick={() => {
+                                    confirmDialog.onConfirm();
+                                }}
                             >
                                 Təsdiqlə
                             </button>

@@ -243,10 +243,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = async () => {
-        await supabase.auth.signOut();
-        setBaseUser(null);
-        setStudealData({});
-        router.push('/');
+        setIsLoading(true);
+        try {
+            // 1. Supabase-dən rəsmi çıxış edirik
+            await supabase.auth.signOut();
+            
+            // 2. Local yaddaşı təmizləyirik
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // 3. State-ləri sıfırlayırıq
+            setBaseUser(null);
+            setStudealData({});
+            
+            // 4. Giriş səhifəsinə yönləndiririk
+            router.replace('/login');
+            router.refresh();
+        } catch (e) {
+            console.error("Logout error:", e);
+            // Error olsa belə dərhal təmizləyib atırıq
+            localStorage.clear();
+            window.location.href = '/login';
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const loginWithGoogle = () => {
