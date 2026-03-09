@@ -1,16 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdminConfig } from "./env";
 
 /**
  * Server-only. Use for admin actions (e.g. creating Company users).
- * Requires SUPABASE_SERVICE_ROLE_KEY in env.
+ * Auth and DB use only Supabase — no other URL.
  */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  }
-  return createClient(url, key, {
+  const { url, serviceRoleKey } = getSupabaseAdminConfig();
+  return createClient(url, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
