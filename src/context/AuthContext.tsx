@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export type Notification = {
     id: string;
@@ -19,7 +20,6 @@ export type Transaction = {
     type: 'earn' | 'spend';
 };
 
-// Standalone User type (no external auth package). Wire Supabase session to this shape via loginWithUser().
 export type User = {
     id: string;
     email?: string;
@@ -50,9 +50,9 @@ type AuthContextType = {
     isLoading: boolean;
     login: (email: string, password: string) => Promise<boolean>;
     loginWithUser: (user: Partial<User> & { id: string }) => void;
-    register: (userData: any) => Promise<boolean>;
+    register: (userData: { email: string; password: string; name: string }) => Promise<boolean>;
     updateUser: (updatedUser: Partial<User>) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
     toggleFavorite: (dealId: number) => void;
     toggleCompanyFavorite: (companyId: number) => void;
     addNotification: (notification: Omit<Notification, 'id' | 'date' | 'isRead'>) => void;
@@ -77,24 +77,22 @@ const defaultStudealMeta = {
     deals: [] as any[],
 };
 
-function buildUser(base: Partial<User> & { id: string }, meta: Partial<User>): User {
-    const roles = base.roles ?? (base.role ? [base.role] : []);
-    const isAdmin = roles.some(r => r === 'Admin' || r === 'SuperAdmin') || base.role === 'Admin' || base.role === 'SuperAdmin';
-    const isCompany = roles.includes('Company') || base.role === 'Company' || !!base.username?.includes('rest');
+type ProfileRow = { id: string; email: string | null; full_name: string | null; role: string | null };
+
+function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
+    const role = profile.role || 'Student';
+    const isAdmin = role === 'Admin' || role === 'SuperAdmin';
+    const isCompany = role === 'Company';
     return {
-        id: base.id,
-        email: base.email,
-        fullName: base.fullName,
-        username: base.username,
-        roles,
-        role: base.role,
-        name: base.fullName || base.username || base.email || base.name || 'User',
+        id: profile.id,
+        email: profile.email ?? undefined,
+        fullName: profile.full_name ?? undefined,
+        name: profile.full_name || profile.email || 'User',
+        role,
+        roles: [role],
         isCompany,
         isAdmin,
         points: meta.points ?? 0,
-        university: meta.university ?? base.university,
-        course: meta.course ?? base.course,
-        phone: meta.phone ?? base.phone,
         favorites: meta.favorites ?? [],
         companyFavorites: meta.companyFavorites ?? [],
         notifications: meta.notifications ?? [],
@@ -103,41 +101,41 @@ function buildUser(base: Partial<User> & { id: string }, meta: Partial<User>): U
         viewCount: meta.viewCount ?? 0,
         usageCount: meta.usageCount ?? 0,
         plan: meta.plan ?? 'bronze',
-        deals: meta.deals ?? base.deals ?? [],
+        deals: meta.deals ?? [],
     };
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [baseUser, setBaseUser] = useState<(Partial<User> & { id: string }) | null>(null);
+    const [baseUser, setBaseUser] = useState<(ProfileRow & Partial<User>) | null>(null);
     const [studealData, setStudealData] = useState<Partial<User>>({});
-    const [isLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+    const supabase = useMemo(() => createClient(), []);
 
-    const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const authUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 
-    // Load Studeal metadata from localStorage when base user changes
     useEffect(() => {
-        if (baseUser) {
-            const savedData = localStorage.getItem(`studeal_meta_${baseUser.id}`);
-            if (savedData) {
-                try {
-                    setStudealData(JSON.parse(savedData));
-                } catch {
-                    setStudealData(defaultStudealMeta);
-                }
-            } else {
+        if (!baseUser) return;
+        const savedData = localStorage.getItem(`studeal_meta_${baseUser.id}`);
+        if (savedData) {
+            try {
+                setStudealData(JSON.parse(savedData));
+            } catch {
                 setStudealData(defaultStudealMeta);
-                localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(defaultStudealMeta));
             }
         } else {
-            setStudealData({});
+            setStudealData(defaultStudealMeta);
+            localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(defaultStudealMeta));
         }
     }, [baseUser?.id]);
 
     const mergedUser = useMemo(() => {
         if (!baseUser) return null;
-        return buildUser(baseUser, studealData);
+        return profileToUser(
+            { id: baseUser.id, email: baseUser.email ?? null, full_name: baseUser.full_name ?? baseUser.fullName ?? null, role: baseUser.role ?? null },
+            studealData
+        );
     }, [baseUser, studealData]);
 
     const saveStudealMeta = (updated: Partial<User>) => {
@@ -147,19 +145,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(newData));
     };
 
-    // No-op until you wire Supabase: sign in with Supabase then call loginWithUser(mappedUser)
-    const login = async (_identifier: string, _password: string): Promise<boolean> => {
-        return false;
+    const fetchProfile = async (userId: string) => {
+        const { data } = await supabase.from('profiles').select('id, email, full_name, role').eq('id', userId).single();
+        return data as ProfileRow | null;
     };
 
-    // Call this with the user from your Supabase session (mapped to User shape)
+    useEffect(() => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT' || !session?.user) {
+                setBaseUser(null);
+                setStudealData({});
+                setIsLoading(false);
+                return;
+            }
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                const profile = await fetchProfile(session.user.id);
+                if (profile) setBaseUser(profile);
+                setIsLoading(false);
+            }
+        });
+
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                fetchProfile(session.user.id).then((profile) => {
+                    if (profile) setBaseUser(profile);
+                    setIsLoading(false);
+                });
+            } else {
+                setIsLoading(false);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [supabase]);
+
+    const login = async (email: string, password: string): Promise<boolean> => {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw new Error(error.message);
+        return true;
+    };
+
     const loginWithUser = (user: Partial<User> & { id: string }) => {
-        setBaseUser(user);
+        setBaseUser({
+            id: user.id,
+            email: user.email ?? undefined,
+            full_name: user.name || user.fullName || user.email || '',
+            role: user.role || 'Company',
+        });
     };
 
-    // No-op until you wire Supabase auth
-    const register = async (_formData: any): Promise<boolean> => {
-        return false;
+    // Only Students can register; Companies are created by Admin
+    const register = async (userData: { email: string; password: string; name: string }): Promise<boolean> => {
+        const { error } = await supabase.auth.signUp({
+            email: userData.email.trim().toLowerCase(),
+            password: userData.password,
+            options: { data: { full_name: userData.name.trim() } },
+        });
+        if (error) throw new Error(error.message);
+        return true;
     };
 
     const updateUser = (updatedFields: Partial<User>) => {
@@ -168,15 +213,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const toggleFavorite = (dealId: number) => {
         const currentFavs = studealData.favorites ?? [];
-        const isFav = currentFavs.includes(dealId);
-        const newFavs = isFav ? currentFavs.filter(id => id !== dealId) : [...currentFavs, dealId];
+        const newFavs = currentFavs.includes(dealId) ? currentFavs.filter((id) => id !== dealId) : [...currentFavs, dealId];
         saveStudealMeta({ favorites: newFavs });
     };
 
     const toggleCompanyFavorite = (companyId: number) => {
         const currentFavs = studealData.companyFavorites ?? [];
-        const isFav = currentFavs.includes(companyId);
-        const newFavs = isFav ? currentFavs.filter(id => id !== companyId) : [...currentFavs, companyId];
+        const newFavs = currentFavs.includes(companyId) ? currentFavs.filter((id) => id !== companyId) : [...currentFavs, companyId];
         saveStudealMeta({ companyFavorites: newFavs });
     };
 
@@ -187,8 +230,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             date: new Date().toLocaleDateString('az-AZ'),
             isRead: false,
         };
-        const currentNotifs = studealData.notifications ?? [];
-        saveStudealMeta({ notifications: [newNotification, ...currentNotifs] });
+        saveStudealMeta({ notifications: [newNotification, ...(studealData.notifications ?? [])] });
     };
 
     const addTransaction = (trans: Omit<Transaction, 'id' | 'date'>) => {
@@ -197,18 +239,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: Date.now().toString(),
             date: new Date().toLocaleDateString('az-AZ'),
         };
-        const currentTransactions = studealData.transactions ?? [];
-        saveStudealMeta({ transactions: [newTransaction, ...currentTransactions] });
+        saveStudealMeta({ transactions: [newTransaction, ...(studealData.transactions ?? [])] });
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await supabase.auth.signOut();
         setBaseUser(null);
         setStudealData({});
         router.push('/');
     };
 
     const loginWithGoogle = () => {
-        // No-op until you wire Supabase OAuth
+        supabase.auth.signInWithOAuth({ provider: 'google' });
     };
 
     return (
