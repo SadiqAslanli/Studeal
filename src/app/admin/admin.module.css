@@ -448,4 +448,70 @@
     justify-content: center;
     cursor: pointer;
     color: #a3aed0;
+    transition: all 0.2s;
+}
+
+.confirmModal {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.confirmIcon {
+    width: 70px;
+    height: 70px;
+    background: #fff5f5;
+    color: #ee5d50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.confirmTitle {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1b2559;
+    margin-bottom: 12px;
+}
+
+.confirmMessage {
+    color: #8f9bba;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.confirmActions {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.cancelBtn {
+    padding: 14px 28px;
+    background: #f4f7fe;
+    color: #1b2559;
+    border-radius: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.confirmBtn {
+    padding: 14px 28px;
+    background: #ee5d50;
+    color: white;
+    border-radius: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 10px 20px rgba(238, 93, 80, 0.2);
 }
