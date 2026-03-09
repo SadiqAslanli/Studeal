@@ -4,6 +4,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Mobile browsers: excludes URL bar & nav UI */
     background: #ffffff;
     display: flex;
     align-items: center;
