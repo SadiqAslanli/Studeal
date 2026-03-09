@@ -77,7 +77,12 @@ const defaultStudealMeta = {
     deals: [] as any[],
 };
 
-type ProfileRow = { id: string; email: string | null; full_name: string | null; role: string | null };
+type ProfileRow = { 
+    id: string; 
+    email: string | null | undefined; 
+    full_name: string | null | undefined; 
+    role: string | null | undefined; 
+};
 
 function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
     const role = profile.role || 'Student';
@@ -162,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 const profile = await fetchProfile(session.user.id);
-                if (profile) setBaseUser(profile);
+                if (profile) setBaseUser(profile as any);
                 setIsLoading(false);
             }
         });
@@ -170,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
                 fetchProfile(session.user.id).then((profile) => {
-                    if (profile) setBaseUser(profile);
+                    if (profile) setBaseUser(profile as any);
                     setIsLoading(false);
                 });
             } else {
@@ -190,10 +195,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const loginWithUser = (user: Partial<User> & { id: string }) => {
         setBaseUser({
             id: user.id,
-            email: user.email ?? undefined,
+            email: user.email ?? null,
             full_name: user.name || user.fullName || user.email || '',
             role: user.role || 'Company',
-        });
+        } as any);
     };
 
     // Only Students can register; Companies are created by Admin
