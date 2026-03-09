@@ -1,5 +1,6 @@
-Supabase
+Supabase (only — no other auth/API URL)
 
+src/lib/supabase/env.ts – validates NEXT_PUBLIC_SUPABASE_URL is a Supabase URL (e.g. *.supabase.co)
 src/lib/supabase/client.ts – browser client
 src/lib/supabase/server.ts – server client
 src/lib/supabase/admin.ts – service-role client (admin-only actions)
@@ -22,10 +23,7 @@ DB
 supabase/migrations/20260309000001_initial_profiles.sql – profiles table, trigger (new user → profile with role Student), RLS.
 supabase/migrations/20260309000002_create_first_admin.sql – instructions + example SQL to set first admin.
 
-.env.local yaradirsan ve icine bunlari yazirsan ve supabaseden aldigin value-lar ile deyisirsen
-NEXT_PUBLIC_SUPABASE_URL=burasupabaseurlyazirsan
-NEXT_PUBLIC_SUPABASE_ANON_KEY=buradaanonkey
-SUPABASE_SERVICE_ROLE_KEY=buradarolekeyartiqnedise
+Copy .env.example to .env.local and set values from Supabase Dashboard (Settings → API). Do not use any other URL (e.g. runasp.net). See .env.example.
 
 admin yaratmaq ucun ise bu cur edirsen (sql querydi)
 
