@@ -2,6 +2,7 @@
   "name": "studeal",
   "version": "0.1.6",
   "private": true,
+  "packageManager": "npm@10.0.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

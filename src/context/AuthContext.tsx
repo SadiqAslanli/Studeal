@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserConfig } from '@/lib/supabase/env';
 
 export type Notification = {
     id: string;
@@ -111,9 +112,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
     const supabase = useMemo(() => createClient(), []);
-
-    const authUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const { url: supabaseUrl } = useMemo(() => getSupabaseBrowserConfig(), []);
+    const authUrl = supabaseUrl;
+    const apiUrl = supabaseUrl;
 
     useEffect(() => {
         if (!baseUser) return;
