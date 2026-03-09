@@ -54,7 +54,8 @@ export const translations = {
             namePlaceholder: "Ad Soyad",
             companyPlaceholder: "Şirkət adı",
             error: "E-poçt və ya şifrə yanlışdır",
-            userNotFound: "Belə hesab yoxdur"
+            userNotFound: "Belə hesab yoxdur",
+            emailNotConfirmed: "E-poçt təsdiqlənməyib. Zəhmət olmasa poçtunuzu yoxlayın və təsdiq linkinə klikləyin."
         },
         deals: {
             view: "Bax",
@@ -446,7 +447,8 @@ export const translations = {
             namePlaceholder: "Full Name",
             companyPlaceholder: "Company Name",
             error: "Email or password incorrect",
-            userNotFound: "Account does not exist"
+            userNotFound: "Account does not exist",
+            emailNotConfirmed: "Email not confirmed. Please check your inbox and click the confirmation link."
         },
         deals: {
             view: "View",
