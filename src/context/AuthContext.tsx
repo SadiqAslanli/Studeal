@@ -138,14 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const mergedUser = useMemo(() => {
         if (!baseUser) return null;
-<<<<<<< HEAD
-        return profileToUser(
-            { id: baseUser.id, email: baseUser.email ?? null, full_name: baseUser.full_name ?? null, role: baseUser.role ?? null },
-            studealData
-        );
-=======
         return profileToUser(baseUser, studealData);
->>>>>>> 95e31d7443cd26e1ad1eea4ef2a750952a83b7f4
     }, [baseUser, studealData]);
 
     const saveStudealMeta = (updated: Partial<User>) => {
@@ -201,11 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setBaseUser({
             id: user.id,
             email: user.email ?? null,
-<<<<<<< HEAD
-            full_name: (user as any).name || (user as any).fullName || user.email || '',
-=======
             full_name: user.name || user.fullName || user.email || '',
->>>>>>> 95e31d7443cd26e1ad1eea4ef2a750952a83b7f4
             role: user.role || 'Company',
         });
     };
@@ -257,29 +246,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = async () => {
+        console.log("Logout initiated");
         setIsLoading(true);
         try {
-            // 1. Supabase-dən rəsmi çıxış edirik
-            await supabase.auth.signOut();
-            
-            // 2. Local yaddaşı təmizləyirik
+            // Local state-i dərhal təmizləyirik ki, UI dərhal yenilənsin
+            setBaseUser(null);
+            setStudealData({});
             localStorage.clear();
             sessionStorage.clear();
 
-            // 3. State-ləri sıfırlayırıq
-            setBaseUser(null);
-            setStudealData({});
+            // Supabase-dən çıxış (network asılılığı var, ona görə dərhal gözləmirik ki, redirect gecikməsin)
+            supabase.auth.signOut().catch(err => console.error("Supabase signOut error:", err));
             
-            // 4. Giriş səhifəsinə yönləndiririk
-            router.replace('/login');
-            router.refresh();
+            console.log("State cleared, redirecting to login");
+            
+            // Tam təmizlənmə üçün səhifəni yenidən yükləyirik (amma artıq logine atmırıq)
+            window.location.reload();
         } catch (e) {
-            console.error("Logout error:", e);
-            // Error olsa belə dərhal təmizləyib atırıq
-            localStorage.clear();
-            window.location.href = '/login';
-        } finally {
-            setIsLoading(false);
+            console.error("Logout process error:", e);
+            window.location.reload();
         }
     };
 

@@ -19,7 +19,7 @@ import styles from '@/app/page.module.css';
 
 export default function Header() {
   const { t, lang, setLang } = useLanguage();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -38,9 +38,8 @@ export default function Header() {
   );
 
   const AuthButtons = () => {
-    const { user, isLoading } = useAuth();
-    
-    if (isLoading) return <div style={{ width: '100px' }} />; // Placeholder to prevent jump
+    // Hidden during loading to prevent flicker, but showing placeholder to avoid UI jump
+    if (authLoading && !user) return <div style={{ minWidth: '100px' }} />;
 
     return (
       <div className={styles.authBtns}>
@@ -79,7 +78,7 @@ export default function Header() {
           <Link
             href="/login"
             className="btn-primary"
-            style={{ borderRadius: '50px', padding: '10px 25px' }}
+            style={{ borderRadius: '50px', padding: '10px 25px', color: 'white', display: 'block' }}
             onClick={() => setIsMenuOpen(false)}
           >
             {t.login}
