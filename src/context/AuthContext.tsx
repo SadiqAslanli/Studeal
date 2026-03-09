@@ -107,7 +107,7 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [baseUser, setBaseUser] = useState<(ProfileRow & Partial<User>) | null>(null);
+    const [baseUser, setBaseUser] = useState<ProfileRow | null>(null);
     const [studealData, setStudealData] = useState<Partial<User>>({});
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
@@ -133,10 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const mergedUser = useMemo(() => {
         if (!baseUser) return null;
-        return profileToUser(
-            { id: baseUser.id, email: baseUser.email ?? null, full_name: baseUser.full_name ?? baseUser.fullName ?? null, role: baseUser.role ?? null },
-            studealData
-        );
+        return profileToUser(baseUser, studealData);
     }, [baseUser, studealData]);
 
     const saveStudealMeta = (updated: Partial<User>) => {
@@ -191,7 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const loginWithUser = (user: Partial<User> & { id: string }) => {
         setBaseUser({
             id: user.id,
-            email: user.email ?? undefined,
+            email: user.email ?? null,
             full_name: user.name || user.fullName || user.email || '',
             role: user.role || 'Company',
         });
