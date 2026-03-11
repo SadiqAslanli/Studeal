@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { ChevronLeft, ChevronRight, ArrowRight, Clock } from 'lucide-react';
 import styles from './FeaturedSlider.module.css';
+import { getFeaturedDeals } from '@/app/admin/contentActions';
 
 export default function FeaturedSlider() {
     const { t } = useLanguage();
@@ -11,17 +12,11 @@ export default function FeaturedSlider() {
     const [featuredItems, setFeaturedItems] = useState<any[]>([]);
 
     useEffect(() => {
-        const savedItems = localStorage.getItem('featuredDeals');
-        if (savedItems) {
-            const parsed = JSON.parse(savedItems);
-            if (parsed.length > 0) {
-                setFeaturedItems(parsed);
-                return;
-            }
-        }
-
-        // If none in localStorage, we start empty to only show dynamic content
-        setFeaturedItems([]);
+        const loadFeatured = async () => {
+            const items = await getFeaturedDeals();
+            setFeaturedItems(items);
+        };
+        loadFeatured();
     }, [t]);
 
     useEffect(() => {
@@ -57,7 +52,7 @@ export default function FeaturedSlider() {
                             <div className={styles.slideMedia}>
                                 {isVideo ? (
                                     <video 
-                                        src={deal.image} 
+                                        src={deal.image_url} 
                                         className={styles.slideVideo} 
                                         autoPlay 
                                         muted 
@@ -65,7 +60,7 @@ export default function FeaturedSlider() {
                                         playsInline 
                                     />
                                 ) : (
-                                    <img src={deal.image} alt={deal.title} className={styles.slideImg} />
+                                    <img src={deal.image_url} alt={deal.title} className={styles.slideImg} />
                                 )}
                                 <div className={styles.slideOverlay} />
                             </div>
@@ -75,7 +70,7 @@ export default function FeaturedSlider() {
                                     <span className={styles.limitedBadge}><Clock size={14} /> {t.featured.limited}</span>
                                 </div>
                                 <h3 className={styles.dealTitle}>{deal.title}</h3>
-                                <p className={styles.dealDesc}>{deal.desc}</p>
+                                <p className={styles.dealDesc}>{deal.description}</p>
                                 <button className={styles.btnAction}>
                                     {t.featured.getNow} <ArrowRight size={18} />
                                 </button>
