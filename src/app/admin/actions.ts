@@ -65,7 +65,7 @@ export async function deleteCompanyUser(id: string): Promise<CreateCompanyResult
 
 export type CreateCompanyResult = { ok: true } | { ok: false; error: string };
 
-export async function createCompanyUser(name: string, email: string, password: string, categoryId: number): Promise<CreateCompanyResult> {
+export async function createCompanyUser(name: string, email: string, password: string, categoryId: number, imageUrl?: string): Promise<CreateCompanyResult> {
   try {
     const supabase = createAdminClient();
     const normalizedEmail = email.trim().toLowerCase();
@@ -97,6 +97,7 @@ export async function createCompanyUser(name: string, email: string, password: s
       role: "Company",
       full_name: name.trim(),
       is_active: true,
+      metadata: { image: imageUrl || null }, // Added image to metadata
       updated_at: new Date().toISOString()
     };
 
