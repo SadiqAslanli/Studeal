@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useParams } from 'next/navigation';
 import { Star, Heart, Flag, Info, X, AlertTriangle, GraduationCap, MapPin, Clock } from 'lucide-react';
 import styles from '../company.module.css';
-import { allCompanies } from '@/utils/dealsData';
+
 
 export default function CompanyProfile() {
     const { t } = useLanguage();
@@ -54,8 +54,11 @@ export default function CompanyProfile() {
         if (id) fetchCompanyFromDb();
     }, [id]);
 
-    const currentCompany = dynamicCompany || allCompanies.find(c => c.id === Number(id)) || allCompanies[0];
-    const isCompanyFavorite = user?.companyFavorites?.includes(typeof currentCompany?.id === 'string' ? currentCompany.id : currentCompany?.id);
+    if (isDbLoading) return <div className={styles.loading}>Yüklənir...</div>;
+    if (!dynamicCompany) return <div className={styles.error}>Müəssisə tapılmadı.</div>;
+
+    const currentCompany = dynamicCompany;
+    const isCompanyFavorite = user?.companyFavorites?.includes(currentCompany.id);
 
     const handleMenuRate = (dealId: any, rating: number) => {
         let newCount = menuRatings[dealId]?.count || 0;
