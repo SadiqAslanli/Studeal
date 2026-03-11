@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Star, Heart, Tag, ArrowUpRight, Check, GraduationCap, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './DealList.module.css';
-import { staticDeals } from '@/utils/dealsData';
+
 import { listCompanies, CompanyProfile } from '@/app/admin/actions';
 
 interface DealListProps {
@@ -96,7 +96,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
   };
 
 
-  const allDeals = [...staticDeals, ...dynamicDeals];
+  const allDeals = [...dynamicDeals];
 
   const handleFavorite = (e: React.MouseEvent, dealId: number, title: string) => {
     e.preventDefault();
@@ -159,7 +159,11 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
               >
                 <div className={styles.cardImage}>
                   {deal.image ? (
-                    <img src={deal.image} alt={deal.title} className={styles.mainImg} />
+                    deal.image.toLowerCase().includes('/video/') || deal.image.endsWith('.mp4') ? (
+                      <video src={deal.image} className={styles.mainImg} autoPlay muted loop playsInline />
+                    ) : (
+                      <img src={deal.image} alt={deal.title} className={styles.mainImg} />
+                    )
                   ) : (
                     <div className={styles.placeholderImg} style={{ backgroundColor: deal.color + '10' }}>
                       <Tag size={32} style={{ color: deal.color }} />
