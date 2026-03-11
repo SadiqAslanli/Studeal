@@ -18,10 +18,10 @@ export default function TermsPage() {
                     <p className={styles.intro}>{termsData.intro}</p>
                 </header>
 
-                <main className={styles.content}>
+                <main className={styles.termsGrid}>
                     {termsData.sections.map((section: any, index: number) => (
-                        <section key={index} className={styles.section}>
-                            <h2>{section.title}</h2>
+                        <section key={index} className={styles.termCard}>
+                            <h3>{section.title}</h3>
                             <p>{section.content}</p>
                         </section>
                     ))}

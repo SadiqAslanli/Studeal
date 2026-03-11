@@ -4,12 +4,15 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useState } from 'react';
 import styles from './Filters.module.css';
 
+import { Search } from 'lucide-react';
+
 interface FiltersProps {
   onCategoryChange: (categoryId: number) => void;
   onSortChange: (sortOption: string) => void;
+  onSearch: (query: string) => void;
 }
 
-export default function Filters({ onCategoryChange, onSortChange }: FiltersProps) {
+export default function Filters({ onCategoryChange, onSortChange, onSearch }: FiltersProps) {
   const { t } = useLanguage();
   const [activeCat, setActiveCat] = useState(6); // Default to 'All'
   const [activeSort, setActiveSort] = useState('new');
@@ -42,6 +45,18 @@ export default function Filters({ onCategoryChange, onSortChange }: FiltersProps
   return (
     <section className={styles.filters}>
       <div className="container">
+        {/* Search Bar */}
+        <div className={styles.searchWrapper}>
+          <div className={styles.searchBar}>
+            <Search size={20} className={styles.searchIcon} />
+            <input 
+              type="text" 
+              placeholder={t.searchPlaceholder} 
+              onChange={(e) => onSearch(e.target.value)}
+            />
+          </div>
+        </div>
+
         {/* Main Categories */}
         <div className={styles.filterWrapper}>
           <div className={styles.label}>{t.categories.label}</div>
