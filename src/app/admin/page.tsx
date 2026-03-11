@@ -23,6 +23,7 @@ import {
 import styles from './admin.module.css';
 import Link from 'next/link';
 import { createCompanyUser, listCompanies, updateCompanyStatus, deleteCompanyUser } from './actions';
+import { uploadMediaAction } from './cloudinaryActions';
 
 type Tab = 'dashboard' | 'restaurants' | 'ads' | 'messages' | 'featured' | 'adRequests';
 
@@ -66,6 +67,12 @@ export default function AdminDashboard() {
         discount: '',
         companyId: ''
     });
+    const [isUploading, setIsUploading] = useState(false);
+    const [newRestImage, setNewRestImage] = useState<File | null>(null);
+    const [newRestPreview, setNewRestPreview] = useState<string | null>(null);
+    const [selectedAdFile, setSelectedAdFile] = useState<File | null>(null);
+    const [selectedFeaturedFile, setSelectedFeaturedFile] = useState<File | null>(null);
+    const [featuredPreview, setFeaturedPreview] = useState<string | null>(null);
 
     useEffect(() => {
         if (isLoading) return; // wait for session to load first
@@ -133,13 +140,35 @@ export default function AdminDashboard() {
         const name = newRest.name.trim();
         const email = newRest.email.trim().toLowerCase();
         const password = newRest.password.trim();
+        
         if (!name || !email || !password) {
             alert("Ad, e-poçt və parol tələb olunur.");
             return;
         }
-        const result = await createCompanyUser(name, email, password, newRest.categoryId);
+
+        setIsUploading(true);
+        let uploadedImageUrl = '';
+        
+        if (newRestImage) {
+            const formData = new FormData();
+            formData.append('file', newRestImage);
+            const res = await uploadMediaAction(formData);
+            if (res.success) {
+                uploadedImageUrl = res.url || '';
+            } else {
+                alert("Şəkil yüklənə bilmədi: " + res.error);
+                setIsUploading(false);
+                return;
+            }
+        }
+
+        const result = await createCompanyUser(name, email, password, newRest.categoryId, uploadedImageUrl);
+        setIsUploading(false);
+        
         if (result.ok) {
             setNewRest({ name: '', email: '', password: '', categoryId: 1 });
+            setNewRestImage(null);
+            setNewRestPreview(null);
             setShowModal(false);
             await loadRestaurants();
             alert("Partnyor hesabı uğurla yaradıldı!");
@@ -192,6 +221,7 @@ export default function AdminDashboard() {
         }
 
         if (file) {
+            setSelectedAdFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setNewAd(prev => ({ ...prev, image: reader.result as string }));
@@ -200,17 +230,43 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleAddAd = (e: React.FormEvent) => {
+    const handleAddAd = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!newAd.image || !newAd.companyId) {
+            alert("Şəkil və partnyor seçilməlidir.");
+            return;
+        }
+
+        setIsUploading(true);
+        let finalImageUrl = newAd.image;
+
+        // Upload to Cloudinary if we have a file
+        if (selectedAdFile) {
+            const formData = new FormData();
+            formData.append('file', selectedAdFile);
+            const res = await uploadMediaAction(formData);
+            if (res.success) {
+                finalImageUrl = res.url || '';
+            } else {
+                alert("Reklam yüklənə bilmədi: " + res.error);
+                setIsUploading(false);
+                return;
+            }
+        }
+        
         const ads = JSON.parse(localStorage.getItem('adminAdsList') || '[]');
         const newItem = {
             ...newAd,
+            image: finalImageUrl,
             id: Date.now().toString()
         };
         const updated = [...ads, newItem];
         localStorage.setItem('adminAdsList', JSON.stringify(updated));
         setDynamicAds(updated);
         setNewAd({ image: '', discount: '', companyId: '' });
+        setSelectedAdFile(null);
+        setIsUploading(false);
         alert("Reklam əlavə edildi!");
     };
 
@@ -242,17 +298,38 @@ export default function AdminDashboard() {
         });
     };
 
-    const handleAddFeatured = (e: React.FormEvent) => {
+    const handleAddFeatured = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        setIsUploading(true);
+        let finalImageUrl = newFeatured.image;
+
+        if (selectedFeaturedFile) {
+            const formData = new FormData();
+            formData.append('file', selectedFeaturedFile);
+            const res = await uploadMediaAction(formData);
+            if (res.success) {
+                finalImageUrl = res.url || '';
+            } else {
+                alert("Xəta: Fayl yüklənə bilmədi: " + res.error);
+                setIsUploading(false);
+                return;
+            }
+        }
+
         const all = JSON.parse(localStorage.getItem('featuredDeals') || '[]');
         const newItem = {
             ...newFeatured,
+            image: finalImageUrl,
             id: Date.now().toString()
         };
         const updated = [...all, newItem];
         localStorage.setItem('featuredDeals', JSON.stringify(updated));
         setFeaturedDeals(updated);
         setNewFeatured({ title: '', desc: '', discount: '', image: '' });
+        setSelectedFeaturedFile(null);
+        setFeaturedPreview(null);
+        setIsUploading(false);
     };
 
     const handleDeleteFeatured = (id: string) => {
@@ -363,7 +440,52 @@ export default function AdminDashboard() {
                                         placeholder="••••••••"
                                     />
                                 </div>
-                                <button type="submit" className={styles.modalSubmitBtn}>Yarat</button>
+                                <div className={styles.formGroup}>
+                                    <label>Loqo / Şəkil / Video</label>
+                                    <div 
+                                        className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
+                                        style={{ height: '120px' }}
+                                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                        onDragLeave={() => setIsDragging(false)}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            setIsDragging(false);
+                                            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                                const file = e.dataTransfer.files[0];
+                                                setNewRestImage(file);
+                                                setNewRestPreview(URL.createObjectURL(file));
+                                            }
+                                        }}
+                                        onClick={() => document.getElementById('restFile')?.click()}
+                                    >
+                                        <input 
+                                            type="file" 
+                                            id="restFile" 
+                                            hidden 
+                                            accept="image/*,video/*"
+                                            onChange={(e) => {
+                                                if (e.target.files && e.target.files[0]) {
+                                                    const file = e.target.files[0];
+                                                    setNewRestImage(file);
+                                                    setNewRestPreview(URL.createObjectURL(file));
+                                                }
+                                            }}
+                                        />
+                                        {newRestPreview ? (
+                                            newRestImage?.type.startsWith('video') ? 
+                                            <video src={newRestPreview} style={{ height: '100%', width: '100%', objectFit: 'contain' }} muted /> :
+                                            <img src={newRestPreview} alt="Preview" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                                        ) : (
+                                            <div className={styles.dropzoneText}>
+                                                <Upload size={20} />
+                                                <span style={{ fontSize: '12px' }}>Fayl seçin (Media)</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <button type="submit" className={styles.modalSubmitBtn} disabled={isUploading}>
+                                    {isUploading ? 'Yüklənir...' : 'Yarat'}
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -635,8 +757,8 @@ export default function AdminDashboard() {
                             <form onSubmit={handleAddAd} className={styles.form}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                                     <h3 style={{ margin: 0, fontWeight: 800, color: '#1b2559' }}>🚀 Yeni Sidebar Reklamı</h3>
-                                    <button type="submit" className="btn-primary" style={{ background: '#4318ff', borderRadius: '12px' }}>
-                                        <Plus size={18} /> Reklamı Əlavə Et
+                                    <button type="submit" className="btn-primary" style={{ background: '#4318ff', borderRadius: '12px' }} disabled={isUploading}>
+                                        <Plus size={18} /> {isUploading ? 'Yüklənir...' : 'Reklamı Əlavə Et'}
                                     </button>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
@@ -657,7 +779,7 @@ export default function AdminDashboard() {
                                                 type="file" 
                                                 id="adFile" 
                                                 hidden 
-                                                accept="image/*"
+                                                accept="image/*,video/*"
                                                 onChange={handleFileSelect}
                                             />
                                             {newAd.image ? (
@@ -834,31 +956,61 @@ export default function AdminDashboard() {
                                         />
                                     </div>
                                 </div>
-                                <div className={styles.formGroup}>
-                                    <label>Təsvir</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Tələbələr üçün özəl 20% endirim kampaniyası davam edir!"
-                                        value={newFeatured.desc}
-                                        onChange={(e) => setNewFeatured({ ...newFeatured, desc: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label>Şəkil URL-i</label>
-                                    <input
-                                        type="text"
-                                        placeholder="https://images.unsplash.com/..."
-                                        value={newFeatured.image}
-                                        onChange={(e) => setNewFeatured({ ...newFeatured, image: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                {newFeatured.image && (
-                                    <div style={{ width: '100%', height: '140px', borderRadius: '16px', overflow: 'hidden', marginTop: '8px' }}>
-                                        <img src={newFeatured.image} alt="Önizləmə" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                                    <div className={styles.formGroup}>
+                                        <label>Media (Şəkil/Video)</label>
+                                        <div 
+                                            className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
+                                            style={{ height: '120px' }}
+                                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                            onDragLeave={() => setIsDragging(false)}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                setIsDragging(false);
+                                                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                                    const file = e.dataTransfer.files[0];
+                                                    setSelectedFeaturedFile(file);
+                                                    setFeaturedPreview(URL.createObjectURL(file));
+                                                }
+                                            }}
+                                            onClick={() => document.getElementById('featFile')?.click()}
+                                        >
+                                            <input 
+                                                type="file" 
+                                                id="featFile" 
+                                                hidden 
+                                                accept="image/*,video/*"
+                                                onChange={(e) => {
+                                                    if (e.target.files && e.target.files[0]) {
+                                                        const file = e.target.files[0];
+                                                        setSelectedFeaturedFile(file);
+                                                        setFeaturedPreview(URL.createObjectURL(file));
+                                                    }
+                                                }}
+                                            />
+                                            {featuredPreview ? (
+                                                selectedFeaturedFile?.type.startsWith('video') ?
+                                                <video src={featuredPreview} style={{ height: '100%', width: '100%', objectFit: 'contain' }} muted /> :
+                                                <img src={featuredPreview} alt="Preview" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                                            ) : (
+                                                <div className={styles.dropzoneText}>
+                                                    <Upload size={20} />
+                                                    <span style={{ fontSize: '12px' }}>Fayl seçin</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
+                                    <div className={styles.formGroup}>
+                                        <label>Təsvir</label>
+                                        <textarea
+                                            placeholder="Tələbələr üçün özəl 20% endirim kampaniyası davam edir!"
+                                            value={newFeatured.desc}
+                                            onChange={(e) => setNewFeatured({ ...newFeatured, desc: e.target.value })}
+                                            required
+                                            style={{ height: '120px', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2', width: '100%' }}
+                                        />
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
