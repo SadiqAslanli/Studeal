@@ -17,6 +17,7 @@ import {
     Send
 } from 'lucide-react';
 import styles from './feedback.module.css';
+import { addMessage } from '../admin/contentActions';
 
 export default function FeedbackPage() {
     const { t } = useLanguage();
@@ -29,27 +30,22 @@ export default function FeedbackPage() {
         message: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.message.trim()) return;
 
-        // Save to localStorage for admin
-        const savedFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
-        const newFeedback = {
-            ...formData,
-            id: Date.now().toString(),
-            date: new Date().toLocaleDateString('az-AZ'),
-            status: 'unread'
-        };
-        savedFeedback.unshift(newFeedback);
-        localStorage.setItem('userFeedback', JSON.stringify(savedFeedback));
-
-        addNotification({
-            title: t.feedback.successTitle,
-            message: t.feedback.successMsg
-        });
-
-        setSubmitted(true);
+        // Save to Supabase
+        const result = await addMessage(formData);
+        
+        if (result.ok) {
+            addNotification({
+                title: t.feedback.successTitle,
+                message: t.feedback.successMsg
+            });
+            setSubmitted(true);
+        } else {
+            alert("Xəta: " + result.error);
+        }
     };
 
     if (submitted) {
