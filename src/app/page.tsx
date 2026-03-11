@@ -35,8 +35,6 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("new");
 
-  const [adData, setAdData] = useState({ left: '', right: '' });
-
   const [dynamicAds, setDynamicAds] = useState<any[]>([]);
 
   useEffect(() => {
@@ -54,46 +52,6 @@ export default function Home() {
       sessionStorage.setItem('visitedToday', 'true');
     }
   }, []);
-
-  const ads = [
-    {
-      brand: 'Pizza Mizza', tag: 'GECƏ TƏKLİFİ',
-      discount: '25% ENDİRİM', price: '13.90 AZN', oldPrice: '18.60 AZN',
-      icon: <Pizza size={18} />, iconBg: '#fff1f1', iconColor: '#ff4d4d',
-      g1: '#ff6b6b', g2: '#ff4d4d',
-      image: adData.left || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      brand: 'KFC', tag: 'TƏLƏBƏ MENYUSU',
-      discount: '20% ENDİRİM', price: '5.90 AZN', oldPrice: '7.40 AZN',
-      icon: <Flame size={18} />, iconBg: '#fef2f2', iconColor: '#e4002b',
-      g1: '#e4002b', g2: '#c40025',
-      image: adData.right || 'https://images.unsplash.com/photo-1513639776629-7b61b0ac49cb?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      brand: 'Starbucks', tag: 'SƏHƏR TƏKLİFİ',
-      discount: '15% ENDİRİM', price: '4.50 AZN', oldPrice: '5.30 AZN',
-      icon: <Coffee size={18} />, iconBg: '#f0faf4', iconColor: '#00704a',
-      g1: '#00704a', g2: '#00582f',
-      image: 'https://images.unsplash.com/photo-1544787210-282aa5ac739d?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      brand: 'CinemaPlus', tag: 'HƏFTƏSONU',
-      discount: '50% ENDİRİM', price: '3.50 AZN', oldPrice: '7.00 AZN',
-      icon: <Clapperboard size={18} />, iconBg: '#f0f4ff', iconColor: '#3b82f6',
-      g1: '#3b82f6', g2: '#2563eb',
-      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      isPlaceholder: true,
-      brand: 'Sənin Reklamın', tag: 'İNDİ YERLƏŞDİR',
-      discount: 'MÜNASİB QİYMƏT', price: 'Bizimlə əlaqə', oldPrice: '',
-      icon: <PlusCircle size={18} />, iconBg: '#eff6ff', iconColor: '#3b82f6',
-      g1: '#3b82f6', g2: '#2563eb',
-      image: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&q=80&w=400',
-      link: '/partners/ad-request'
-    }
-  ];
 
   const Sidebar = () => (
     <aside className={styles.sideAd}>
@@ -140,7 +98,11 @@ export default function Home() {
               }}
             >
               <div className={styles.adImageWrapper}>
-                <img src={ad.image} alt="Partner Ad" />
+                {ad.image?.toLowerCase().includes('/video/') || ad.image?.endsWith('.mp4') ? (
+                  <video src={ad.image} className={styles.adImgVideo} autoPlay muted loop playsInline />
+                ) : (
+                  <img src={ad.image} alt="Partner Ad" />
+                )}
                 <div className={styles.adImgOverlay} />
                 <div className={styles.newDiscountBadge}>{ad.discount}</div>
                 <button 
