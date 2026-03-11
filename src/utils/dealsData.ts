@@ -1,2 +1,2 @@
-export const allCompanies = [];
-export const staticDeals = [];
+export const allCompanies: any[] = [];
+export const staticDeals: any[] = [];
