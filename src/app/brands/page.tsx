@@ -3,35 +3,42 @@
 import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
 import { ArrowLeft, Search, Building2, Star } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './brands.module.css';
+import { listCompanies } from '@/app/admin/actions';
 
 export default function BrandsPage() {
     const { t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Replicating static deals data format to extract unique brands
-    const staticDeals = [
-        { id: 1, title: 'KFC Tələbə Menyu', company: 'KFC Azerbaijan', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7OOVEsL1bzTuB4MJfCc8BCCqSBGoOTQVmVQ&s' },
-        { id: 2, title: 'Nike Tələbə Kartı', company: 'Nike Store', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800' },
-        { id: 3, title: 'IELTS Hazırlığı', company: 'CELT Colleges', image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800' },
-        { id: 4, title: 'Sinema Bileti', company: 'CinemaPlus', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800' },
-        { id: 5, title: 'MacBook Pro', company: 'Alma Store', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=800' },
-        { id: 6, title: 'Pizza Festivalı', company: 'Pizza Mizza', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=800' },
-        { id: 7, title: 'McDonalds Tələbə Kombo', company: 'McDonalds', image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&q=80&w=800' },
-        { id: 8, title: 'Mado Səhər Yeməyi', company: 'Mado', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=800' },
-        { id: 9, title: 'Starbucks Coffee', company: 'Starbucks', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=800' },
-        { id: 10, title: 'Fryday Menyu', company: 'Fryday', image: 'https://imageproxy.wolt.com/mes-image/0207ffda-d544-4106-ae2d-c371ec2070b8/e85043fa-6d4c-4380-8622-35c89b68dd25' },
-        { id: 11, title: 'Vapiano Pasta', company: 'Vapiano', image: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&q=80&w=800' },
-        { id: 12, title: 'Entree Bakery', company: 'Entree', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800' },
-        { id: 13, title: 'Baku Book Center', company: 'BBC', image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&q=80&w=800' },
-        { id: 14, title: 'Ali & Nino', company: 'Ali & Nino', image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=800' },
-        { id: 15, company: 'Bravo', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800' },
-    ];
+    const [uniqueBrands, setUniqueBrands] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const uniqueBrands = Array.from(new Set(staticDeals.map(d => d.company))).map(company => {
-        return staticDeals.find(d => d.company === company);
-    }).filter(d => d?.company.toLowerCase().includes(searchQuery.toLowerCase()));
+    useEffect(() => {
+        const fetchBrands = async () => {
+            setIsLoading(true);
+            try {
+                const companies = await listCompanies();
+                const formattedBrands = companies
+                    .filter(c => c.is_active !== false)
+                    .map(c => ({
+                        id: c.id,
+                        company: c.full_name,
+                        image: (c as any).metadata?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800'
+                    }));
+                setUniqueBrands(formattedBrands);
+            } catch (error) {
+                console.error("Failed to fetch brands:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchBrands();
+    }, []);
+
+    const filteredBrands = uniqueBrands.filter(brand => 
+        brand.company.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className={styles.brandsPage}>
