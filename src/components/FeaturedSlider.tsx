@@ -20,30 +20,8 @@ export default function FeaturedSlider() {
             }
         }
 
-        // Fallback to default items if none in localStorage
-        setFeaturedItems([
-            {
-                id: 1,
-                title: t.featured.deal1Title,
-                desc: t.featured.deal1Desc,
-                image: "https://images.unsplash.com/photo-1513639776629-7b61b0ac49cb?auto=format&fit=crop&q=80&w=1200",
-                discount: "20%"
-            },
-            {
-                id: 2,
-                title: t.featured.deal2Title,
-                desc: t.featured.deal2Desc,
-                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=1200",
-                discount: "15%"
-            },
-            {
-                id: 4,
-                title: t.featured.deal3Title,
-                desc: t.featured.deal3Desc,
-                image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200",
-                discount: "50%"
-            }
-        ]);
+        // If none in localStorage, we start empty to only show dynamic content
+        setFeaturedItems([]);
     }, [t]);
 
     useEffect(() => {
@@ -68,28 +46,43 @@ export default function FeaturedSlider() {
             </div>
 
             <div className={styles.sliderTrack}>
-                {featuredItems.map((deal, index) => (
-                    <div
-                        key={deal.id}
-                        className={`${styles.slide} ${index === current ? styles.activeSlide : ''}`}
-                        style={{
-                            display: index === current ? 'flex' : 'none',
-                            backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url(${deal.image})`
-                        }}
-                    >
-                        <div className={styles.slideContent}>
-                            <div className={styles.badgeRow}>
-                                <span className={styles.discountBadge}>-{deal.discount}</span>
-                                <span className={styles.limitedBadge}><Clock size={14} /> {t.featured.limited}</span>
+                {featuredItems.map((deal, index) => {
+                    const isVideo = deal.image?.toLowerCase().includes('/video/') || deal.image?.endsWith('.mp4');
+                    return (
+                        <div
+                            key={deal.id}
+                            className={`${styles.slide} ${index === current ? styles.activeSlide : ''}`}
+                            style={{ display: index === current ? 'flex' : 'none' }}
+                        >
+                            <div className={styles.slideMedia}>
+                                {isVideo ? (
+                                    <video 
+                                        src={deal.image} 
+                                        className={styles.slideVideo} 
+                                        autoPlay 
+                                        muted 
+                                        loop 
+                                        playsInline 
+                                    />
+                                ) : (
+                                    <img src={deal.image} alt={deal.title} className={styles.slideImg} />
+                                )}
+                                <div className={styles.slideOverlay} />
                             </div>
-                            <h3 className={styles.dealTitle}>{deal.title}</h3>
-                            <p className={styles.dealDesc}>{deal.desc}</p>
-                            <button className={styles.btnAction}>
-                                {t.featured.getNow} <ArrowRight size={18} />
-                            </button>
+                            <div className={styles.slideContent}>
+                                <div className={styles.badgeRow}>
+                                    <span className={styles.discountBadge}>-{deal.discount}</span>
+                                    <span className={styles.limitedBadge}><Clock size={14} /> {t.featured.limited}</span>
+                                </div>
+                                <h3 className={styles.dealTitle}>{deal.title}</h3>
+                                <p className={styles.dealDesc}>{deal.desc}</p>
+                                <button className={styles.btnAction}>
+                                    {t.featured.getNow} <ArrowRight size={18} />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className={styles.dots}>
