@@ -159,16 +159,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const fetchProfile = async (userId: string) => {
+    const fetchProfile = async (userId: string, retryCount = 0): Promise<ProfileRow | null> => {
         try {
-            console.log("DEBUG: fetchProfile started for", userId);
-            // Try to fetch with metadata, if it fails because column doesn't exist, it will return error
-            const { data, error } = await supabase.from('profiles').select('id, email, full_name, role, metadata').eq('id', userId).single();
+            console.log("DEBUG: fetchProfile started for", userId, "attempt", retryCount + 1);
+            
+            // Try to fetch with metadata
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('id, email, full_name, role, metadata')
+              .eq('id', userId)
+              .maybeSingle();
             
             if (error) {
+                // If it's a specific "lock broken" error, we retry up to 2 times
+                if (error.message.includes('AbortError') || error.message.includes('lock broken')) {
+                    if (retryCount < 2) {
+                        console.warn("DEBUG: fetchProfile lock error, retrying...", retryCount + 1);
+                        await new Promise(r => setTimeout(r, 200));
+                        return fetchProfile(userId, retryCount + 1);
+                    }
+                    console.error("DEBUG: fetchProfile aborted after multiple lock competition retries.");
+                    return null;
+                }
+
                 console.warn("DEBUG: fetchProfile first attempt error (possibly missing metadata column):", error.message);
+                
                 // Fallback attempt without metadata column
-                const { data: fbData, error: fbError } = await supabase.from('profiles').select('id, email, full_name, role').eq('id', userId).single();
+                const { data: fbData, error: fbError } = await supabase
+                  .from('profiles')
+                  .select('id, email, full_name, role')
+                  .eq('id', userId)
+                  .maybeSingle();
+                
                 if (fbError) {
                     console.error("DEBUG: fetchProfile fallback error:", fbError.message);
                     return null;
@@ -177,17 +199,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             
             return data as ProfileRow | null;
-        } catch (e) {
+        } catch (e: any) {
+            // Guard against AbortError in catch block too
+            if ((e?.name === 'AbortError' || e?.message?.includes('Lock broken')) && retryCount < 2) {
+                console.warn("DEBUG: fetchProfile caught AbortError, retrying...", retryCount + 1);
+                await new Promise(r => setTimeout(r, 200));
+                return fetchProfile(userId, retryCount + 1);
+            }
             console.error("DEBUG: fetchProfile unexpected exception:", e);
             return null;
         }
     };
 
     useEffect(() => {
+        let mounted = true;
+
+        // supabase.auth.onAuthStateChange is the most reliable way to handle session
+        // It fires 'INITIAL_SESSION' immediately upon registration.
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (!mounted) return;
+            
             console.log("DEBUG: Auth State Changed:", event);
+            
             if (event === 'SIGNED_OUT' || !session?.user) {
                 setBaseUser(null);
                 setStudealData({});
@@ -195,24 +230,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return;
             }
             
-            // For any event with a user, ensure we have a profile and stop loading
-            const profile = await fetchProfile(session.user.id);
-            if (profile) setBaseUser(profile as any);
-            setIsLoading(false);
+            // For any event with a user, ensure we have a profile
+            try {
+                const profile = await fetchProfile(session.user.id);
+                if (mounted && profile) {
+                    setBaseUser(profile);
+                }
+            } catch (err) {
+                console.error("DEBUG: Failed to fetch profile on auth change:", err);
+            } finally {
+                if (mounted) setIsLoading(false);
+            }
         });
 
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.user) {
-                fetchProfile(session.user.id).then((profile) => {
-                    if (profile) setBaseUser(profile);
-                    setIsLoading(false);
-                }).catch(() => setIsLoading(false));
-            } else {
-                setIsLoading(false);
-            }
-        }).catch(() => setIsLoading(false));
-
-        return () => subscription.unsubscribe();
+        return () => {
+            mounted = false;
+            subscription.unsubscribe();
+        };
     }, [supabase]);
 
     const login = async (email: string, password: string): Promise<boolean> => {
