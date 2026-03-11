@@ -47,7 +47,9 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      const success = await login(email, password);
+      const success = await login(email.trim().toLowerCase(), password);
+      // AuthContext will handle the session and update the 'user' state,
+      // which triggers the useEffect redirection logic below.
       if (!success) {
         setError(t.auth.error);
       }

@@ -54,7 +54,7 @@ export default function AdminDashboard() {
     const [todayVisits, setTodayVisits] = useState(0);
 
     // Form states
-    const [newRest, setNewRest] = useState({ name: '', email: '', password: '' });
+    const [newRest, setNewRest] = useState({ name: '', email: '', password: '', categoryId: 1 });
     const [newFeatured, setNewFeatured] = useState({
         title: '',
         desc: '',
@@ -91,7 +91,13 @@ export default function AdminDashboard() {
 
     const loadRestaurants = async () => {
         const list = await listCompanies();
-        setRestaurants(list.map((c) => ({ id: c.id, name: c.full_name || c.email || '—', email: c.email ?? '', isActive: c.is_active !== false })));
+        setRestaurants(list.map((c) => ({ 
+            id: c.id, 
+            name: c.full_name || c.email || '—', 
+            email: c.email ?? '', 
+            isActive: c.is_active !== false,
+            category_id: c.category_id
+        })));
     };
 
     const loadAds = () => {
@@ -131,12 +137,12 @@ export default function AdminDashboard() {
             alert("Ad, e-poçt və parol tələb olunur.");
             return;
         }
-        const result = await createCompanyUser(name, email, password);
+        const result = await createCompanyUser(name, email, password, newRest.categoryId);
         if (result.ok) {
-            setNewRest({ name: '', email: '', password: '' });
+            setNewRest({ name: '', email: '', password: '', categoryId: 1 });
             setShowModal(false);
             await loadRestaurants();
-            alert("Restoran uğurla yaradıldı!");
+            alert("Partnyor hesabı uğurla yaradıldı!");
         } else {
             alert(result.error || "Xəta baş verdi.");
         }
@@ -147,7 +153,7 @@ export default function AdminDashboard() {
         setConfirmDialog({
             open: true,
             title: 'Statusu Dəyiş',
-            message: `Bu restoranı ${newActive ? 'yandırmaq' : 'söndürmək'} istədiyinizə əminsiniz?`,
+            message: `Bu partnyoru ${newActive ? 'yandırmaq' : 'söndürmək'} istədiyinizə əminsiniz?`,
             onConfirm: async () => {
                 const result = await updateCompanyStatus(rest.id, newActive);
                 if (result.ok) await loadRestaurants();
@@ -159,8 +165,8 @@ export default function AdminDashboard() {
     const handleDeleteRestaurant = (rest: { id: string; name: string }) => {
         setConfirmDialog({
             open: true,
-            title: 'Restoranı Sil',
-            message: 'Bu restoranı tamamilə silmək istədiyinizə əminsiniz? Bu geri qaytarıla bilməz.',
+            title: 'Partnyoru Sil',
+            message: 'Bu partnyoru tamamilə silmək istədiyinizə əminsiniz? Bu geri qaytarıla bilməz.',
             onConfirm: async () => {
                 const result = await deleteCompanyUser(rest.id);
                 if (result.ok) await loadRestaurants();
@@ -300,6 +306,69 @@ export default function AdminDashboard() {
             {sidebarOpen && <div className={styles.overlay} onClick={() => setSidebarOpen(false)} />}
 
             <div className={styles.dashboardLayout}>
+                {/* Modal for New Partner */}
+                {showModal && (
+                    <div className={styles.modalOverlay}>
+                        <div className={styles.modal}>
+                            <div className={styles.modalHeader}>
+                                <h2>Yeni Partnyor Əlavə Et</h2>
+                                <button onClick={() => setShowModal(false)}><X size={20} /></button>
+                            </div>
+                            <form onSubmit={handleCreateRestaurant} className={styles.modalForm}>
+                                <div className={styles.formGroup}>
+                                    <label>Ad</label>
+                                    <input 
+                                        type="text" 
+                                        value={newRest.name} 
+                                        onChange={e => setNewRest({...newRest, name: e.target.value})} 
+                                        placeholder="Məs: KFC Azerbaijan"
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Kateqoriya</label>
+                                    <select 
+                                        value={newRest.categoryId} 
+                                        onChange={e => setNewRest({...newRest, categoryId: parseInt(e.target.value)})}
+                                        className={styles.modalSelect}
+                                        style={{
+                                            width: '100%',
+                                            padding: '12px',
+                                            borderRadius: '12px',
+                                            border: '1px solid #e0e5f2',
+                                            background: '#f4f7fe'
+                                        }}
+                                    >
+                                        <option value={1}>Restoran və Kafe</option>
+                                        <option value={2}>Geyim və Mağazalar</option>
+                                        <option value={3}>Təhsil</option>
+                                        <option value={4}>Əyləncə</option>
+                                        <option value={5}>Texnologiya</option>
+                                    </select>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Email</label>
+                                    <input 
+                                        type="email" 
+                                        value={newRest.email} 
+                                        onChange={e => setNewRest({...newRest, email: e.target.value})} 
+                                        placeholder="company@studeal.az"
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Parol</label>
+                                    <input 
+                                        type="password" 
+                                        value={newRest.password} 
+                                        onChange={e => setNewRest({...newRest, password: e.target.value})} 
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                                <button type="submit" className={styles.modalSubmitBtn}>Yarat</button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
                 {/* Sidebar */}
                 <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
                     <div className={styles.logo}>
@@ -318,7 +387,7 @@ export default function AdminDashboard() {
                             className={`${styles.navItem} ${activeTab === 'restaurants' ? styles.activeNavItem : ''}`}
                             onClick={() => handleTabChange('restaurants')}
                         >
-                            <Users size={20} /> <span>Restoranlar</span>
+                            <Users size={20} /> <span>Partnyorlar</span>
                         </button>
                         <button
                             className={`${styles.navItem} ${activeTab === 'ads' ? styles.activeNavItem : ''}`}
@@ -374,7 +443,7 @@ export default function AdminDashboard() {
                             <span className={styles.welcomeBadge}>Admin Panel 👋</span>
                             <h1>{
                                 activeTab === 'dashboard' ? 'Dashboard' :
-                                activeTab === 'restaurants' ? 'Restoranlar' :
+                                activeTab === 'restaurants' ? 'Partnyorlar' :
                                 activeTab === 'ads' ? 'Reklamlar' :
                                 activeTab === 'messages' ? 'Mesajlar' :
                                 activeTab === 'featured' ? 'Seçilmişlər' :
@@ -384,7 +453,7 @@ export default function AdminDashboard() {
                         </div>
                         {activeTab === 'restaurants' && (
                             <button className={styles.addBtn} onClick={() => setShowModal(true)}>
-                                <Plus size={20} /> Yeni Restoran
+                                <Plus size={20} /> Yeni Partnyor
                             </button>
                         )}
                     </header>
@@ -397,7 +466,7 @@ export default function AdminDashboard() {
                                     <Users size={24} />
                                 </div>
                                 <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Ümumi Restoranlar</span>
+                                    <span className={styles.statLabel}>Ümumi Partnyorlar</span>
                                     <span className={styles.statValue}>{restaurants.length}</span>
                                 </div>
                             </div>
@@ -448,13 +517,14 @@ export default function AdminDashboard() {
                 {activeTab === 'restaurants' && (
                     <section className={styles.section}>
                         <div className={styles.sectionHeader}>
-                            <h2>Qeydiyyatdan keçmiş restoranlar</h2>
+                            <h2>Qeydiyyatdan keçmiş partnyorlar</h2>
                         </div>
                         <div className={styles.tableWrapper}>
                             <table className={styles.table}>
                                     <thead>
                                         <tr>
                                             <th>Ad</th>
+                                            <th>Kateqoriya</th>
                                             <th>Email</th>
                                             <th>Status</th>
                                             <th>Əməliyyat</th>
@@ -464,6 +534,15 @@ export default function AdminDashboard() {
                                         {restaurants.map((rest, i) => (
                                             <tr key={i}>
                                                 <td>{rest.name}</td>
+                                                <td>
+                                                    <span className={styles.categoryBadge}>
+                                                        {rest.category_id === 1 ? 'Restoran' : 
+                                                         rest.category_id === 2 ? 'Mağaza' :
+                                                         rest.category_id === 3 ? 'Təhsil' :
+                                                         rest.category_id === 4 ? 'Əyləncə' :
+                                                         rest.category_id === 5 ? 'Texno' : 'Qeyri-müəyyən'}
+                                                    </span>
+                                                </td>
                                                 <td>{rest.email}</td>
                                                 <td>
                                                     <span style={{ 
@@ -493,7 +572,7 @@ export default function AdminDashboard() {
                                                                 padding: '10px 18px',
                                                                 borderRadius: '12px',
                                                                 border: 'none',
-                                                                minWidth: '100px',
+                                                                minWidth: '130px',
                                                                 display: 'inline-flex',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
@@ -503,7 +582,7 @@ export default function AdminDashboard() {
                                                             onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                                                             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                                         >
-                                                            Giriş et
+                                                            Panelə Giriş
                                                         </button>
                                                         <button 
                                                             onClick={() => toggleRestaurantStatus(rest)}
@@ -547,7 +626,7 @@ export default function AdminDashboard() {
                 {activeTab === 'ads' && (
                     <section className={styles.section}>
                         <div className={styles.sectionHeader}>
-                            <h2>Partner Reklamlarını İdarə Et (Sidebar)</h2>
+                            <h2>Partnyor Reklamlarını İdarə Et (Sidebar)</h2>
                             <span style={{ color: '#a3aed0', fontSize: '14px' }}>{dynamicAds.length} reklam</span>
                         </div>
 
@@ -603,22 +682,16 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label>Hansı restorana yönləndirilsin?</label>
+                                    <label>Hansı partnyora yönləndirilsin?</label>
                                     <select
                                         value={newAd.companyId}
                                         onChange={(e) => setNewAd({ ...newAd, companyId: e.target.value })}
                                         required
                                         style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2' }}
                                     >
-                                        <option value="">Restoran seçin...</option>
-                                        {/* Using a mix of static and dynamic companies if needed */}
-                                        <option value="1">KFC Azerbaijan</option>
-                                        <option value="2">Nike Store</option>
-                                        <option value="4">CinemaPlus</option>
-                                        <option value="6">Pizza Mizza</option>
-                                        <option value="7">McDonalds</option>
+                                        <option value="">Partnyor seçin...</option>
                                         {restaurants.map(r => (
-                                            <option key={r.email} value={r.email}>{r.name}</option>
+                                            <option key={r.id} value={r.id}>{r.name} ({r.email})</option>
                                         ))}
                                     </select>
                                 </div>
@@ -849,7 +922,7 @@ export default function AdminDashboard() {
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
-                                        <th>Brend / Restoran</th>
+                                        <th>Brend / Müəssisə</th>
                                         <th>Əlaqə</th>
                                         <th>Məzmun</th>
                                         <th>Tarix</th>
@@ -921,51 +994,6 @@ export default function AdminDashboard() {
                 )}
                 </main>
             </div>
-
-            {/* Modal */}
-            {showModal && (
-                <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
-                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h2>Yeni Restoran Admini Yarat</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowModal(false)}>✕</button>
-                        </div>
-                        <form onSubmit={handleCreateRestaurant} className={styles.form}>
-                            <div className={styles.formGroup}>
-                                <label>Restoran Adı</label>
-                                <input
-                                    type="text"
-                                    value={newRest.name}
-                                    onChange={(e) => setNewRest({ ...newRest, name: e.target.value })}
-                                    required
-                                    placeholder="Məs: KFC Azerbaijan"
-                                />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label>Email</label>
-                                <input
-                                    type="email"
-                                    value={newRest.email}
-                                    onChange={(e) => setNewRest({ ...newRest, email: e.target.value })}
-                                    required
-                                    placeholder="admin@kfc.com"
-                                />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label>Parol</label>
-                                <input
-                                    type="text"
-                                    value={newRest.password}
-                                    onChange={(e) => setNewRest({ ...newRest, password: e.target.value })}
-                                    required
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                            <button type="submit" className="btn-primary" style={{ marginTop: '10px' }}>Hesabı Yarat</button>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             {/* Confirmation Dialog */}
             {confirmDialog.open && (

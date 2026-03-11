@@ -23,11 +23,11 @@ export type Transaction = {
 
 export type User = {
     id: string;
-    email?: string;
-    fullName?: string;
+    email: string | null;
+    fullName: string | null;
     username?: string;
     roles?: string[];
-    role?: string;
+    role: string | null;
     name: string;
     isCompany: boolean;
     isAdmin: boolean;
@@ -78,7 +78,13 @@ const defaultStudealMeta = {
     deals: [] as any[],
 };
 
-type ProfileRow = { id: string; email: string | null; full_name: string | null; role: string | null };
+type ProfileRow = { 
+    id: string; 
+    email: string | null | undefined; 
+    full_name: string | null | undefined; 
+    role: string | null | undefined; 
+    metadata?: any;
+};
 
 function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
     const role = profile.role || 'Student';
@@ -86,8 +92,8 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
     const isCompany = role === 'Company';
     return {
         id: profile.id,
-        email: profile.email ?? undefined,
-        fullName: profile.full_name ?? undefined,
+        email: profile.email ?? null,
+        fullName: profile.full_name ?? null,
         name: profile.full_name || profile.email || 'User',
         role,
         roles: [role],
@@ -102,7 +108,7 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
         viewCount: meta.viewCount ?? 0,
         usageCount: meta.usageCount ?? 0,
         plan: meta.plan ?? 'bronze',
-        deals: meta.deals ?? [],
+        deals: meta.deals ?? profile.metadata?.deals ?? [],
     };
 }
 
@@ -136,33 +142,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return profileToUser(baseUser, studealData);
     }, [baseUser, studealData]);
 
-    const saveStudealMeta = (updated: Partial<User>) => {
+    const saveStudealMeta = async (updated: Partial<User>) => {
         if (!baseUser) return;
         const newData = { ...studealData, ...updated };
         setStudealData(newData);
         localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(newData));
+
+        // Sync to Supabase for public visibility - non-blocking try/catch
+        try {
+            await supabase
+                .from('profiles')
+                .update({ metadata: newData })
+                .eq('id', baseUser.id);
+        } catch (e) {
+            console.warn("DEBUG: Supabase metadata sync failed:", e);
+        }
     };
 
     const fetchProfile = async (userId: string) => {
-        const { data } = await supabase.from('profiles').select('id, email, full_name, role').eq('id', userId).single();
-        return data as ProfileRow | null;
+        try {
+            console.log("DEBUG: fetchProfile started for", userId);
+            // Try to fetch with metadata, if it fails because column doesn't exist, it will return error
+            const { data, error } = await supabase.from('profiles').select('id, email, full_name, role, metadata').eq('id', userId).single();
+            
+            if (error) {
+                console.warn("DEBUG: fetchProfile first attempt error (possibly missing metadata column):", error.message);
+                // Fallback attempt without metadata column
+                const { data: fbData, error: fbError } = await supabase.from('profiles').select('id, email, full_name, role').eq('id', userId).single();
+                if (fbError) {
+                    console.error("DEBUG: fetchProfile fallback error:", fbError.message);
+                    return null;
+                }
+                return fbData as ProfileRow | null;
+            }
+            
+            return data as ProfileRow | null;
+        } catch (e) {
+            console.error("DEBUG: fetchProfile unexpected exception:", e);
+            return null;
+        }
     };
 
     useEffect(() => {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log("DEBUG: Auth State Changed:", event);
             if (event === 'SIGNED_OUT' || !session?.user) {
                 setBaseUser(null);
                 setStudealData({});
                 setIsLoading(false);
                 return;
             }
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                const profile = await fetchProfile(session.user.id);
-                if (profile) setBaseUser(profile);
-                setIsLoading(false);
-            }
+            
+            // For any event with a user, ensure we have a profile and stop loading
+            const profile = await fetchProfile(session.user.id);
+            if (profile) setBaseUser(profile as any);
+            setIsLoading(false);
         });
 
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -170,17 +206,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 fetchProfile(session.user.id).then((profile) => {
                     if (profile) setBaseUser(profile);
                     setIsLoading(false);
-                });
+                }).catch(() => setIsLoading(false));
             } else {
                 setIsLoading(false);
             }
-        });
+        }).catch(() => setIsLoading(false));
 
         return () => subscription.unsubscribe();
     }, [supabase]);
 
     const login = async (email: string, password: string): Promise<boolean> => {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ 
+            email: email.trim().toLowerCase(), 
+            password 
+        });
         if (error) throw new Error(error.message);
         return true;
     };
@@ -241,30 +280,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = async () => {
-        setIsLoading(true);
-        try {
-            // 1. Supabase-dən rəsmi çıxış edirik
-            await supabase.auth.signOut();
-            
-            // 2. Local yaddaşı təmizləyirik
-            localStorage.clear();
-            sessionStorage.clear();
+        console.log("Forcing logout and page reload...");
 
-            // 3. State-ləri sıfırlayırıq
-            setBaseUser(null);
-            setStudealData({});
-            
-            // 4. Giriş səhifəsinə yönləndiririk
-            router.replace('/login');
-            router.refresh();
-        } catch (e) {
-            console.error("Logout error:", e);
-            // Error olsa belə dərhal təmizləyib atırıq
-            localStorage.clear();
-            window.location.href = '/login';
-        } finally {
-            setIsLoading(false);
-        }
+        // 1. Client-side signout
+        await supabase.auth.signOut();
+
+        // 2. Clear all traces
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // 3. Force full page reload to clear all state
+        window.location.href = "/";
     };
 
     const loginWithGoogle = () => {
