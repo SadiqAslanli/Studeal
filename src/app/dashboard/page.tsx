@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
 import { Trash2, Edit, Plus, Image as ImageIcon, Upload, LogOut, BarChart3, Tag as TagIcon, Settings, Eye, Users, CheckCircle2, Heart, MessageSquare, Menu, X } from 'lucide-react';
 import { uploadMediaAction } from '../admin/cloudinaryActions';
+import { getMessages } from '../admin/contentActions';
 
 export default function CompanyDashboard() {
     const { t } = useLanguage();
@@ -40,13 +41,18 @@ export default function CompanyDashboard() {
             return;
         }
 
-        // Fetch complaints related to this company
-        const allFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
-        const companyComplaints = allFeedback.filter((f: any) => 
-            f.message.toLowerCase().includes(user.name.toLowerCase()) ||
-            f.type === 'complaint' && f.message.toLowerCase().includes(user.name.toLowerCase())
-        );
-        setComplaints(companyComplaints);
+        // Fetch complaints from Supabase
+        const fetchFeedback = async () => {
+            const allFeedback = await getMessages();
+            // Filter feedback where message mentions company name or is type complaint
+            const companyComplaints = allFeedback.filter((f: any) => 
+                f.message.toLowerCase().includes(user.name.toLowerCase()) ||
+                (f.type === 'complaint' && f.message.toLowerCase().includes(user.name.toLowerCase()))
+            );
+            setComplaints(companyComplaints);
+        };
+
+        fetchFeedback();
 
         // Fetch all users to calculate favorites
         const users = JSON.parse(localStorage.getItem('users') || '[]');

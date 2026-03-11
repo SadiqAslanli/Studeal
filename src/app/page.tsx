@@ -26,6 +26,7 @@ import FeaturedSlider from "@/components/FeaturedSlider";
 import LoadingScreen from "@/components/LoadingScreen";
 import styles from "./page.module.css";
 import { useLanguage } from '@/context/LanguageContext';
+import { getSidebarAds } from './admin/contentActions';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -38,8 +39,11 @@ export default function Home() {
   const [dynamicAds, setDynamicAds] = useState<any[]>([]);
 
   useEffect(() => {
-    const savedAds = JSON.parse(localStorage.getItem('adminAdsList') || '[]');
-    setDynamicAds(savedAds);
+    const loadAds = async () => {
+        const ads = await getSidebarAds();
+        setDynamicAds(ads);
+    };
+    loadAds();
 
     // Track daily visits
     const today = new Date().toISOString().split('T')[0];
@@ -98,10 +102,10 @@ export default function Home() {
               }}
             >
               <div className={styles.adImageWrapper}>
-                {ad.image?.toLowerCase().includes('/video/') || ad.image?.endsWith('.mp4') ? (
-                  <video src={ad.image} className={styles.adImgVideo} autoPlay muted loop playsInline />
+                {ad.image_url?.toLowerCase().includes('/video/') || ad.image_url?.endsWith('.mp4') ? (
+                  <video src={ad.image_url} className={styles.adImgVideo} autoPlay muted loop playsInline />
                 ) : (
-                  <img src={ad.image} alt="Partner Ad" />
+                  <img src={ad.image_url} alt="Partner Ad" />
                 )}
                 <div className={styles.adImgOverlay} />
                 <div className={styles.newDiscountBadge}>{ad.discount}</div>

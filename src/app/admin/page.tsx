@@ -24,6 +24,12 @@ import styles from './admin.module.css';
 import Link from 'next/link';
 import { createCompanyUser, listCompanies, updateCompanyStatus, deleteCompanyUser } from './actions';
 import { uploadMediaAction } from './cloudinaryActions';
+import { 
+    getSidebarAds, addSidebarAd, deleteSidebarAd,
+    getFeaturedDeals, addFeaturedDeal, deleteFeaturedDeal,
+    getMessages, deleteMessage,
+    getAdRequests, updateAdRequestStatus, deleteAdRequest
+} from './contentActions';
 
 type Tab = 'dashboard' | 'restaurants' | 'ads' | 'messages' | 'featured' | 'adRequests';
 
@@ -107,31 +113,29 @@ export default function AdminDashboard() {
         })));
     };
 
-    const loadAds = () => {
-        const ads = JSON.parse(localStorage.getItem('adminAdsList') || '[]');
+    const loadAds = async () => {
+        const ads = await getSidebarAds();
         setDynamicAds(ads);
     };
 
-    const loadMessages = () => {
-        const msgs = JSON.parse(localStorage.getItem('userFeedback') || '[]');
+    const loadMessages = async () => {
+        const msgs = await getMessages();
         setMessages(msgs);
     };
 
-    const loadFeatured = () => {
-        const items = JSON.parse(localStorage.getItem('featuredDeals') || '[]');
+    const loadFeatured = async () => {
+        const items = await getFeaturedDeals();
         setFeaturedDeals(items);
     };
 
-    const loadAdRequests = () => {
-        const reqs = JSON.parse(localStorage.getItem('adRequests') || '[]');
+    const loadAdRequests = async () => {
+        const reqs = await getAdRequests();
         setAdRequests(reqs);
     };
 
-    const handleAdRequestStatus = (id: string, status: 'approved' | 'rejected') => {
-        const all = JSON.parse(localStorage.getItem('adRequests') || '[]');
-        const updated = all.map((r: any) => r.id === id ? { ...r, status } : r);
-        localStorage.setItem('adRequests', JSON.stringify(updated));
-        setAdRequests(updated);
+    const handleAdRequestStatus = async (id: string, status: 'approved' | 'rejected') => {
+        const result = await updateAdRequestStatus(id, status);
+        if (result.ok) await loadAdRequests();
     };
 
 
@@ -254,20 +258,18 @@ export default function AdminDashboard() {
                 return;
             }
         }
+
+        const result = await addSidebarAd(finalImageUrl, newAd.discount, newAd.companyId);
         
-        const ads = JSON.parse(localStorage.getItem('adminAdsList') || '[]');
-        const newItem = {
-            ...newAd,
-            image: finalImageUrl,
-            id: Date.now().toString()
-        };
-        const updated = [...ads, newItem];
-        localStorage.setItem('adminAdsList', JSON.stringify(updated));
-        setDynamicAds(updated);
-        setNewAd({ image: '', discount: '', companyId: '' });
-        setSelectedAdFile(null);
+        if (result.ok) {
+            await loadAds();
+            setNewAd({ image: '', discount: '', companyId: '' });
+            setSelectedAdFile(null);
+            alert("Reklam əlavə edildi!");
+        } else {
+            alert("Xəta: " + result.error);
+        }
         setIsUploading(false);
-        alert("Reklam əlavə edildi!");
     };
 
     const handleDeleteAd = (id: string) => {
@@ -275,10 +277,9 @@ export default function AdminDashboard() {
             open: true,
             title: 'Reklamı Sil',
             message: 'Bu reklamı silmək istədiyinizə əminsiniz?',
-            onConfirm: () => {
-                const filtered = dynamicAds.filter(ad => ad.id !== id);
-                localStorage.setItem('adminAdsList', JSON.stringify(filtered));
-                setDynamicAds(filtered);
+            onConfirm: async () => {
+                const result = await deleteSidebarAd(id);
+                if (result.ok) await loadAds();
                 setConfirmDialog(prev => ({ ...prev, open: false }));
             }
         });
@@ -289,10 +290,9 @@ export default function AdminDashboard() {
             open: true,
             title: 'Mesajı Sil',
             message: 'Bu mesajı silmək istədiyinizə əminsiniz?',
-            onConfirm: () => {
-                const filtered = messages.filter(m => m.id !== id);
-                localStorage.setItem('userFeedback', JSON.stringify(filtered));
-                setMessages(filtered);
+            onConfirm: async () => {
+                const result = await deleteMessage(id);
+                if (result.ok) await loadMessages();
                 setConfirmDialog(prev => ({ ...prev, open: false }));
             }
         });
@@ -317,18 +317,21 @@ export default function AdminDashboard() {
             }
         }
 
-        const all = JSON.parse(localStorage.getItem('featuredDeals') || '[]');
-        const newItem = {
-            ...newFeatured,
-            image: finalImageUrl,
-            id: Date.now().toString()
-        };
-        const updated = [...all, newItem];
-        localStorage.setItem('featuredDeals', JSON.stringify(updated));
-        setFeaturedDeals(updated);
-        setNewFeatured({ title: '', desc: '', discount: '', image: '' });
-        setSelectedFeaturedFile(null);
-        setFeaturedPreview(null);
+        const result = await addFeaturedDeal({
+            title: newFeatured.title,
+            description: newFeatured.desc,
+            discount: newFeatured.discount,
+            image_url: finalImageUrl
+        });
+
+        if (result.ok) {
+            await loadFeatured();
+            setNewFeatured({ title: '', desc: '', discount: '', image: '' });
+            setSelectedFeaturedFile(null);
+            setFeaturedPreview(null);
+        } else {
+            alert("Xəta: " + result.error);
+        }
         setIsUploading(false);
     };
 
@@ -337,10 +340,9 @@ export default function AdminDashboard() {
             open: true,
             title: 'Seçilmişi Sil',
             message: 'Bu endirimi slider-dən silmək istədiyinizə əminsiniz?',
-            onConfirm: () => {
-                const filtered = featuredDeals.filter((f: any) => f.id !== id);
-                localStorage.setItem('featuredDeals', JSON.stringify(filtered));
-                setFeaturedDeals(filtered);
+            onConfirm: async () => {
+                const result = await deleteFeaturedDeal(id);
+                if (result.ok) await loadFeatured();
                 setConfirmDialog(prev => ({ ...prev, open: false }));
             }
         });
@@ -351,11 +353,9 @@ export default function AdminDashboard() {
             open: true,
             title: 'Müraciəti Sil',
             message: 'Bu reklam müraciətini silmək istədiyinizə əminsiniz?',
-            onConfirm: () => {
-                const all = JSON.parse(localStorage.getItem('adRequests') || '[]');
-                const filtered = all.filter((r: any) => r.id !== id);
-                localStorage.setItem('adRequests', JSON.stringify(filtered));
-                setAdRequests(filtered);
+            onConfirm: async () => {
+                const result = await deleteAdRequest(id);
+                if (result.ok) await loadAdRequests();
                 setConfirmDialog(prev => ({ ...prev, open: false }));
             }
         });
