@@ -175,7 +175,7 @@ export default function AdminDashboard() {
             setNewRestPreview(null);
             setShowModal(false);
             await loadRestaurants();
-            alert("Partnyor hesabı uğurla yaradıldı!");
+            alert("Sahibkar hesabı uğurla yaradıldı!");
         } else {
             alert(result.error || "Xəta baş verdi.");
         }
@@ -186,7 +186,7 @@ export default function AdminDashboard() {
         setConfirmDialog({
             open: true,
             title: 'Statusu Dəyiş',
-            message: `Bu partnyoru ${newActive ? 'yandırmaq' : 'söndürmək'} istədiyinizə əminsiniz?`,
+            message: `Bu sahibkarı ${newActive ? 'yandırmaq' : 'söndürmək'} istədiyinizə əminsiniz?`,
             onConfirm: async () => {
                 const result = await updateCompanyStatus(rest.id, newActive);
                 if (result.ok) await loadRestaurants();
@@ -198,8 +198,8 @@ export default function AdminDashboard() {
     const handleDeleteRestaurant = (rest: { id: string; name: string }) => {
         setConfirmDialog({
             open: true,
-            title: 'Partnyoru Sil',
-            message: 'Bu partnyoru tamamilə silmək istədiyinizə əminsiniz? Bu geri qaytarıla bilməz.',
+            title: 'Sahibkarı Sil',
+            message: 'Bu sahibkarı tamamilə silmək istədiyinizə əminsiniz? Bu geri qaytarıla bilməz.',
             onConfirm: async () => {
                 const result = await deleteCompanyUser(rest.id);
                 if (result.ok) await loadRestaurants();
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
         e.preventDefault();
         
         if (!newAd.image || !newAd.companyId) {
-            alert("Şəkil və partnyor seçilməlidir.");
+            alert("Şəkil və sahibkar seçilməlidir.");
             return;
         }
 
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
                     <div className={styles.modalOverlay}>
                         <div className={styles.modal}>
                             <div className={styles.modalHeader}>
-                                <h2>Yeni Partnyor Əlavə Et</h2>
+                                <h2>Yeni Sahibkar Əlavə Et</h2>
                                 <button onClick={() => setShowModal(false)}><X size={20} /></button>
                             </div>
                             <form onSubmit={handleCreateRestaurant} className={styles.modalForm}>
@@ -509,7 +509,7 @@ export default function AdminDashboard() {
                             className={`${styles.navItem} ${activeTab === 'restaurants' ? styles.activeNavItem : ''}`}
                             onClick={() => handleTabChange('restaurants')}
                         >
-                            <Users size={20} /> <span>Partnyorlar</span>
+                            <Users size={20} /> <span>Sahibkarlar</span>
                         </button>
                         <button
                             className={`${styles.navItem} ${activeTab === 'ads' ? styles.activeNavItem : ''}`}
@@ -565,7 +565,7 @@ export default function AdminDashboard() {
                             <span className={styles.welcomeBadge}>Admin Panel 👋</span>
                             <h1>{
                                 activeTab === 'dashboard' ? 'Dashboard' :
-                                activeTab === 'restaurants' ? 'Partnyorlar' :
+                                activeTab === 'restaurants' ? 'Sahibkarlar' :
                                 activeTab === 'ads' ? 'Reklamlar' :
                                 activeTab === 'messages' ? 'Mesajlar' :
                                 activeTab === 'featured' ? 'Seçilmişlər' :
@@ -575,7 +575,7 @@ export default function AdminDashboard() {
                         </div>
                         {activeTab === 'restaurants' && (
                             <button className={styles.addBtn} onClick={() => setShowModal(true)}>
-                                <Plus size={20} /> Yeni Partnyor
+                                <Plus size={20} /> Yeni Sahibkar
                             </button>
                         )}
                     </header>
@@ -588,7 +588,7 @@ export default function AdminDashboard() {
                                     <Users size={24} />
                                 </div>
                                 <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Ümumi Partnyorlar</span>
+                                    <span className={styles.statLabel}>Ümumi Sahibkarlar</span>
                                     <span className={styles.statValue}>{restaurants.length}</span>
                                 </div>
                             </div>
@@ -639,7 +639,7 @@ export default function AdminDashboard() {
                 {activeTab === 'restaurants' && (
                     <section className={styles.section}>
                         <div className={styles.sectionHeader}>
-                            <h2>Qeydiyyatdan keçmiş partnyorlar</h2>
+                            <h2>Qeydiyyatdan keçmiş sahibkarlar</h2>
                         </div>
                         <div className={styles.tableWrapper}>
                             <table className={styles.table}>
@@ -748,7 +748,7 @@ export default function AdminDashboard() {
                 {activeTab === 'ads' && (
                     <section className={styles.section}>
                         <div className={styles.sectionHeader}>
-                            <h2>Partnyor Reklamlarını İdarə Et (Sidebar)</h2>
+                            <h2>Sahibkar Reklamlarını İdarə Et (Sidebar)</h2>
                             <span style={{ color: '#a3aed0', fontSize: '14px' }}>{dynamicAds.length} reklam</span>
                         </div>
 
@@ -804,14 +804,14 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label>Hansı partnyora yönləndirilsin?</label>
+                                    <label>Hansı sahibkara yönləndirilsin?</label>
                                     <select
                                         value={newAd.companyId}
                                         onChange={(e) => setNewAd({ ...newAd, companyId: e.target.value })}
                                         required
                                         style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2' }}
                                     >
-                                        <option value="">Partnyor seçin...</option>
+                                        <option value="">Sahibkar seçin...</option>
                                         {restaurants.map(r => (
                                             <option key={r.id} value={r.id}>{r.name} ({r.email})</option>
                                         ))}

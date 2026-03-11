@@ -1,6 +1,9 @@
 export const translations = {
     az: {
         welcome: "Xoş gəlmisiniz",
+        heroTitlePrefix: "Tələbə olmaq ",
+        heroTitleSuffix: " ilə daha maraqlıdır!",
+        heroDesc: "Sevdiyin brendlərdə eksklüziv endirimləri kəşf et, xallar qazan və tələbə həyatının hər anından maksimum həzz al.",
         discoverDeals: "Tələbələr üçün ən yaxşı endirimləri kəşf edin",
         searchPlaceholder: "Mağaza və ya kateqoriya axtar...",
         searchBtn: "Axtar",
@@ -394,6 +397,9 @@ export const translations = {
     },
     en: {
         welcome: "Welcome",
+        heroTitlePrefix: "Being a student is more interesting with ",
+        heroTitleSuffix: "!",
+        heroDesc: "Discover exclusive discounts at your favorite brands, earn points, and enjoy every moment of student life to the fullest.",
         discoverDeals: "Discover the best deals for students",
         searchPlaceholder: "Search for store or category...",
         searchBtn: "Search",

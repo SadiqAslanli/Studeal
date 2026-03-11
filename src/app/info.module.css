@@ -1,12 +1,12 @@
 .infoPage {
     min-height: 100vh;
-    padding: 180px 0 100px;
+    padding: 120px 0 60px; /* Reduced from 180px top, 100px bottom */
     background: #ffffff;
 }
 
 .header {
     text-align: center;
-    margin-bottom: 80px;
+    margin-bottom: 40px; /* Reduced from 80px */
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -59,6 +59,40 @@
     font-size: 16px;
     color: #475569;
     line-height: 1.8;
+}
+
+.termsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.termCard {
+    background: #f8fafc;
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.3s ease;
+}
+
+.termCard:hover {
+    transform: translateY(-4px);
+    border-color: #3b82f633;
+}
+
+.termCard h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+.termCard p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
 }
 
 @media (max-width: 768px) {
