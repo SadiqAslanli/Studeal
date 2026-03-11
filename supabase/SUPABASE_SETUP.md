@@ -82,6 +82,15 @@ After this, that user can log in to the app with the **password you set in Step 
 **Alternative (by user id):** If you prefer, use the user’s UUID from **Authentication → Users** and run:  
 `update public.profiles set role = 'Admin', updated_at = now() where id = 'uuid-here';`
 
+### Email confirmation ("Email not confirmed" / 400 on login)
+
+By default Supabase requires **email confirmation** before a user can sign in. Until they click the link in the signup email, login returns "Email not confirmed" and the token request returns **400**.
+
+**To allow login right after signup (no confirmation):**  
+Supabase → **Authentication** → **Providers** → **Email** → turn **off** "Confirm email" → Save.
+
+**To keep confirmation:** Leave it on; users must confirm by email. The app shows a friendly message when this error occurs.
+
 ## 5. Auth rules summary
 
 | Role     | Who creates it | How |
@@ -91,3 +100,7 @@ After this, that user can log in to the app with the **password you set in Step 
 | **Admin**   | You (one-off)  | Create user in Supabase Auth, then run SQL above to set `profiles.role = 'Admin'`. |
 
 Companies and Admins cannot self-register; only Students can use the public registration form.
+
+---
+
+**Quick link:** [Supabase Auth → Email provider](https://supabase.com/dashboard/project/_/auth/providers) (replace `_` with your project ref) to turn off "Confirm email" if users see "Email not confirmed" on login.

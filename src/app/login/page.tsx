@@ -52,10 +52,13 @@ export default function LoginPage() {
         setError(t.auth.error);
       }
     } catch (err: any) {
-      if (err.message === 'user_not_found') {
+      const msg = err?.message || '';
+      if (msg === 'user_not_found') {
         setError(t.auth.userNotFound);
+      } else if (msg === 'Email not confirmed' || msg.toLowerCase().includes('email not confirmed')) {
+        setError(t.auth.emailNotConfirmed);
       } else {
-        setError(err.message || t.auth.error);
+        setError(msg || t.auth.error);
       }
     } finally {
       setSubmitting(false);
