@@ -112,14 +112,14 @@
   height: 140px;
 }
 
-.adImageWrapper img {
+.adImageWrapper img, .adImgVideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.8s ease;
 }
 
-.adCard:hover .adImageWrapper img {
+.adCard:hover .adImageWrapper img, .adCard:hover .adImgVideo {
   transform: scale(1.1);
 }
 
