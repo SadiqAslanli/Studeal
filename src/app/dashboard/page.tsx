@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
 import { Trash2, Edit, Plus, Image as ImageIcon, Upload, LogOut, BarChart3, Tag as TagIcon, Settings, Eye, Users, CheckCircle2, Heart, MessageSquare, Menu, X } from 'lucide-react';
+import { uploadMediaAction } from '../admin/cloudinaryActions';
 
 export default function CompanyDashboard() {
     const { t } = useLanguage();
@@ -29,6 +30,8 @@ export default function CompanyDashboard() {
     });
     const [editingDealId, setEditingDealId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     useEffect(() => {
         if (isLoading) return;
@@ -68,6 +71,7 @@ export default function CompanyDashboard() {
         }
 
         if (file) {
+            setSelectedFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setNewDeal(prev => ({ ...prev, image: reader.result as string }));
@@ -76,23 +80,39 @@ export default function CompanyDashboard() {
         }
     };
 
-    const handleAddDeal = (e: React.FormEvent) => {
+    const handleAddDeal = async (e: React.FormEvent) => {
         e.preventDefault();
         const currentDeals = (user as any).deals || [];
 
+        setIsUploading(true);
+        let imageUrl = newDeal.image;
+
+        // If it's a new file (actually a File object was selected), upload it to Cloudinary
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            const res = await uploadMediaAction(formData);
+            if (res.success) {
+                imageUrl = res.url || '';
+            } else {
+                alert("Xəta: Şəkil yüklənə bilmədi: " + res.error);
+                setIsUploading(false);
+                return;
+            }
+        }
+
         if (editingDealId) {
-            // Update existing deal
             const updatedDeals = currentDeals.map((d: any) => 
-                d.id === editingDealId ? { ...newDeal, id: d.id, company: d.company, date: d.date } : d
+                d.id === editingDealId ? { ...newDeal, image: imageUrl, id: d.id, company: d.company, date: d.date } : d
             );
             updateUser({
                 // @ts-ignore
                 deals: updatedDeals
             });
         } else {
-            // Add new deal
             const dealToSave = {
                 ...newDeal,
+                image: imageUrl,
                 id: Date.now(),
                 company: user?.name || 'Restaurant',
                 date: new Date().toISOString()
@@ -103,6 +123,7 @@ export default function CompanyDashboard() {
             });
         }
 
+        setIsUploading(false);
         resetForm();
     };
 
@@ -130,6 +151,7 @@ export default function CompanyDashboard() {
             image: '',
             studentCardRequired: false
         });
+        setSelectedFile(null);
         setEditingDealId(null);
         setShowAddDeal(false);
     };
@@ -468,8 +490,8 @@ export default function CompanyDashboard() {
                                 <label htmlFor="cardReq">Tələbə kartı tələb olunur?</label>
                             </div>
 
-                            <button type="submit" className={`btn-primary ${styles.btnBlock}`}>
-                                {editingDealId ? "Yadda Saxla" : "Paylaş"}
+                            <button type="submit" className={`btn-primary ${styles.btnBlock}`} disabled={isUploading}>
+                                {isUploading ? 'Yüklənir...' : (editingDealId ? "Yadda Saxla" : "Paylaş")}
                             </button>
                         </form>
                     </div>
