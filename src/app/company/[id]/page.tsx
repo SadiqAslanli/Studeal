@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useParams } from 'next/navigation';
@@ -11,27 +11,60 @@ import { allCompanies } from '@/utils/dealsData';
 export default function CompanyProfile() {
     const { t } = useLanguage();
     const { id } = useParams();
-    const { user, addNotification, toggleFavorite } = useAuth();
+    const { user, addNotification, toggleFavorite, toggleCompanyFavorite } = useAuth();
 
     const [selectedDeal, setSelectedDeal] = useState<any>(null);
     const [reportingDeal, setReportingDeal] = useState<any>(null);
     const [reportText, setReportText] = useState("");
 
-    // New: Individual menu ratings
+    // State for dynamic company data
+    const [dynamicCompany, setDynamicCompany] = useState<any>(null);
+    const [isDbLoading, setIsDbLoading] = useState(true);
+
     const [menuRatings, setMenuRatings] = useState<Record<number, { score: number, count: number }>>({});
     const [userMenuRatings, setUserMenuRatings] = useState<Record<number, number>>({});
     const [cityFilter, setCityFilter] = useState("All");
 
-    const handleMenuRate = (dealId: number, rating: number) => {
+    const [companyRating, setCompanyRating] = useState(0);
+    const [reviewCount, setReviewCount] = useState(0);
+    const [userCompanyRating, setUserCompanyRating] = useState(0);
+
+    useEffect(() => {
+        const fetchCompanyFromDb = async () => {
+            const supabase = (await import('@/lib/supabase/client')).createClient();
+            const { data } = await supabase
+                .from('profiles')
+                .select('id, full_name, email, metadata, category_id')
+                .eq('id', id)
+                .single();
+
+            if (data) {
+                const metadata = data.metadata || {};
+                setDynamicCompany({
+                    id: data.id,
+                    name: data.full_name || data.email,
+                    tagline: metadata.tagline || (data.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
+                    image: metadata.image || '/hero-bg.jpg',
+                    branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
+                    deals: metadata.deals || []
+                });
+            }
+            setIsDbLoading(false);
+        };
+        if (id) fetchCompanyFromDb();
+    }, [id]);
+
+    const currentCompany = dynamicCompany || allCompanies.find(c => c.id === Number(id)) || allCompanies[0];
+    const isCompanyFavorite = user?.companyFavorites?.includes(typeof currentCompany?.id === 'string' ? currentCompany.id : currentCompany?.id);
+
+    const handleMenuRate = (dealId: any, rating: number) => {
         let newCount = menuRatings[dealId]?.count || 0;
         let newScore = 0;
         const currentRating = userMenuRatings[dealId] || 0;
 
         if (currentRating > 0) {
-            // Updating existing rating
             newScore = ((menuRatings[dealId].score * newCount) - currentRating + rating) / newCount;
         } else {
-            // First time rating
             newCount += 1;
             newScore = (((menuRatings[dealId]?.score || 0) * (newCount - 1)) + rating) / newCount;
         }
@@ -45,20 +78,13 @@ export default function CompanyProfile() {
         });
     };
 
-    // Simulating dynamic company stats
-    const [companyRating, setCompanyRating] = useState(0);
-    const [reviewCount, setReviewCount] = useState(0);
-    const [userCompanyRating, setUserCompanyRating] = useState(0);
-
     const handleCompanyRate = (rating: number) => {
         let newCount = reviewCount;
         let newRating = 0;
 
         if (userCompanyRating > 0) {
-            // User is changing their existing rating
             newRating = ((companyRating * reviewCount) - userCompanyRating + rating) / reviewCount;
         } else {
-            // First time rating
             newCount = reviewCount + 1;
             newRating = ((companyRating * reviewCount) + rating) / newCount;
         }
@@ -69,14 +95,9 @@ export default function CompanyProfile() {
 
         addNotification({
             title: "Rəyiniz yeniləndi",
-            message: `Restorana ${rating} ulduz verdiniz.`
+            message: `Müəssisəyə ${rating} ulduz verdiniz.`
         });
     };
-
-
-    const currentCompany = allCompanies.find(c => c.id === Number(id)) || allCompanies[0];
-    const { toggleCompanyFavorite } = useAuth();
-    const isCompanyFavorite = user?.companyFavorites?.includes(currentCompany.id);
 
     const handleReport = () => {
         if (!reportText.trim()) return;
@@ -281,7 +302,7 @@ export default function CompanyProfile() {
                                 <div className={styles.contentsBox}>
                                     <h4><Info size={18} /> Menyuya daxildir:</h4>
                                     <ul>
-                                        {selectedDeal.contents?.map((item: string, i: number) => (
+                                        {(selectedDeal.contents || selectedDeal.ingredients?.split(',')).map((item: string, i: number) => (
                                             <li key={i}>
                                                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)' }} />
                                                 {item}

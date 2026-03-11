@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Star, Heart, Tag, ArrowUpRight, Check, GraduationCap, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './DealList.module.css';
 import { staticDeals } from '@/utils/dealsData';
+import { listCompanies, CompanyProfile } from '@/app/admin/actions';
 
 interface DealListProps {
   activeCategoryId: number;
@@ -29,6 +30,32 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     if (savedRatings) {
       setUserRatings(JSON.parse(savedRatings));
     }
+    
+    // Fetch dynamic companies from database
+    const fetchDynamicCompanies = async () => {
+      const companies = await listCompanies();
+      const formattedDeals = companies
+        .filter(c => c.is_active !== false)
+        .map(c => ({
+          id: c.id, // ID as string from Supabase
+          title: c.full_name,
+          company: c.full_name,
+          discount: 'Yeni', // Default label for new companies
+          type: c.category_id === 1 ? 'Restaurant' : 
+                c.category_id === 2 ? 'Shop' :
+                c.category_id === 3 ? 'Education' :
+                c.category_id === 4 ? 'Entertainment' : 'Tech',
+          typeId: c.category_id || 1,
+          color: '#4318ff',
+          image: (c as any).metadata?.image || null, 
+          rating: 5.0,
+          ratingsCount: 1,
+          isDynamic: true
+        }));
+      setDynamicDeals(formattedDeals);
+    };
+    
+    fetchDynamicCompanies();
   }, []);
 
   useEffect(() => {
@@ -91,8 +118,8 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
 
   const filteredDeals = allDeals.filter(deal => {
     const matchesCategory = activeCategoryId === 6 || deal.typeId === activeCategoryId;
-    const matchesSearch = deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      deal.company.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (deal.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (deal.company || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -122,7 +149,13 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                 key={deal.id}
                 className={styles.card}
                 style={{ animationDelay: `${index * 0.05}s` }}
-                onClick={() => router.push(user ? `/company/${deal.id}` : '/login')}
+                onClick={() => {
+                  if (deal.isDynamic) {
+                    router.push(user ? `/company/${deal.id}` : '/login');
+                  } else {
+                    router.push(user ? `/company/${deal.id}` : '/login');
+                  }
+                }}
               >
                 <div className={styles.cardImage}>
                   {deal.image ? (

@@ -112,6 +112,65 @@
     box-shadow: 0 10px 20px rgba(238, 93, 80, 0.2);
 }
 
+.categoryBadge {
+    background: #f4f7fe;
+    color: #4318ff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.modal {
+    background: white;
+    border-radius: 35px;
+    width: 100%;
+    max-width: 550px;
+    padding: 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    z-index: 2001;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.modalHeader h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1b2559;
+}
+
+.modalForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modalSubmitBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(67, 24, 255, 0.25);
+    margin-top: 10px;
+}
+
+.modalSubmitBtn:hover {
+    background: #3311cc;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(67, 24, 255, 0.3);
+}
+
 /* --- MAIN CONTENT --- */
 .mainContent {
     flex: 1;

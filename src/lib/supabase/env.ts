@@ -17,7 +17,7 @@ function getSupabaseServiceRoleKey() {
   return process.env.SUPABASE_SERVICE_ROLE_KEY;
 }
 
-function assertSupabaseUrl(url: string | undefined): asserts url is string {
+function assertSupabaseUrl(url: string | undefined) {
   if (!url || typeof url !== "string" || url.trim() === "") {
     throw new Error(
       "Missing NEXT_PUBLIC_SUPABASE_URL. Set it in .env.local (and in Vercel for production) to your Supabase project URL, e.g. https://xxxx.supabase.co"
@@ -39,7 +39,7 @@ export function getSupabaseBrowserConfig() {
       "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY. Set it in .env.local and in Vercel to your Supabase anon (public) key."
     );
   }
-  return { url: url.trim(), anonKey: anonKey.trim() };
+  return { url: url!.trim(), anonKey: anonKey!.trim() };
 }
 
 export function getSupabaseServerConfig() {
@@ -49,7 +49,7 @@ export function getSupabaseServerConfig() {
   if (!anonKey?.trim()) {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY.");
   }
-  return { url: url.trim(), anonKey: anonKey.trim() };
+  return { url: url!.trim(), anonKey: anonKey!.trim() };
 }
 
 export function getSupabaseAdminConfig() {
@@ -61,5 +61,5 @@ export function getSupabaseAdminConfig() {
       "Missing SUPABASE_SERVICE_ROLE_KEY. Required for admin actions (create company, etc.)."
     );
   }
-  return { url: url.trim(), serviceRoleKey: serviceRoleKey.trim() };
+  return { url: (url || "").trim(), serviceRoleKey: (serviceRoleKey || "").trim() };
 }

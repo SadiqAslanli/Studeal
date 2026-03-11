@@ -27,6 +27,7 @@ export default function CompanyDashboard() {
         image: '',
         studentCardRequired: false
     });
+    const [editingDealId, setEditingDealId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
@@ -77,19 +78,49 @@ export default function CompanyDashboard() {
 
     const handleAddDeal = (e: React.FormEvent) => {
         e.preventDefault();
-        const dealToSave = {
-            ...newDeal,
-            id: Date.now(),
-            company: user?.name || 'Restaurant',
-            date: new Date().toISOString()
-        };
-
         const currentDeals = (user as any).deals || [];
-        updateUser({
-            // @ts-ignore
-            deals: [dealToSave, ...currentDeals]
-        });
 
+        if (editingDealId) {
+            // Update existing deal
+            const updatedDeals = currentDeals.map((d: any) => 
+                d.id === editingDealId ? { ...newDeal, id: d.id, company: d.company, date: d.date } : d
+            );
+            updateUser({
+                // @ts-ignore
+                deals: updatedDeals
+            });
+        } else {
+            // Add new deal
+            const dealToSave = {
+                ...newDeal,
+                id: Date.now(),
+                company: user?.name || 'Restaurant',
+                date: new Date().toISOString()
+            };
+            updateUser({
+                // @ts-ignore
+                deals: [dealToSave, ...currentDeals]
+            });
+        }
+
+        resetForm();
+    };
+
+    const handleEditDeal = (deal: any) => {
+        setNewDeal({
+            title: deal.title,
+            description: deal.description,
+            ingredients: deal.ingredients,
+            price: deal.price,
+            discount: deal.discount,
+            image: deal.image,
+            studentCardRequired: deal.studentCardRequired
+        });
+        setEditingDealId(deal.id);
+        setShowAddDeal(true);
+    };
+
+    const resetForm = () => {
         setNewDeal({
             title: '',
             description: '',
@@ -99,6 +130,7 @@ export default function CompanyDashboard() {
             image: '',
             studentCardRequired: false
         });
+        setEditingDealId(null);
         setShowAddDeal(false);
     };
 
@@ -173,7 +205,7 @@ export default function CompanyDashboard() {
                         <p>{t.dashboard.statsSub}</p>
                     </div>
                     <div className={styles.headerActions}>
-                        <button className={styles.addBtn} onClick={() => setShowAddDeal(true)}>
+                        <button className={styles.addBtn} onClick={() => { resetForm(); setShowAddDeal(true); }}>
                             <Plus size={20} />
                             <span>Yeni Menyu</span>
                         </button>
@@ -243,7 +275,7 @@ export default function CompanyDashboard() {
                     <section className={styles.dealsList}>
                         <div className={styles.sectionHeader}>
                             <h2>Mənim Endirimlərim</h2>
-                            <button className={styles.addBtnSmall} onClick={() => setShowAddDeal(true)}>
+                            <button className={styles.addBtnSmall} onClick={() => { resetForm(); setShowAddDeal(true); }}>
                                 <Plus size={16} />
                                 <span>Əlavə et</span>
                             </button>
@@ -269,6 +301,7 @@ export default function CompanyDashboard() {
                                                 <span>{deal.studentCardRequired ? "🪪 Tələbə kartı lazımdır" : "✅ Sərbəst giriş"}</span>
                                             </div>
                                             <div className={styles.dealActions}>
+                                                <button className={styles.editBtn} onClick={() => handleEditDeal(deal)} title="Redaktə et"><Edit size={18} /></button>
                                                 <button className={styles.deleteBtn} onClick={() => handleDeleteDeal(deal.id)} title="Sil"><Trash2 size={18} /></button>
                                             </div>
                                         </div>
@@ -330,11 +363,11 @@ export default function CompanyDashboard() {
 
             {/* Modal */}
             {showAddDeal && (
-                <div className={styles.modalOverlay} onClick={() => setShowAddDeal(false)}>
+                <div className={styles.modalOverlay} onClick={resetForm}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2>Yeni Endirim Menyu Əlavə Et</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowAddDeal(false)}>✕</button>
+                            <h2>{editingDealId ? "Menyunu Redaktə Et" : "Yeni Endirim Menyu Əlavə Et"}</h2>
+                            <button className={styles.closeBtn} onClick={resetForm}>✕</button>
                         </div>
                         <form className={styles.dealForm} onSubmit={handleAddDeal}>
                             <div className={styles.formGrid}>
@@ -436,7 +469,7 @@ export default function CompanyDashboard() {
                             </div>
 
                             <button type="submit" className={`btn-primary ${styles.btnBlock}`}>
-                                Paylaş
+                                {editingDealId ? "Yadda Saxla" : "Paylaş"}
                             </button>
                         </form>
                     </div>
