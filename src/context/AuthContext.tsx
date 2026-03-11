@@ -247,25 +247,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const logout = async () => {
         console.log("Logout initiated");
-        setIsLoading(true);
-        try {
-            // Local state-i dərhal təmizləyirik ki, UI dərhal yenilənsin
-            setBaseUser(null);
-            setStudealData({});
-            localStorage.clear();
-            sessionStorage.clear();
 
-            // Supabase-dən çıxış (network asılılığı var, ona görə dərhal gözləmirik ki, redirect gecikməsin)
-            supabase.auth.signOut().catch(err => console.error("Supabase signOut error:", err));
-            
-            console.log("State cleared, redirecting to login");
-            
-            // Tam təmizlənmə üçün səhifəni yenidən yükləyirik (amma artıq logine atmırıq)
-            window.location.reload();
-        } catch (e) {
-            console.error("Logout process error:", e);
-            window.location.reload();
+        // 1. UI-ni dərhal yeniləyirik
+        setBaseUser(null);
+        setStudealData({});
+        setIsLoading(false);
+
+        // 2. Local Storage-ı təmizləyirik
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // 3. Server-side signout — fetch ilə cookie-ləri silir, amma tam refresh olmur
+        try {
+            await fetch("/api/auth/signout", { method: "GET", redirect: "manual" });
+        } catch {
+            // network xətasını ignore edirik, hər halda logout edirik
         }
+
+        // 4. Soft client-side naviqasiya — tam refresh YOX
+        router.push("/");
+        router.refresh(); // server state-ni yeniləyir (cookie dəyişikliyi)
     };
 
     const loginWithGoogle = () => {
