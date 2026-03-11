@@ -16,6 +16,7 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import styles from './ad-request.module.css';
+import { submitAdRequest } from '../../admin/contentActions';
 
 export default function AdRequestPage() {
     const { t } = useLanguage();
@@ -30,7 +31,7 @@ export default function AdRequestPage() {
         email: user?.email || ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Validation
@@ -43,22 +44,24 @@ export default function AdRequestPage() {
             return;
         }
 
-        // Save ad request to localStorage for admin to review
-        const savedRequests = JSON.parse(localStorage.getItem('adRequests') || '[]');
-        savedRequests.unshift({
-            ...formData,
-            id: Date.now().toString(),
-            date: new Date().toLocaleDateString('az-AZ'),
-            status: 'pending'
-        });
-        localStorage.setItem('adRequests', JSON.stringify(savedRequests));
-
-        addNotification({
-            title: "Müraciət Göndərildi",
-            message: "Reklam müraciətiniz qəbul edildi. Tezliklə sizinlə əlaqə saxlayacağıq."
+        // Save to Supabase
+        const result = await submitAdRequest({
+            company_id: user?.id,
+            company_name: formData.restaurantName,
+            content: formData.content,
+            phone: formData.phoneNumber,
+            email: formData.email
         });
 
-        setSubmitted(true);
+        if (result.ok) {
+            addNotification({
+                title: "Müraciət Göndərildi",
+                message: "Reklam müraciətiniz qəbul edildi. Tezliklə sizinlə əlaqə saxlayacağıq."
+            });
+            setSubmitted(true);
+        } else {
+            alert("Xəta: " + result.error);
+        }
     };
 
     if (submitted) {
