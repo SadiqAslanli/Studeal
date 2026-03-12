@@ -41,55 +41,51 @@ export default function CompanyProfile() {
 
                 const supabase = (await import('@/lib/supabase/client')).createClient();
                 
-                // 1. Try fetching by ID (UUID)
-                const { data, error: idError } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, email, metadata, category_id, role')
-                    .eq('id', idParam)
-                    .maybeSingle();
+                let profileData = null;
+                const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idParam);
 
-                if (data && data.role?.toLowerCase() === 'company') {
-                    const metadata = data.metadata || {};
-                    // If a slug exists in metadata and it's different from the URL param, redirect to slug
-                    if (metadata.slug && metadata.slug !== idParam) {
-                        router.replace(`/company/${metadata.slug}`);
-                        return;
+                // 1. Try fetching by ID if it's a valid UUID
+                if (isUUID) {
+                    const { data, error: idError } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, email, metadata, category_id, role, image_url')
+                        .eq('id', idParam)
+                        .maybeSingle();
+                    
+                    if (data && data.role?.toLowerCase() === 'company') {
+                        profileData = data;
                     }
-
-                    setDynamicCompany({
-                        id: data.id,
-                        name: data.full_name || data.email || 'Adsız Müəssisə',
-                        tagline: metadata.tagline || (data.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
-                        image: metadata.image || '/hero-bg.jpg',
-                        branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
-                        deals: metadata.deals || []
-                    });
-                    setIsDbLoading(false);
-                    return;
                 }
 
-                // 2. Fallback: If not found by ID, maybe it's a name or slug in the metadata
-                const { data: searchData, error: sError } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, email, metadata, category_id, role')
-                    .eq('role', 'Company')
-                    .or(`full_name.ilike.%${idParam}%,metadata->slug.eq."${idParam}"`)
-                    .limit(1)
-                    .maybeSingle();
+                // 2. Fallback: If not found by ID (or it wasn't a UUID), try fetching by slug or name
+                if (!profileData) {
+                    const { data: searchData, error: sError } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, email, metadata, category_id, role, image_url')
+                        .eq('role', 'Company')
+                        .or(`full_name.ilike.%${idParam}%,metadata->>slug.eq.${idParam}`)
+                        .limit(1)
+                        .maybeSingle();
 
-                if (searchData) {
-                    const metadata = searchData.metadata || {};
-                    // If we found it via name search but it has a slug, redirect to slug for consistency
-                    if (metadata.slug && metadata.slug !== idParam) {
+                    if (searchData) {
+                        profileData = searchData;
+                    }
+                }
+
+                // If we found a valid profile
+                if (profileData) {
+                    const metadata = profileData.metadata || {};
+                    // If a slug exists in metadata and we're not currently on the slug URL, redirect
+                    if (metadata.slug && metadata.slug !== idParam && !isUUID) {
                         router.replace(`/company/${metadata.slug}`);
                         return;
                     }
 
                     setDynamicCompany({
-                        id: searchData.id,
-                        name: searchData.full_name || searchData.email,
-                        tagline: metadata.tagline || (searchData.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
-                        image: metadata.image || '/hero-bg.jpg',
+                        id: profileData.id,
+                        name: profileData.full_name || profileData.email || 'Adsız Müəssisə',
+                        tagline: metadata.tagline || (profileData.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
+                        image: profileData.image_url || metadata.image || '/hero-bg.jpg',
                         branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
                         deals: metadata.deals || []
                     });
