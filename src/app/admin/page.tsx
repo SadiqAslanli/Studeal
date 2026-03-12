@@ -24,7 +24,7 @@ import styles from './admin.module.css';
 import Link from 'next/link';
 import { createCompanyUser, listCompanies, updateCompanyStatus, deleteCompanyUser } from './actions';
 import { uploadMediaAction } from './cloudinaryActions';
-import { 
+import {
     getSidebarAds, addSidebarAd, deleteSidebarAd,
     getFeaturedDeals, addFeaturedDeal, deleteFeaturedDeal,
     getMessages, deleteMessage,
@@ -66,7 +66,8 @@ export default function AdminDashboard() {
         title: '',
         desc: '',
         discount: '',
-        image: ''
+        image: '',
+        companyId: ''
     });
     const [newAd, setNewAd] = useState({
         image: '',
@@ -104,10 +105,10 @@ export default function AdminDashboard() {
 
     const loadRestaurants = async () => {
         const list = await listCompanies();
-        setRestaurants(list.map((c) => ({ 
-            id: c.id, 
-            name: c.full_name || c.email || '—', 
-            email: c.email ?? '', 
+        setRestaurants(list.map((c) => ({
+            id: c.id,
+            name: c.full_name || c.email || '—',
+            email: c.email ?? '',
             isActive: c.is_active !== false,
             category_id: c.category_id,
             image: c.image_url || c.metadata?.image || null
@@ -145,7 +146,7 @@ export default function AdminDashboard() {
         const name = newRest.name.trim();
         const email = newRest.email.trim().toLowerCase();
         const password = newRest.password.trim();
-        
+
         if (!name || !email || !password) {
             alert("Ad, e-poçt və parol tələb olunur.");
             return;
@@ -153,7 +154,7 @@ export default function AdminDashboard() {
 
         setIsUploading(true);
         let uploadedImageUrl = '';
-        
+
         if (newRestImage) {
             const formData = new FormData();
             formData.append('file', newRestImage);
@@ -169,7 +170,7 @@ export default function AdminDashboard() {
 
         const result = await createCompanyUser(name, email, password, newRest.categoryId, uploadedImageUrl);
         setIsUploading(false);
-        
+
         if (result.ok) {
             setNewRest({ name: '', email: '', password: '', categoryId: 1 });
             setNewRestImage(null);
@@ -240,7 +241,7 @@ export default function AdminDashboard() {
 
     const handleAddAd = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!newAd.image || !newAd.companyId) {
             alert("Şəkil və sahibkar seçilməlidir.");
             return;
@@ -264,7 +265,7 @@ export default function AdminDashboard() {
         }
 
         const result = await addSidebarAd(finalImageUrl, newAd.discount, newAd.companyId);
-        
+
         if (result.ok) {
             await loadAds();
             setNewAd({ image: '', discount: '', companyId: '' });
@@ -304,7 +305,7 @@ export default function AdminDashboard() {
 
     const handleAddFeatured = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         setIsUploading(true);
         let finalImageUrl = newFeatured.image;
 
@@ -325,12 +326,13 @@ export default function AdminDashboard() {
             title: newFeatured.title,
             description: newFeatured.desc,
             discount: newFeatured.discount,
-            image_url: finalImageUrl
+            image_url: finalImageUrl,
+            company_id: newFeatured.companyId
         });
 
         if (result.ok) {
             await loadFeatured();
-            setNewFeatured({ title: '', desc: '', discount: '', image: '' });
+            setNewFeatured({ title: '', desc: '', discount: '', image: '', companyId: '' });
             setSelectedFeaturedFile(null);
             setFeaturedPreview(null);
         } else {
@@ -398,18 +400,18 @@ export default function AdminDashboard() {
                             <form onSubmit={handleCreateRestaurant} className={styles.modalForm}>
                                 <div className={styles.formGroup}>
                                     <label>Ad</label>
-                                    <input 
-                                        type="text" 
-                                        value={newRest.name} 
-                                        onChange={e => setNewRest({...newRest, name: e.target.value})} 
+                                    <input
+                                        type="text"
+                                        value={newRest.name}
+                                        onChange={e => setNewRest({ ...newRest, name: e.target.value })}
                                         placeholder="Məs: KFC Azerbaijan"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label>Kateqoriya</label>
-                                    <select 
-                                        value={newRest.categoryId} 
-                                        onChange={e => setNewRest({...newRest, categoryId: parseInt(e.target.value)})}
+                                    <select
+                                        value={newRest.categoryId}
+                                        onChange={e => setNewRest({ ...newRest, categoryId: parseInt(e.target.value) })}
                                         className={styles.modalSelect}
                                         style={{
                                             width: '100%',
@@ -428,25 +430,25 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label>Email</label>
-                                    <input 
-                                        type="email" 
-                                        value={newRest.email} 
-                                        onChange={e => setNewRest({...newRest, email: e.target.value})} 
+                                    <input
+                                        type="email"
+                                        value={newRest.email}
+                                        onChange={e => setNewRest({ ...newRest, email: e.target.value })}
                                         placeholder="company@studeal.az"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label>Parol</label>
-                                    <input 
-                                        type="password" 
-                                        value={newRest.password} 
-                                        onChange={e => setNewRest({...newRest, password: e.target.value})} 
+                                    <input
+                                        type="password"
+                                        value={newRest.password}
+                                        onChange={e => setNewRest({ ...newRest, password: e.target.value })}
                                         placeholder="••••••••"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label>Loqo / Şəkil / Video</label>
-                                    <div 
+                                    <div
                                         className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
                                         style={{ height: '120px' }}
                                         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -462,10 +464,10 @@ export default function AdminDashboard() {
                                         }}
                                         onClick={() => document.getElementById('restFile')?.click()}
                                     >
-                                        <input 
-                                            type="file" 
-                                            id="restFile" 
-                                            hidden 
+                                        <input
+                                            type="file"
+                                            id="restFile"
+                                            hidden
                                             accept="image/*,video/*"
                                             onChange={(e) => {
                                                 if (e.target.files && e.target.files[0]) {
@@ -476,9 +478,9 @@ export default function AdminDashboard() {
                                             }}
                                         />
                                         {newRestPreview ? (
-                                            newRestImage?.type.startsWith('video') ? 
-                                            <video src={newRestPreview} style={{ height: '100%', width: '100%', objectFit: 'contain' }} muted /> :
-                                            <img src={newRestPreview} alt="Preview" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                                            newRestImage?.type.startsWith('video') ?
+                                                <video src={newRestPreview} style={{ height: '100%', width: '100%', objectFit: 'contain' }} muted /> :
+                                                <img src={newRestPreview} alt="Preview" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                                         ) : (
                                             <div className={styles.dropzoneText}>
                                                 <Upload size={20} />
@@ -569,11 +571,11 @@ export default function AdminDashboard() {
                             <span className={styles.welcomeBadge}>Admin Panel 👋</span>
                             <h1>{
                                 activeTab === 'dashboard' ? 'Dashboard' :
-                                activeTab === 'restaurants' ? 'Sahibkarlar' :
-                                activeTab === 'ads' ? 'Reklamlar' :
-                                activeTab === 'messages' ? 'Mesajlar' :
-                                activeTab === 'featured' ? 'Seçilmişlər' :
-                                activeTab === 'adRequests' ? 'Reklam Müraciətləri' : activeTab
+                                    activeTab === 'restaurants' ? 'Sahibkarlar' :
+                                        activeTab === 'ads' ? 'Reklamlar' :
+                                            activeTab === 'messages' ? 'Mesajlar' :
+                                                activeTab === 'featured' ? 'Seçilmişlər' :
+                                                    activeTab === 'adRequests' ? 'Reklam Müraciətləri' : activeTab
                             }</h1>
                             <p>Sizin bugünkü rəqəmləriniz və fəaliyyətiniz.</p>
                         </div>
@@ -584,69 +586,69 @@ export default function AdminDashboard() {
                         )}
                     </header>
 
-                {activeTab === 'dashboard' && (
-                    <div className={styles.dashboardOverview}>
-                        <div className={styles.statsGrid}>
-                            <div className={`${styles.statCard} ${styles.statGreen}`}>
-                                <div className={styles.statIconBox}>
-                                    <Users size={24} />
+                    {activeTab === 'dashboard' && (
+                        <div className={styles.dashboardOverview}>
+                            <div className={styles.statsGrid}>
+                                <div className={`${styles.statCard} ${styles.statGreen}`}>
+                                    <div className={styles.statIconBox}>
+                                        <Users size={24} />
+                                    </div>
+                                    <div className={styles.statInfo}>
+                                        <span className={styles.statLabel}>Ümumi Sahibkarlar</span>
+                                        <span className={styles.statValue}>{restaurants.length}</span>
+                                    </div>
                                 </div>
-                                <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Ümumi Sahibkarlar</span>
-                                    <span className={styles.statValue}>{restaurants.length}</span>
+                                <div className={`${styles.statCard} ${styles.statBlue}`}>
+                                    <div className={styles.statIconBox}>
+                                        <ImageIcon size={24} />
+                                    </div>
+                                    <div className={styles.statInfo}>
+                                        <span className={styles.statLabel}>Aktiv Reklamlar</span>
+                                        <span className={styles.statValue}>{dynamicAds.length}</span>
+                                    </div>
+                                </div>
+                                <div className={`${styles.statCard} ${styles.statRed}`}>
+                                    <div className={styles.statIconBox}>
+                                        <MessageCircle size={24} />
+                                    </div>
+                                    <div className={styles.statInfo}>
+                                        <span className={styles.statLabel}>Yeni Mesajlar</span>
+                                        <span className={styles.statValue}>{messages.length}</span>
+                                    </div>
+                                </div>
+                                <div className={`${styles.statCard} ${styles.statYellow}`}>
+                                    <div className={styles.statIconBox}>
+                                        <Megaphone size={24} />
+                                    </div>
+                                    <div className={styles.statInfo}>
+                                        <span className={styles.statLabel}>Müraciətlər</span>
+                                        <span className={styles.statValue}>{adRequests.length}</span>
+                                    </div>
+                                </div>
+                                <div className={`${styles.statCard} ${styles.statCyan}`}>
+                                    <div className={styles.statIconBox}>
+                                        <Zap size={24} />
+                                    </div>
+                                    <div className={styles.statInfo}>
+                                        <span className={styles.statLabel}>Bu gün Ziyarət</span>
+                                        <span className={styles.statValue}>{todayVisits}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className={`${styles.statCard} ${styles.statBlue}`}>
-                                <div className={styles.statIconBox}>
-                                    <ImageIcon size={24} />
-                                </div>
-                                <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Aktiv Reklamlar</span>
-                                    <span className={styles.statValue}>{dynamicAds.length}</span>
-                                </div>
-                            </div>
-                            <div className={`${styles.statCard} ${styles.statRed}`}>
-                                <div className={styles.statIconBox}>
-                                    <MessageCircle size={24} />
-                                </div>
-                                <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Yeni Mesajlar</span>
-                                    <span className={styles.statValue}>{messages.length}</span>
-                                </div>
-                            </div>
-                            <div className={`${styles.statCard} ${styles.statYellow}`}>
-                                <div className={styles.statIconBox}>
-                                    <Megaphone size={24} />
-                                </div>
-                                <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Müraciətlər</span>
-                                    <span className={styles.statValue}>{adRequests.length}</span>
-                                </div>
-                            </div>
-                            <div className={`${styles.statCard} ${styles.statCyan}`}>
-                                <div className={styles.statIconBox}>
-                                    <Zap size={24} />
-                                </div>
-                                <div className={styles.statInfo}>
-                                    <span className={styles.statLabel}>Bu gün Ziyarət</span>
-                                    <span className={styles.statValue}>{todayVisits}</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className={styles.welcomeBanner}>
-                            <h2>Xoş Gəlmisiniz, Admin! 👋</h2>
-                            <p>Sistem üzrə bütün göstəricilər və idarəetmə paneli aşağıdadır.</p>
+                            <div className={styles.welcomeBanner}>
+                                <h2>Xoş Gəlmisiniz, Admin! 👋</h2>
+                                <p>Sistem üzrə bütün göstəricilər və idarəetmə paneli aşağıdadır.</p>
+                            </div>
                         </div>
-                    </div>
-                )}
-                {activeTab === 'restaurants' && (
-                    <section className={styles.section}>
-                        <div className={styles.sectionHeader}>
-                            <h2>Qeydiyyatdan keçmiş sahibkarlar</h2>
-                        </div>
-                        <div className={styles.tableWrapper}>
-                            <table className={styles.table}>
+                    )}
+                    {activeTab === 'restaurants' && (
+                        <section className={styles.section}>
+                            <div className={styles.sectionHeader}>
+                                <h2>Qeydiyyatdan keçmiş sahibkarlar</h2>
+                            </div>
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
                                     <thead>
                                         <tr>
                                             <th>Loqo</th>
@@ -672,16 +674,16 @@ export default function AdminDashboard() {
                                                 <td>{rest.name}</td>
                                                 <td>
                                                     <span className={styles.categoryBadge}>
-                                                        {rest.category_id === 1 ? 'Restoran' : 
-                                                         rest.category_id === 2 ? 'Mağaza' :
-                                                         rest.category_id === 3 ? 'Təhsil' :
-                                                         rest.category_id === 4 ? 'Əyləncə' :
-                                                         rest.category_id === 5 ? 'Texno' : 'Qeyri-müəyyən'}
+                                                        {rest.category_id === 1 ? 'Restoran' :
+                                                            rest.category_id === 2 ? 'Mağaza' :
+                                                                rest.category_id === 3 ? 'Təhsil' :
+                                                                    rest.category_id === 4 ? 'Əyləncə' :
+                                                                        rest.category_id === 5 ? 'Texno' : 'Qeyri-müəyyən'}
                                                     </span>
                                                 </td>
                                                 <td>{rest.email}</td>
                                                 <td>
-                                                    <span style={{ 
+                                                    <span style={{
                                                         color: rest.isActive !== false ? '#10b981' : '#ee5d50',
                                                         background: rest.isActive !== false ? '#e6f8f1' : '#fff5f5',
                                                         padding: '4px 12px',
@@ -694,12 +696,12 @@ export default function AdminDashboard() {
                                                 </td>
                                                 <td>
                                                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                                        <button 
+                                                        <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleLoginAsRestaurant(rest);
                                                             }}
-                                                            style={{ 
+                                                            style={{
                                                                 color: 'white',
                                                                 cursor: 'pointer',
                                                                 fontSize: '13px',
@@ -720,9 +722,9 @@ export default function AdminDashboard() {
                                                         >
                                                             Panelə Giriş
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => toggleRestaurantStatus(rest)}
-                                                            style={{ 
+                                                            style={{
                                                                 color: rest.isActive !== false ? '#ee5d50' : '#10b981',
                                                                 cursor: 'pointer',
                                                                 fontSize: '13px',
@@ -736,10 +738,10 @@ export default function AdminDashboard() {
                                                         >
                                                             {rest.isActive !== false ? 'Söndür' : 'Yandır'}
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleDeleteRestaurant(rest)}
-                                                            style={{ 
-                                                                color: '#a3aed0', 
+                                                            style={{
+                                                                color: '#a3aed0',
                                                                 cursor: 'pointer',
                                                                 padding: '8px',
                                                                 borderRadius: '10px',
@@ -753,411 +755,429 @@ export default function AdminDashboard() {
                                             </tr>
                                         ))}
                                     </tbody>
-                            </table>
-                        </div>
-                    </section>
-                )}
+                                </table>
+                            </div>
+                        </section>
+                    )}
 
-                {/* Ads Tab */}
-                {activeTab === 'ads' && (
-                    <section className={styles.section}>
-                        <div className={styles.sectionHeader}>
-                            <h2>Sahibkar Reklamlarını İdarə Et (Sidebar)</h2>
-                            <span style={{ color: '#a3aed0', fontSize: '14px' }}>{dynamicAds.length} reklam</span>
-                        </div>
+                    {/* Ads Tab */}
+                    {activeTab === 'ads' && (
+                        <section className={styles.section}>
+                            <div className={styles.sectionHeader}>
+                                <h2>Sahibkar Reklamlarını İdarə Et (Sidebar)</h2>
+                                <span style={{ color: '#a3aed0', fontSize: '14px' }}>{dynamicAds.length} reklam</span>
+                            </div>
 
-                        {/* Add Ad Form */}
-                        <div className={styles.section} style={{ marginBottom: '30px', background: '#f8faff', border: '1px solid #e0e5f2' }}>
-                            <form onSubmit={handleAddAd} className={styles.form}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                    <h3 style={{ margin: 0, fontWeight: 800, color: '#1b2559' }}>🚀 Yeni Sidebar Reklamı</h3>
-                                    <button type="submit" className="btn-primary" style={{ background: '#4318ff', borderRadius: '12px' }} disabled={isUploading}>
-                                        <Plus size={18} /> {isUploading ? 'Yüklənir...' : 'Reklamı Əlavə Et'}
-                                    </button>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                                    <div className={styles.formGroup}>
-                                        <label>Şəkli buraya sürükləyin</label>
-                                        <div 
-                                            className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
-                                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                                            onDragLeave={() => setIsDragging(false)}
-                                            onDrop={(e) => {
-                                                e.preventDefault();
-                                                setIsDragging(false);
-                                                handleFileSelect(e);
-                                            }}
-                                            onClick={() => document.getElementById('adFile')?.click()}
-                                        >
-                                            <input 
-                                                type="file" 
-                                                id="adFile" 
-                                                hidden 
-                                                accept="image/*,video/*"
-                                                onChange={handleFileSelect}
+                            {/* Add Ad Form */}
+                            <div className={styles.section} style={{ marginBottom: '30px', background: '#f8faff', border: '1px solid #e0e5f2' }}>
+                                <form onSubmit={handleAddAd} className={styles.form}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontWeight: 800, color: '#1b2559' }}>🚀 Yeni Sidebar Reklamı</h3>
+                                        <button type="submit" className="btn-primary" style={{ background: '#4318ff', borderRadius: '12px' }} disabled={isUploading}>
+                                            <Plus size={18} /> {isUploading ? 'Yüklənir...' : 'Reklamı Əlavə Et'}
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                                        <div className={styles.formGroup}>
+                                            <label>Şəkli buraya sürükləyin</label>
+                                            <div
+                                                className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
+                                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                                onDragLeave={() => setIsDragging(false)}
+                                                onDrop={(e) => {
+                                                    e.preventDefault();
+                                                    setIsDragging(false);
+                                                    handleFileSelect(e);
+                                                }}
+                                                onClick={() => document.getElementById('adFile')?.click()}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    id="adFile"
+                                                    hidden
+                                                    accept="image/*,video/*"
+                                                    onChange={handleFileSelect}
+                                                />
+                                                {newAd.image ? (
+                                                    <img src={newAd.image} alt="Preview" className={styles.dropzonePreview} />
+                                                ) : (
+                                                    <div className={styles.dropzoneText}>
+                                                        <Upload size={24} />
+                                                        <span>Şəkli seçin və ya bura atın</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className={styles.formGroup}>
+                                            <label>Endirim Mətni (Badge)</label>
+                                            <input
+                                                type="text"
+                                                value={newAd.discount}
+                                                onChange={(e) => setNewAd({ ...newAd, discount: e.target.value })}
+                                                placeholder="Məs: 25% ENDİRİM"
+                                                required
                                             />
-                                            {newAd.image ? (
-                                                <img src={newAd.image} alt="Preview" className={styles.dropzonePreview} />
-                                            ) : (
-                                                <div className={styles.dropzoneText}>
-                                                    <Upload size={24} />
-                                                    <span>Şəkli seçin və ya bura atın</span>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                     <div className={styles.formGroup}>
-                                        <label>Endirim Mətni (Badge)</label>
-                                        <input
-                                            type="text"
-                                            value={newAd.discount}
-                                            onChange={(e) => setNewAd({ ...newAd, discount: e.target.value })}
-                                            placeholder="Məs: 25% ENDİRİM"
+                                        <label>Hansı sahibkara yönləndirilsin?</label>
+                                        <select
+                                            value={newAd.companyId}
+                                            onChange={(e) => setNewAd({ ...newAd, companyId: e.target.value })}
                                             required
-                                        />
-                                    </div>
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label>Hansı sahibkara yönləndirilsin?</label>
-                                    <select
-                                        value={newAd.companyId}
-                                        onChange={(e) => setNewAd({ ...newAd, companyId: e.target.value })}
-                                        required
-                                        style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2' }}
-                                    >
-                                        <option value="">Sahibkar seçin...</option>
-                                        {restaurants.map(r => (
-                                            <option key={r.id} value={r.id}>{r.name} ({r.email})</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Ads List */}
-                        <div className={styles.tableWrapper}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Önizləmə</th>
-                                        <th>Endirim</th>
-                                        <th>Yönləndirmə ID</th>
-                                        <th>Əməliyyat</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {dynamicAds.map((ad) => (
-                                        <tr key={ad.id}>
-                                            <td>
-                                                <div style={{ position: 'relative', width: '120px', height: '60px', borderRadius: '10px', overflow: 'hidden' }}>
-                                                    <img src={ad.image} alt="Ad" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                    <div style={{
-                                                        position: 'absolute', top: '8px', left: '8px',
-                                                        background: 'white', padding: '2px 8px', borderRadius: '20px',
-                                                        fontSize: '10px', fontWeight: 800, color: '#1b2559', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                                                    }}>
-                                                        {ad.discount}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style={{ fontWeight: 800 }}>{ad.discount}</td>
-                                            <td>{ad.companyId}</td>
-                                            <td>
-                                                <button
-                                                    onClick={() => handleDeleteAd(ad.id)}
-                                                    style={{ background: 'none', border: 'none', color: '#ee5d50', cursor: 'pointer' }}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {dynamicAds.length === 0 && (
-                                        <tr>
-                                            <td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#a3aed0' }}>
-                                                Hələ heç bir reklam yoxdur.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                )}
-
-                {/* Messages Tab */}
-                {activeTab === 'messages' && (
-                    <section className={styles.section}>
-                        <div className={styles.sectionHeader}>
-                            <h2>İstifadəçi Təklifləri</h2>
-                        </div>
-                        <div className={styles.tableWrapper}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Ad</th>
-                                        <th>Növ</th>
-                                        <th>Mesaj</th>
-                                        <th>Tarix</th>
-                                        <th>Əməliyyat</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {messages.map((msg, i) => (
-                                        <tr key={i}>
-                                            <td>{msg.name}</td>
-                                            <td>{msg.type}</td>
-                                            <td style={{ maxWidth: '300px' }}>{msg.message}</td>
-                                            <td>{msg.date || 'Bugün'}</td>
-                                            <td>
-                                                <button
-                                                    onClick={() => handleDeleteMessage(msg.id)}
-                                                    className={styles.deleteBtn}
-                                                    style={{ background: 'none', border: 'none', color: '#ee5d50' }}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {messages.length === 0 && (
-                                        <tr>
-                                            <td colSpan={5} style={{ textAlign: 'center' }}>Heç bir mesaj yoxdur.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                )}
-
-                {/* Featured Tab */}
-                {activeTab === 'featured' && (
-                    <section className={styles.section}>
-                        <div className={styles.sectionHeader}>
-                            <h2>Seçilmiş Endirimlər (Slider)</h2>
-                            <span style={{ color: '#a3aed0', fontSize: '14px' }}>{featuredDeals.length} endirim</span>
-                        </div>
-
-                        {/* Add Form */}
-                        <div className={styles.section} style={{ marginBottom: '32px', background: '#f8faff', border: '1px solid #e0e5f2' }}>
-                            <form onSubmit={handleAddFeatured} className={styles.form}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#1b2559' }}>✨ Yeni Seçilmiş Endirim</h3>
-                                    <button type="submit" className="btn-primary" style={{ padding: '10px 20px', borderRadius: '14px', display: 'flex', gap: '8px', alignItems: 'center', background: '#4318ff' }}>
-                                        <Plus size={18} /> Əlavə et
-                                    </button>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                                    <div className={styles.formGroup}>
-                                        <label>Başlıq</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Məs: KFC Zinger Menyu"
-                                            value={newFeatured.title}
-                                            onChange={(e) => setNewFeatured({ ...newFeatured, title: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Endirim faizi</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Məs: 20%"
-                                            value={newFeatured.discount}
-                                            onChange={(e) => setNewFeatured({ ...newFeatured, discount: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
-                                    <div className={styles.formGroup}>
-                                        <label>Media (Şəkil/Video)</label>
-                                        <div 
-                                            className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
-                                            style={{ height: '120px' }}
-                                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                                            onDragLeave={() => setIsDragging(false)}
-                                            onDrop={(e) => {
-                                                e.preventDefault();
-                                                setIsDragging(false);
-                                                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                                                    const file = e.dataTransfer.files[0];
-                                                    setSelectedFeaturedFile(file);
-                                                    setFeaturedPreview(URL.createObjectURL(file));
-                                                }
-                                            }}
-                                            onClick={() => document.getElementById('featFile')?.click()}
+                                            style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2' }}
                                         >
-                                            <input 
-                                                type="file" 
-                                                id="featFile" 
-                                                hidden 
-                                                accept="image/*,video/*"
-                                                onChange={(e) => {
-                                                    if (e.target.files && e.target.files[0]) {
-                                                        const file = e.target.files[0];
+                                            <option value="">Sahibkar seçin...</option>
+                                            {restaurants.map(r => (
+                                                <option key={r.id} value={r.id}>{r.name} ({r.email})</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {/* Ads List */}
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>Önizləmə</th>
+                                            <th>Endirim</th>
+                                            <th>Yönləndirmə ID</th>
+                                            <th>Əməliyyat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {dynamicAds.map((ad) => (
+                                            <tr key={ad.id}>
+                                                <td>
+                                                    <div style={{ position: 'relative', width: '120px', height: '60px', borderRadius: '10px', overflow: 'hidden' }}>
+                                                        <img src={ad.image} alt="Ad" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <div style={{
+                                                            position: 'absolute', top: '8px', left: '8px',
+                                                            background: 'white', padding: '2px 8px', borderRadius: '20px',
+                                                            fontSize: '10px', fontWeight: 800, color: '#1b2559', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                                        }}>
+                                                            {ad.discount}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ fontWeight: 800 }}>{ad.discount}</td>
+                                                <td>{ad.companyId}</td>
+                                                <td>
+                                                    <button
+                                                        onClick={() => handleDeleteAd(ad.id)}
+                                                        style={{ background: 'none', border: 'none', color: '#ee5d50', cursor: 'pointer' }}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {dynamicAds.length === 0 && (
+                                            <tr>
+                                                <td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#a3aed0' }}>
+                                                    Hələ heç bir reklam yoxdur.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Messages Tab */}
+                    {activeTab === 'messages' && (
+                        <section className={styles.section}>
+                            <div className={styles.sectionHeader}>
+                                <h2>İstifadəçi Təklifləri</h2>
+                            </div>
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>Ad</th>
+                                            <th>Növ</th>
+                                            <th>Mesaj</th>
+                                            <th>Tarix</th>
+                                            <th>Əməliyyat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {messages.map((msg, i) => (
+                                            <tr key={i}>
+                                                <td>{msg.name}</td>
+                                                <td>{msg.type}</td>
+                                                <td style={{ maxWidth: '300px' }}>{msg.message}</td>
+                                                <td>{msg.date || 'Bugün'}</td>
+                                                <td>
+                                                    <button
+                                                        onClick={() => handleDeleteMessage(msg.id)}
+                                                        className={styles.deleteBtn}
+                                                        style={{ background: 'none', border: 'none', color: '#ee5d50' }}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {messages.length === 0 && (
+                                            <tr>
+                                                <td colSpan={5} style={{ textAlign: 'center' }}>Heç bir mesaj yoxdur.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Featured Tab */}
+                    {activeTab === 'featured' && (
+                        <section className={styles.section}>
+                            <div className={styles.sectionHeader}>
+                                <h2>Seçilmiş Endirimlər (Slider)</h2>
+                                <span style={{ color: '#a3aed0', fontSize: '14px' }}>{featuredDeals.length} endirim</span>
+                            </div>
+
+                            {/* Add Form */}
+                            <div className={styles.section} style={{ marginBottom: '32px', background: '#f8faff', border: '1px solid #e0e5f2' }}>
+                                <form onSubmit={handleAddFeatured} className={styles.form}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#1b2559' }}>✨ Yeni Seçilmiş Endirim</h3>
+                                        <button type="submit" className="btn-primary" style={{ padding: '10px 20px', borderRadius: '14px', display: 'flex', gap: '8px', alignItems: 'center', background: '#4318ff' }}>
+                                            <Plus size={18} /> Əlavə et
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                        <div className={styles.formGroup}>
+                                            <label>Başlıq</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Məs: KFC Zinger Menyu"
+                                                value={newFeatured.title}
+                                                onChange={(e) => setNewFeatured({ ...newFeatured, title: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className={styles.formGroup}>
+                                            <label>Endirim faizi</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Məs: 20%"
+                                                value={newFeatured.discount}
+                                                onChange={(e) => setNewFeatured({ ...newFeatured, discount: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                                        <div className={styles.formGroup}>
+                                            <label>Media (Şəkil/Video)</label>
+                                            <div
+                                                className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
+                                                style={{ height: '120px' }}
+                                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                                onDragLeave={() => setIsDragging(false)}
+                                                onDrop={(e) => {
+                                                    e.preventDefault();
+                                                    setIsDragging(false);
+                                                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                                        const file = e.dataTransfer.files[0];
                                                         setSelectedFeaturedFile(file);
                                                         setFeaturedPreview(URL.createObjectURL(file));
                                                     }
                                                 }}
+                                                onClick={() => document.getElementById('featFile')?.click()}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    id="featFile"
+                                                    hidden
+                                                    accept="image/*,video/*"
+                                                    onChange={(e) => {
+                                                        if (e.target.files && e.target.files[0]) {
+                                                            const file = e.target.files[0];
+                                                            setSelectedFeaturedFile(file);
+                                                            setFeaturedPreview(URL.createObjectURL(file));
+                                                        }
+                                                    }}
+                                                />
+                                                {featuredPreview ? (
+                                                    selectedFeaturedFile?.type.startsWith('video') ?
+                                                        <video src={featuredPreview} style={{ height: '100%', width: '100%', objectFit: 'contain' }} muted /> :
+                                                        <img src={featuredPreview} alt="Preview" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                                                ) : (
+                                                    <div className={styles.dropzoneText}>
+                                                        <Upload size={20} />
+                                                        <span style={{ fontSize: '12px' }}>Fayl seçin</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className={styles.formGroup}>
+                                            <label>Sahibkar Seçin (Profilə keçid üçün)</label>
+                                            <select
+                                                value={newFeatured.companyId}
+                                                onChange={(e) => setNewFeatured({ ...newFeatured, companyId: e.target.value })}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '12px',
+                                                    borderRadius: '12px',
+                                                    border: '1px solid #e0e5f2',
+                                                    background: 'white',
+                                                    marginBottom: '10px'
+                                                }}
+                                            >
+                                                <option value="">— Sahibkar seçilməyib —</option>
+                                                {restaurants.map(r => (
+                                                    <option key={r.id} value={r.id}>{r.name}</option>
+                                                ))}
+                                            </select>
+                                            <label>Təsvir</label>
+                                            <textarea
+                                                placeholder="Tələbələr üçün özəl 20% endirim kampaniyası davam edir!"
+                                                value={newFeatured.desc}
+                                                onChange={(e) => setNewFeatured({ ...newFeatured, desc: e.target.value })}
+                                                required
+                                                style={{ height: '120px', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2', width: '100%' }}
                                             />
-                                            {featuredPreview ? (
-                                                selectedFeaturedFile?.type.startsWith('video') ?
-                                                <video src={featuredPreview} style={{ height: '100%', width: '100%', objectFit: 'contain' }} muted /> :
-                                                <img src={featuredPreview} alt="Preview" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
-                                            ) : (
-                                                <div className={styles.dropzoneText}>
-                                                    <Upload size={20} />
-                                                    <span style={{ fontSize: '12px' }}>Fayl seçin</span>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Təsvir</label>
-                                        <textarea
-                                            placeholder="Tələbələr üçün özəl 20% endirim kampaniyası davam edir!"
-                                            value={newFeatured.desc}
-                                            onChange={(e) => setNewFeatured({ ...newFeatured, desc: e.target.value })}
-                                            required
-                                            style={{ height: '120px', padding: '12px', borderRadius: '12px', border: '1px solid #e0e5f2', width: '100%' }}
-                                        />
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
 
-                        {/* List */}
-                        <div className={styles.tableWrapper}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Şəkil</th>
-                                        <th>Başlıq</th>
-                                        <th>Endirim</th>
-                                        <th>Təsvir</th>
-                                        <th>Əməliyyat</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {featuredDeals.map((item: any) => (
-                                        <tr key={item.id}>
-                                            <td>
-                                                {item.image && (
-                                                    <img src={item.image} alt={item.title}
-                                                        style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '8px' }} />
-                                                )}
-                                            </td>
-                                            <td style={{ fontWeight: 800 }}>{item.title}</td>
-                                            <td>
-                                                <span style={{ background: '#fee2e2', color: '#dc2626', padding: '3px 10px', borderRadius: '12px', fontWeight: 800, fontSize: '12px' }}>-{item.discount}</span>
-                                            </td>
-                                            <td style={{ maxWidth: '200px', color: '#64748b', fontSize: '13px' }}>{item.desc}</td>
-                                            <td>
-                                                <button
-                                                    onClick={() => handleDeleteFeatured(item.id)}
-                                                    style={{ background: 'none', border: 'none', color: '#ee5d50', cursor: 'pointer' }}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {featuredDeals.length === 0 && (
+                            {/* List */}
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
                                         <tr>
-                                            <td colSpan={5} style={{ textAlign: 'center', padding: '30px', color: '#a3aed0' }}>
-                                                Hələ heç bir seçilmiş endirim yoxdur.
-                                            </td>
+                                            <th>Şəkil</th>
+                                            <th>Başlıq</th>
+                                            <th>Endirim</th>
+                                            <th>Təsvir</th>
+                                            <th>Əməliyyat</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                )}
-
-                {/* Ad Requests Tab */}
-                {activeTab === 'adRequests' && (
-                    <section className={styles.section}>
-                        <div className={styles.sectionHeader}>
-                            <h2>Reklam Müraciətləri</h2>
-                            <span style={{ color: '#a3aed0', fontSize: '14px' }}>{adRequests.length} müraciət</span>
-                        </div>
-                        <div className={styles.tableWrapper}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Brend / Müəssisə</th>
-                                        <th>Əlaqə</th>
-                                        <th>Məzmun</th>
-                                        <th>Tarix</th>
-                                        <th>Status</th>
-                                        <th>Əməliyyat</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {adRequests.map((req) => (
-                                        <tr key={req.id}>
-                                            <td style={{ fontWeight: 800 }}>{req.restaurantName}</td>
-                                            <td>
-                                                <div>{req.phoneNumber}</div>
-                                                <div style={{ fontSize: '12px', color: '#a3aed0' }}>{req.email}</div>
-                                            </td>
-                                            <td style={{ maxWidth: '220px', color: '#64748b' }}>{req.content}</td>
-                                            <td>{req.date}</td>
-                                            <td>
-                                                <span style={{
-                                                    padding: '4px 12px',
-                                                    borderRadius: '20px',
-                                                    fontSize: '12px',
-                                                    fontWeight: 700,
-                                                    background: req.status === 'approved' ? '#d1fae5' : req.status === 'rejected' ? '#fee2e2' : '#fef9c3',
-                                                    color: req.status === 'approved' ? '#059669' : req.status === 'rejected' ? '#dc2626' : '#ca8a04'
-                                                }}>
-                                                    {req.status === 'approved' ? '✓ Təsdiqləndi' : req.status === 'rejected' ? '✗ Rədd edildi' : '⏳ Gözləyir'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div style={{ display: 'flex', gap: '8px' }}>
-                                                    {req.status === 'pending' && (
-                                                        <>
-                                                            <button
-                                                                onClick={() => handleAdRequestStatus(req.id, 'approved')}
-                                                                style={{ background: '#d1fae5', border: 'none', color: '#059669', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }}
-                                                            >
-                                                                Təsdiqlə
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleAdRequestStatus(req.id, 'rejected')}
-                                                                style={{ background: '#fee2e2', border: 'none', color: '#dc2626', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }}
-                                                            >
-                                                                Rədd et
-                                                            </button>
-                                                        </>
+                                    </thead>
+                                    <tbody>
+                                        {featuredDeals.map((item: any) => (
+                                            <tr key={item.id}>
+                                                <td>
+                                                    {item.image && (
+                                                        <img src={item.image} alt={item.title}
+                                                            style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '8px' }} />
                                                     )}
+                                                </td>
+                                                <td style={{ fontWeight: 800 }}>{item.title}</td>
+                                                <td>
+                                                    <span style={{ background: '#fee2e2', color: '#dc2626', padding: '3px 10px', borderRadius: '12px', fontWeight: 800, fontSize: '12px' }}>-{item.discount}</span>
+                                                </td>
+                                                <td style={{ maxWidth: '200px', color: '#64748b', fontSize: '13px' }}>{item.desc}</td>
+                                                <td>
                                                     <button
-                                                        onClick={() => handleDeleteAdRequest(req.id)}
-                                                        style={{ background: 'none', border: 'none', color: '#a3aed0', cursor: 'pointer' }}
+                                                        onClick={() => handleDeleteFeatured(item.id)}
+                                                        style={{ background: 'none', border: 'none', color: '#ee5d50', cursor: 'pointer' }}
                                                     >
-                                                        <Trash2 size={16} />
+                                                        <Trash2 size={18} />
                                                     </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {adRequests.length === 0 && (
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {featuredDeals.length === 0 && (
+                                            <tr>
+                                                <td colSpan={5} style={{ textAlign: 'center', padding: '30px', color: '#a3aed0' }}>
+                                                    Hələ heç bir seçilmiş endirim yoxdur.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Ad Requests Tab */}
+                    {activeTab === 'adRequests' && (
+                        <section className={styles.section}>
+                            <div className={styles.sectionHeader}>
+                                <h2>Reklam Müraciətləri</h2>
+                                <span style={{ color: '#a3aed0', fontSize: '14px' }}>{adRequests.length} müraciət</span>
+                            </div>
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
                                         <tr>
-                                            <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#a3aed0' }}>
-                                                Hələ heç bir reklam müraciəti yoxdur.
-                                            </td>
+                                            <th>Brend / Müəssisə</th>
+                                            <th>Əlaqə</th>
+                                            <th>Məzmun</th>
+                                            <th>Tarix</th>
+                                            <th>Status</th>
+                                            <th>Əməliyyat</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                )}
+                                    </thead>
+                                    <tbody>
+                                        {adRequests.map((req) => (
+                                            <tr key={req.id}>
+                                                <td style={{ fontWeight: 800 }}>{req.restaurantName}</td>
+                                                <td>
+                                                    <div>{req.phoneNumber}</div>
+                                                    <div style={{ fontSize: '12px', color: '#a3aed0' }}>{req.email}</div>
+                                                </td>
+                                                <td style={{ maxWidth: '220px', color: '#64748b' }}>{req.content}</td>
+                                                <td>{req.date}</td>
+                                                <td>
+                                                    <span style={{
+                                                        padding: '4px 12px',
+                                                        borderRadius: '20px',
+                                                        fontSize: '12px',
+                                                        fontWeight: 700,
+                                                        background: req.status === 'approved' ? '#d1fae5' : req.status === 'rejected' ? '#fee2e2' : '#fef9c3',
+                                                        color: req.status === 'approved' ? '#059669' : req.status === 'rejected' ? '#dc2626' : '#ca8a04'
+                                                    }}>
+                                                        {req.status === 'approved' ? '✓ Təsdiqləndi' : req.status === 'rejected' ? '✗ Rədd edildi' : '⏳ Gözləyir'}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        {req.status === 'pending' && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleAdRequestStatus(req.id, 'approved')}
+                                                                    style={{ background: '#d1fae5', border: 'none', color: '#059669', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }}
+                                                                >
+                                                                    Təsdiqlə
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleAdRequestStatus(req.id, 'rejected')}
+                                                                    style={{ background: '#fee2e2', border: 'none', color: '#dc2626', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }}
+                                                                >
+                                                                    Rədd et
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleDeleteAdRequest(req.id)}
+                                                            style={{ background: 'none', border: 'none', color: '#a3aed0', cursor: 'pointer' }}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {adRequests.length === 0 && (
+                                            <tr>
+                                                <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#a3aed0' }}>
+                                                    Hələ heç bir reklam müraciəti yoxdur.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    )}
                 </main>
             </div>
 
@@ -1169,15 +1189,15 @@ export default function AdminDashboard() {
                         <h2 className={styles.confirmTitle}>{confirmDialog.title}</h2>
                         <p className={styles.confirmMessage}>{confirmDialog.message}</p>
                         <div className={styles.confirmActions}>
-                            <button 
-                                className={styles.cancelBtn} 
+                            <button
+                                className={styles.cancelBtn}
                                 onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
                             >
                                 Ləğv et
                             </button>
-                            <button 
+                            <button
                                 type="button"
-                                className={styles.confirmBtn} 
+                                className={styles.confirmBtn}
                                 onClick={() => {
                                     confirmDialog.onConfirm();
                                 }}

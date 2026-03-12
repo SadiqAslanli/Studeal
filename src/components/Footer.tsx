@@ -60,7 +60,11 @@ export default function Footer() {
                     <div className={styles.footerBrand}>
                         <div className={styles.footerLogoWrap}>
                             <Link href="/" className={styles.logo}>
-                                <img src="/logo.png" alt="Studeal Logo" className={styles.logoImg} />
+                                <img src="/logo2.png" alt="Studeal Logo" className={styles.logoImg} />
+                                <div className={styles.logoText}>
+                                    <span className={styles.logoStu}>Stu</span>
+                                    <span className={styles.logoDeal}>Deal</span>
+                                </div>
                             </Link>
                         </div>
                         <p className={styles.brandDesc}>{t.footerSection.desc}</p>

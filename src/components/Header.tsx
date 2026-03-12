@@ -127,7 +127,11 @@ export default function Header() {
         <div className={`container ${styles.headerContent}`}>
           <div className={styles.headerLeft}>
             <Link href="/" className={styles.logo}>
-              <img src="/logo.png" alt="Studeal Logo" className={styles.logoImg} />
+              <img src="/logo2.png" alt="Studeal Logo" className={styles.logoImg} />
+              <div className={styles.logoText}>
+                <span className={styles.logoStu}>Stu</span>
+                <span className={styles.logoDeal}>Deal</span>
+              </div>
             </Link>
             <NavLinks />
           </div>
