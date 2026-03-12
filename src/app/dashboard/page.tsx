@@ -8,6 +8,7 @@ import styles from './dashboard.module.css';
 import { Trash2, Edit, Plus, Image as ImageIcon, Upload, LogOut, BarChart3, Tag as TagIcon, Settings, Eye, Users, CheckCircle2, Heart, MessageSquare, Menu, X, Camera, Save } from 'lucide-react';
 import { uploadMediaAction } from '../admin/cloudinaryActions';
 import { getMessages } from '../admin/contentActions';
+import { slugify } from '@/utils/slugify';
 
 export default function CompanyDashboard() {
     const { t } = useLanguage();
@@ -148,7 +149,7 @@ export default function CompanyDashboard() {
                 ...newDeal,
                 image: imageUrl,
                 id: Date.now(),
-                company: user?.name || 'Restaurant',
+                company: (user as any)?.fullName || user?.name || 'Restaurant',
                 date: new Date().toISOString()
             };
             updateUser({
@@ -164,12 +165,12 @@ export default function CompanyDashboard() {
     const handleEditDeal = (deal: any) => {
         setNewDeal({
             title: deal.title,
-            description: deal.description,
-            ingredients: deal.ingredients,
-            price: deal.price,
-            discount: deal.discount,
-            image: deal.image,
-            studentCardRequired: deal.studentCardRequired
+            description: deal.description || deal.desc || '',
+            ingredients: deal.ingredients || (deal.contents ? deal.contents.join(', ') : ''),
+            price: deal.price || '',
+            discount: deal.discount || '',
+            image: deal.image || '',
+            studentCardRequired: deal.studentCardRequired || false
         });
         setEditingDealId(deal.id);
         setShowAddDeal(true);
@@ -231,10 +232,20 @@ export default function CompanyDashboard() {
                 }
             }
 
-            updateUser({
-                fullName: settingsState.name,
-                image: imageUrl
-            });
+            const slug = slugify(settingsState.name);
+
+            if (user) {
+                updateUser({
+                    fullName: settingsState.name,
+                    image: imageUrl,
+                    // @ts-ignore
+                    metadata: {
+                        ...(user.metadata || {}),
+                        slug: slug,
+                        image: imageUrl
+                    }
+                });
+            }
 
             alert("Tənzimləmələr uğurla yadda saxlanıldı!");
             setSettingsFile(null);
