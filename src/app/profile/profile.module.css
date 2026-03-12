@@ -56,6 +56,28 @@
     box-shadow: 0 10px 20px rgba(0, 102, 255, 0.15);
 }
 
+.logoutBtn {
+    margin-top: 15px;
+    padding: 16px 20px;
+    border-radius: 15px;
+    background: #fff5f5;
+    border: 1px solid #fee2e2;
+    text-align: left;
+    font-weight: 700;
+    color: #ef4444;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logoutBtn:hover {
+    background: #fef2f2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+}
+
 .notifBadge {
     position: absolute;
     top: 15px;
