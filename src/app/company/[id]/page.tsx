@@ -31,31 +31,43 @@ export default function CompanyProfile() {
 
     useEffect(() => {
         const fetchCompanyFromDb = async () => {
-            const supabase = (await import('@/lib/supabase/client')).createClient();
-            const { data } = await supabase
-                .from('profiles')
-                .select('id, full_name, email, metadata, category_id')
-                .eq('id', id)
-                .single();
+            try {
+                const supabase = (await import('@/lib/supabase/client')).createClient();
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, email, metadata, category_id, role')
+                    .eq('id', id as string)
+                    .maybeSingle();
 
-            if (data) {
-                const metadata = data.metadata || {};
-                setDynamicCompany({
-                    id: data.id,
-                    name: data.full_name || data.email,
-                    tagline: metadata.tagline || (data.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
-                    image: metadata.image || '/hero-bg.jpg',
-                    branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
-                    deals: metadata.deals || []
-                });
+                if (error) {
+                    console.error("DEBUG: Fetch error:", error);
+                    setIsDbLoading(false);
+                    return;
+                }
+
+                if (data && data.role === 'Company') {
+                    const metadata = data.metadata || {};
+                    setDynamicCompany({
+                        id: data.id,
+                        name: data.full_name || data.email || 'Adsız Müəssisə',
+                        tagline: metadata.tagline || (data.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
+                        image: metadata.image || '/hero-bg.jpg',
+                        branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
+                        deals: metadata.deals || []
+                    });
+                }
+            } catch (err) {
+                console.error("DEBUG: Unexpected error:", err);
+            } finally {
+                setIsDbLoading(false);
             }
-            setIsDbLoading(false);
         };
         if (id) fetchCompanyFromDb();
+        else setIsDbLoading(false);
     }, [id]);
 
-    if (isDbLoading) return <div className={styles.loading}>Yüklənir...</div>;
-    if (!dynamicCompany) return <div className={styles.error}>Müəssisə tapılmadı.</div>;
+    if (isDbLoading) return <div className={styles.loadingWrapper}><div className={styles.loader}></div><p>Yüklənir...</p></div>;
+    if (!dynamicCompany) return <div className={styles.errorWrapper}><h2>Müəssisə tapılmadı</h2><p>Düzgün linkdən istifadə etdiyinizə əmin olun.</p></div>;
 
     const currentCompany = dynamicCompany;
     const isCompanyFavorite = user?.companyFavorites?.includes(currentCompany.id);
@@ -305,10 +317,10 @@ export default function CompanyProfile() {
                                 <div className={styles.contentsBox}>
                                     <h4><Info size={18} /> Menyuya daxildir:</h4>
                                     <ul>
-                                        {(selectedDeal.contents || selectedDeal.ingredients?.split(',')).map((item: string, i: number) => (
+                                        {(selectedDeal.contents || (selectedDeal.ingredients && typeof selectedDeal.ingredients === 'string' ? selectedDeal.ingredients.split(',') : [])).map((item: string, i: number) => (
                                             <li key={i}>
                                                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)' }} />
-                                                {item}
+                                                {item.trim()}
                                             </li>
                                         ))}
                                     </ul>
