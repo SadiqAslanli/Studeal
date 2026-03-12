@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getSupabaseBrowserConfig } from '@/lib/supabase/env';
+import { updateCompanyProfile } from "@/app/admin/actions";
 
 export type Notification = {
     id: string;
@@ -145,9 +146,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return profileToUser(baseUser, studealData);
     }, [baseUser, studealData]);
 
-    const saveStudealMeta = async (updated: Partial<User>) => {
+    const saveStudealMeta = async (updated: Partial<User> & Record<string, any>) => {
         if (!baseUser) return;
-        const newData = { ...studealData, ...updated };
+        
+        // Merge with existing metadata to preserve deals, notifications etc.
+        const newData = { ...(studealData || {}), ...updated };
         setStudealData(newData);
         localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(newData));
 
@@ -160,16 +163,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
            return next;
         });
 
-        // Sync to Supabase - non-blocking try/catch
+        // Sync to Supabase via Server Action
         try {
             const updatePayload: any = { metadata: newData };
             if (updated.fullName) updatePayload.full_name = updated.fullName;
             if (updated.image) updatePayload.image_url = updated.image;
+            if (updated.categoryId) updatePayload.category_id = updated.categoryId;
             
-            await supabase
-                .from('profiles')
-                .update(updatePayload)
-                .eq('id', baseUser.id);
+            await updateCompanyProfile(baseUser.id, updatePayload);
         } catch (e) {
             console.warn("DEBUG: Metadata sync failed:", e);
         }
@@ -251,11 +252,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = async (email: string, password: string): Promise<boolean> => {
-        const { error } = await supabase.auth.signInWithPassword({ 
+        setIsLoading(true);
+        const { data, error } = await supabase.auth.signInWithPassword({ 
             email: email.trim().toLowerCase(), 
             password 
         });
-        if (error) throw new Error(error.message);
+        
+        if (error) {
+            setIsLoading(false);
+            throw new Error(error.message);
+        }
+
+        if (data.user) {
+            const profile = await fetchProfile(data.user.id);
+            if (profile) {
+                setBaseUser(profile);
+            }
+        }
+        
+        setIsLoading(false);
         return true;
     };
 

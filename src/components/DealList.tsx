@@ -73,44 +73,39 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
   const fetchDynamicCompanies = async () => {
     try {
       const companies = await listCompanies();
-      console.log("DEBUG: DealList data check:", companies.map(c => ({ name: c.full_name, img: c.image_url })));
+      const allMenus: any[] = [];
       
-      const mappedDeals = companies
-        .filter(c => c.is_active !== false)
-        .map(company => {
-          // Parse metadata if it's a JSON string (sometimes happens with DB drivers)
-          let meta = company.metadata;
-          if (typeof meta === 'string') {
-              try { meta = JSON.parse(meta); } catch (e) { meta = {}; }
-          }
-
-          // Priority: 1. image_url column, 2. metadata.image field
-          let imgUrl = null;
-          if (company.image_url && typeof company.image_url === 'string' && company.image_url.trim() !== '' && company.image_url !== 'null') {
-            imgUrl = company.image_url;
-          } else if (meta?.image && typeof meta.image === 'string' && meta.image.trim() !== '' && meta.image !== 'null') {
-            imgUrl = meta.image;
-          }
-
-          return {
-            id: company.id,
-            title: company.full_name || 'Restaurant',
-            company: company.full_name || 'Restaurant',
-            discount: 'Yeni',
+      companies.filter(c => c.is_active !== false).forEach(company => {
+        let meta = company.metadata;
+        if (typeof meta === 'string') {
+          try { meta = JSON.parse(meta); } catch (e) { meta = {}; }
+        }
+        
+        const deals = meta?.deals || [];
+        deals.forEach((deal: any) => {
+          allMenus.push({
+            ...deal,
+            id: deal.id,
+            companyId: company.id,
+            companyName: company.full_name || 'Restaurant',
+            image: deal.image || company.image_url, // Use deal image if exists, else company image
             type: company.category_id === 1 ? 'Restaurant' : 
                   company.category_id === 2 ? 'Shop' :
                   company.category_id === 3 ? 'Education' :
                   company.category_id === 4 ? 'Entertainment' : 'Tech',
             typeId: company.category_id || 1,
-            image: imgUrl,
             color: '#4318ff',
             rating: 5.0,
             ratingsCount: 1,
             isDynamic: true,
-            studentCardRequired: meta?.studentCardRequired ?? false
-          };
+            createdAt: deal.date || company.created_at
+          });
         });
-      setDynamicDeals(mappedDeals);
+      });
+      // Sort: Newest first
+      allMenus.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      
+      setDynamicDeals(allMenus);
     } catch (error) {
       console.error("Failed to fetch dynamic companies:", error);
     }
@@ -188,7 +183,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
   const filteredDeals = allDeals.filter(deal => {
     const matchesCategory = activeCategoryId === 6 || deal.typeId === activeCategoryId;
     const matchesSearch = (deal.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (deal.company || '').toLowerCase().includes(searchQuery.toLowerCase());
+      (deal.companyName || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -219,7 +214,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                 className={styles.card}
                 style={{ animationDelay: `${index * 0.05}s` }}
                 onClick={() => {
-                  router.push(user ? `/company/${deal.id}` : '/login');
+                  router.push(`/company/${deal.companyId}`);
                 }}
               >
                 <div className={styles.cardImage}>
@@ -254,7 +249,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                     </div>
                   </div>
                   <h3 className={styles.cardTitle}>{deal.title}</h3>
-                  <p className={styles.company}>{deal.company}</p>
+                  <p className={styles.company}>{deal.companyName}</p>
 
                   <div className={styles.starRatingRow}>
                     <div className={styles.ratePrompt}>
@@ -291,7 +286,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                     <div className={styles.studentNotice}>
                       <GraduationCap size={14} /> {t.dealList.studentCard}
                     </div>
-                    <Link href={user ? `/company/${deal.id}` : '/login'} className={styles.btnView}>
+                    <Link href={`/company/${deal.companyId}`} className={styles.btnView}>
                       {t.common.showMore}
                     </Link>
                   </div>

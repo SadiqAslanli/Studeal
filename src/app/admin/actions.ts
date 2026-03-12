@@ -21,14 +21,21 @@ export async function listCompanies() {
   
   const { data, error } = await supabase
     .from("profiles")
-    .select("*");
+    .select("*")
+    .eq("role", "Company"); // Direct SQL filter for safety and performance
 
   if (error) {
     console.error("DEBUG: listCompanies error:", error);
     return [];
   }
 
-  const companies = data?.filter(p => p.role?.toLowerCase() === "company") || [];
+  // Robust mapping with fallbacks
+  const companies = (data || []).map(p => ({
+    ...p,
+    // Fallback if column is missing or null
+    category_id: p.category_id ?? p.metadata?.category_id ?? 1
+  }));
+
   return (companies as CompanyProfile[]);
 }
 
@@ -39,6 +46,9 @@ export async function updateCompanyStatus(id: string, isActive: boolean): Promis
     const supabase = createAdminClient();
     const { error } = await supabase.from("profiles").update({ is_active: isActive, updated_at: new Date().toISOString() }).eq("id", id);
     if (error) return { ok: false, error: error.message };
+
+    revalidatePath('/admin');
+    revalidatePath('/');
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Update failed" };
@@ -84,33 +94,51 @@ export async function createCompanyUser(name: string, email: string, password: s
       is_active: true,
       category_id: categoryId,
       image_url: imageUrl || null,
-      metadata: { image: imageUrl || null },
+      metadata: { 
+        image: imageUrl || null,
+        category_id: categoryId // Backup storage in metadata
+      },
       updated_at: new Date().toISOString()
     };
 
-    // Try UPDATE first (profile row created by trigger)
-    const { error: updateError } = await supabase
+    // Use upsert directly to ensure the profile row is either created or updated with our data
+    const { error: upsertError } = await supabase
       .from("profiles")
-      .update(profileData)
-      .eq("id", userId);
+      .upsert(profileData, { onConflict: 'id' });
 
-    if (updateError) {
-      // Fallback: if trigger hasn't created row yet, upsert it
-      console.warn("Update failed, attempting upsert:", updateError.message);
-      const { error: upsertError } = await supabase
-        .from("profiles")
-        .upsert(profileData);
-      
-      if (upsertError) {
-        console.error("Upsert also failed:", upsertError.message);
-        // Still return ok — user was created, profile might need manual fix
-      }
+    if (upsertError) {
+      console.error("Profile upsert failed:", upsertError.message);
+      // Return error to UI so we know why it's failing
+      return { ok: false, error: "İstifadəçi yarandı, lakin profil məlumatları bazaya yazıla bilmədi: " + upsertError.message };
     }
 
     revalidatePath('/admin');
+    revalidatePath('/');
     return { ok: true };
   } catch (e) {
     console.error("createCompanyUser error:", e);
     return { ok: false, error: e instanceof Error ? e.message : "Xəta baş verdi" };
+  }
+}
+
+export async function updateCompanyProfile(id: string, payload: any): Promise<CreateCompanyResult> {
+  try {
+    const supabase = createAdminClient();
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        ...payload,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", id);
+
+    if (error) return { ok: false, error: error.message };
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidatePath(`/company/${id}`);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Update failed" };
   }
 }

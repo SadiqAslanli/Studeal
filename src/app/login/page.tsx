@@ -48,10 +48,14 @@ export default function LoginPage() {
 
     try {
       const success = await login(email.trim().toLowerCase(), password);
-      // AuthContext will handle the session and update the 'user' state,
-      // which triggers the useEffect redirection logic below.
-      if (!success) {
+      // Wait a tiny bit for context to propagate if needed, then let useEffect handle it, 
+      // but if useEffect is slow, we can also trigger a manual check here if success is true.
+      if (success) {
+        // Redirection logic will be triggered by user object changing, 
+        // but setting submitting to false is the only thing we do here.
+      } else {
         setError(t.auth.error);
+        setSubmitting(false);
       }
     } catch (err: any) {
       const msg = err?.message || '';
@@ -62,8 +66,10 @@ export default function LoginPage() {
       } else {
         setError(msg || t.auth.error);
       }
-    } finally {
       setSubmitting(false);
+    } finally {
+      // submitting will be set to false only on errors; 
+      // on success, we let the redirection happen while showing loader
     }
   };
 

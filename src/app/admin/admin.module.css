@@ -1,6 +1,8 @@
 .adminDashboard {
     background: #ffffff;
     min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .dashboardLayout {
@@ -8,6 +10,10 @@
     gap: 30px;
     padding: 40px;
     min-height: 100vh;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 /* --- SIDEBAR --- */
@@ -131,6 +137,7 @@
     padding: 40px;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
     z-index: 2001;
+    box-sizing: border-box;
 }
 
 .modalHeader {
@@ -368,37 +375,75 @@
 @media (max-width: 1024px) {
     .dashboardLayout {
         flex-direction: column;
-        padding: 90px 20px 40px;
+        padding: 100px 15px 40px;
+        gap: 20px;
     }
 
     .sidebar {
-        display: none;
         position: fixed;
-        left: 20px;
-        top: 90px;
-        width: calc(100% - 40px);
-        height: auto;
-        z-index: 100;
+        left: -320px;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 1000;
+        border-radius: 0;
+        transition: left 0.4s ease;
     }
 
     .sidebarOpen {
+        left: 0;
         display: flex;
     }
 
     .mobileMenuBtn {
         display: flex;
     }
+
+    .mainContent {
+        width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
-    .statsGrid { grid-template-columns: 1fr; }
-    .dashboardHeader { flex-direction: column; align-items: flex-start; gap: 20px; }
-    .headerInfo h1 { font-size: 28px; }
+    .statsGrid { 
+        grid-template-columns: 1fr; 
+        gap: 15px;
+    }
+    .dashboardHeader { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 15px; 
+    }
+    .headerInfo h1 { 
+        font-size: 26px; 
+    }
+    .addBtn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
-    .section { padding: 20px; }
-    .table td, .table th { padding: 12px 10px; font-size: 13px; }
+    .section { 
+        padding: 15px; 
+    }
+    .table td, .table th { 
+        padding: 12px 8px; 
+        font-size: 12px; 
+    }
+    .headerInfo h1 {
+        font-size: 24px;
+    }
+    .modalContent {
+        padding: 25px 20px;
+        border-radius: 25px;
+    }
+    .statCard {
+        padding: 20px;
+    }
+    .statValue {
+        font-size: 24px;
+    }
 }
 
 /* --- MISC --- */
