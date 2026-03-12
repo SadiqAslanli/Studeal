@@ -29,7 +29,7 @@ export default function PartnersSection() {
                 <div className={styles.marqueeContent}>
                     {[...partners, ...partners].map((partner, index) => (
                         <div key={index} className={styles.partnerLogo}>
-                            <img src={(partner as any).metadata?.image || '/logo.png'} alt={partner.full_name || 'Partner'} />
+                            <img src={partner.image_url || partner.metadata?.image || '/logo.png'} alt={partner.full_name || 'Partner'} />
                         </div>
                     ))}
                 </div>

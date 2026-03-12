@@ -51,6 +51,9 @@ export default function Header() {
             </Link>
             <div className={styles.userDropdownTrigger} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
               <div className={styles.userName}>
+                {user.image ? (
+                  <img src={user.image} alt="Avatar" className={styles.headerAvatar} />
+                ) : null}
                 {user.name}
                 <ChevronDown size={14} className={styles.chevron} />
               </div>

@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
-import { Trash2, Edit, Plus, Image as ImageIcon, Upload, LogOut, BarChart3, Tag as TagIcon, Settings, Eye, Users, CheckCircle2, Heart, MessageSquare, Menu, X } from 'lucide-react';
+import { Trash2, Edit, Plus, Image as ImageIcon, Upload, LogOut, BarChart3, Tag as TagIcon, Settings, Eye, Users, CheckCircle2, Heart, MessageSquare, Menu, X, Camera, Save } from 'lucide-react';
 import { uploadMediaAction } from '../admin/cloudinaryActions';
 import { getMessages } from '../admin/contentActions';
 
@@ -33,6 +33,23 @@ export default function CompanyDashboard() {
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    // Settings State
+    const [settingsState, setSettingsState] = useState({
+        name: '',
+        image: ''
+    });
+    const [isSavingSettings, setIsSavingSettings] = useState(false);
+    const [settingsFile, setSettingsFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        if (user) {
+            setSettingsState({
+                name: user.fullName || user.name || '',
+                image: user.image || ''
+            });
+        }
+    }, [user]);
 
     useEffect(() => {
         if (isLoading) return;
@@ -169,6 +186,53 @@ export default function CompanyDashboard() {
             // @ts-ignore
             deals: updatedDeals
         });
+    };
+
+    const handleSettingsFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSettingsFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSettingsState(prev => ({ ...prev, image: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleUpdateSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingSettings(true);
+
+        try {
+            let imageUrl = settingsState.image;
+
+            if (settingsFile) {
+                const formData = new FormData();
+                formData.append('file', settingsFile);
+                const res = await uploadMediaAction(formData);
+                if (res.success) {
+                    imageUrl = res.url || '';
+                } else {
+                    alert("Xəta: Şəkil yüklənə bilmədi: " + res.error);
+                    setIsSavingSettings(false);
+                    return;
+                }
+            }
+
+            updateUser({
+                fullName: settingsState.name,
+                image: imageUrl
+            });
+
+            alert("Tənzimləmələr uğurla yadda saxlanıldı!");
+            setSettingsFile(null);
+        } catch (error) {
+            console.error("Settings update failed:", error);
+            alert("Xəta baş verdi.");
+        } finally {
+            setIsSavingSettings(false);
+        }
     };
 
     const userDeals = (user as any)?.deals || [];
@@ -379,10 +443,69 @@ export default function CompanyDashboard() {
 
                 {activeTab === 'settings' && (
                     <section className={styles.settingsSection}>
-                        <div className={styles.comingSoonBox}>
-                            <Settings size={48} className={styles.spinningIcon} />
+                        <div className={styles.sectionHeader}>
                             <h2>Tənzimləmələr</h2>
-                            <p>Tezliklə aktiv olacaq! Burada profil və şirkət məlumatlarınızı yeniləyə biləcəksiniz.</p>
+                        </div>
+                        
+                        <div className={styles.settingsContainer}>
+                            <form className={styles.settingsForm} onSubmit={handleUpdateSettings}>
+                                <div className={styles.profileImageSection}>
+                                    <div className={styles.imagePreviewWrapper}>
+                                        {settingsState.image ? (
+                                            <img src={settingsState.image} alt="Profile" className={styles.profileImagePreview} />
+                                        ) : (
+                                            <div className={`${styles.profileImagePreview} ${styles.placeholderImg}`}>
+                                                <ImageIcon size={48} />
+                                            </div>
+                                        )}
+                                        <button 
+                                            type="button" 
+                                            className={styles.imageEditBadge}
+                                            onClick={() => document.getElementById('settings-file')?.click()}
+                                        >
+                                            <Camera size={16} />
+                                        </button>
+                                    </div>
+                                    <input 
+                                        type="file" 
+                                        id="settings-file" 
+                                        hidden 
+                                        accept="image/*" 
+                                        onChange={handleSettingsFileSelect} 
+                                    />
+                                    <p className={styles.imageHint}>Restoranın əsas logosu və ya qapaq şəkli</p>
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label>Restoran Adı</label>
+                                    <div className={styles.inputWithIcon}>
+                                        <input
+                                            type="text"
+                                            value={settingsState.name}
+                                            onChange={(e) => setSettingsState({ ...settingsState, name: e.target.value })}
+                                            placeholder="Restoranın rəsmi adı"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className={styles.settingsActions}>
+                                    <button 
+                                        type="submit" 
+                                        className={styles.saveSettingsBtn} 
+                                        disabled={isSavingSettings}
+                                    >
+                                        {isSavingSettings ? (
+                                            <>Yadda saxlanılır...</>
+                                        ) : (
+                                            <>
+                                                <Save size={20} />
+                                                <span>Dəyişiklikləri Yadda Saxla</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </section>
                 )}

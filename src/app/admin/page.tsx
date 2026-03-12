@@ -109,7 +109,8 @@ export default function AdminDashboard() {
             name: c.full_name || c.email || '—', 
             email: c.email ?? '', 
             isActive: c.is_active !== false,
-            category_id: c.category_id
+            category_id: c.category_id,
+            image: c.image_url || c.metadata?.image || null
         })));
     };
 
@@ -174,11 +175,14 @@ export default function AdminDashboard() {
             setNewRestImage(null);
             setNewRestPreview(null);
             setShowModal(false);
+            // Wait for DB to settle before reloading
+            await new Promise(r => setTimeout(r, 800));
             await loadRestaurants();
             alert("Sahibkar hesabı uğurla yaradıldı!");
         } else {
             alert(result.error || "Xəta baş verdi.");
         }
+
     };
 
     const toggleRestaurantStatus = (rest: { id: string; isActive?: boolean }) => {
@@ -645,6 +649,7 @@ export default function AdminDashboard() {
                             <table className={styles.table}>
                                     <thead>
                                         <tr>
+                                            <th>Loqo</th>
                                             <th>Ad</th>
                                             <th>Kateqoriya</th>
                                             <th>Email</th>
@@ -655,6 +660,15 @@ export default function AdminDashboard() {
                                     <tbody>
                                         {restaurants.map((rest, i) => (
                                             <tr key={i}>
+                                                <td>
+                                                    {rest.image ? (
+                                                        <img src={rest.image} alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                                                    ) : (
+                                                        <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#f4f7fe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <ImageIcon size={20} color="#a3aed0" />
+                                                        </div>
+                                                    )}
+                                                </td>
                                                 <td>{rest.name}</td>
                                                 <td>
                                                     <span className={styles.categoryBadge}>

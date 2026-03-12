@@ -772,7 +772,16 @@
 }
 
 .userName:hover {
-  background: #ebf0ff;
+  background: var(--primary);
+  color: white;
+}
+
+.headerAvatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
 }
 
 .chevron {

@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Star, Heart, Tag, ArrowUpRight, Check, GraduationCap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, Heart, Tag, GraduationCap, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
 import styles from './DealList.module.css';
 
-import { listCompanies, CompanyProfile } from '@/app/admin/actions';
+import { listCompanies } from '@/app/admin/actions';
 
 interface DealListProps {
   activeCategoryId: number;
@@ -14,49 +14,119 @@ interface DealListProps {
   sortOption?: string;
 }
 
+/**
+ * DealImage Sub-component
+ * Handles loading states and fallbacks for images and videos.
+ */
+function DealImage({ src, title, color }: { src?: string | null, title: string, color?: string }) {
+    const [error, setError] = useState(false);
+    const [loaded, setLoaded] = useState(false);
+
+    // If no source or error during loading, show placeholder
+    if (!src || error || src === "null" || src === "undefined") {
+        return (
+            <div className={styles.placeholderImg} style={{ backgroundColor: (color || '#4318ff') + '15' }}>
+                <ImageOff size={44} style={{ opacity: 0.3 }} />
+                <span className={styles.placeholderText}>{title}</span>
+            </div>
+        );
+    }
+
+    const isVideo = src.toLowerCase().includes('/video/') || src.endsWith('.mp4');
+
+    if (isVideo) {
+        return <video src={src} className={styles.mainImg} autoPlay muted loop playsInline />;
+    }
+
+    return (
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            {!loaded && (
+                <div className={styles.placeholderImg} style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+                    <ImageOff size={44} style={{ opacity: 0.3 }} />
+                </div>
+            )}
+            <img 
+                src={src} 
+                alt={title} 
+                className={styles.mainImg} 
+                onLoad={() => setLoaded(true)}
+                onError={() => {
+                    console.error("Image load failed:", src);
+                    setError(true);
+                }}
+            />
+        </div>
+    );
+}
+
 export default function DealList({ activeCategoryId, searchQuery, sortOption }: DealListProps) {
   const { t } = useLanguage();
   const { user, toggleFavorite, addNotification } = useAuth();
   const router = useRouter();
 
-  const [userRatings, setUserRatings] = useState<Record<number, number>>({});
-  const [hoverRating, setHoverRating] = useState<Record<number, number>>({});
+  const [userRatings, setUserRatings] = useState<Record<string | number, number>>({});
+  const [hoverRating, setHoverRating] = useState<Record<string | number, number>>({});
   const [dynamicDeals, setDynamicDeals] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
 
+  const fetchDynamicCompanies = async () => {
+    try {
+      const companies = await listCompanies();
+      console.log("DEBUG: DealList data check:", companies.map(c => ({ name: c.full_name, img: c.image_url })));
+      
+      const mappedDeals = companies
+        .filter(c => c.is_active !== false)
+        .map(company => {
+          // Parse metadata if it's a JSON string (sometimes happens with DB drivers)
+          let meta = company.metadata;
+          if (typeof meta === 'string') {
+              try { meta = JSON.parse(meta); } catch (e) { meta = {}; }
+          }
+
+          // Priority: 1. image_url column, 2. metadata.image field
+          let imgUrl = null;
+          if (company.image_url && typeof company.image_url === 'string' && company.image_url.trim() !== '' && company.image_url !== 'null') {
+            imgUrl = company.image_url;
+          } else if (meta?.image && typeof meta.image === 'string' && meta.image.trim() !== '' && meta.image !== 'null') {
+            imgUrl = meta.image;
+          }
+
+          return {
+            id: company.id,
+            title: company.full_name || 'Restaurant',
+            company: company.full_name || 'Restaurant',
+            discount: 'Yeni',
+            type: company.category_id === 1 ? 'Restaurant' : 
+                  company.category_id === 2 ? 'Shop' :
+                  company.category_id === 3 ? 'Education' :
+                  company.category_id === 4 ? 'Entertainment' : 'Tech',
+            typeId: company.category_id || 1,
+            image: imgUrl,
+            color: '#4318ff',
+            rating: 5.0,
+            ratingsCount: 1,
+            isDynamic: true,
+            studentCardRequired: meta?.studentCardRequired ?? false
+          };
+        });
+      setDynamicDeals(mappedDeals);
+    } catch (error) {
+      console.error("Failed to fetch dynamic companies:", error);
+    }
+  };
+
   useEffect(() => {
     const savedRatings = localStorage.getItem('studeal_user_ratings');
     if (savedRatings) {
-      setUserRatings(JSON.parse(savedRatings));
+      try {
+        setUserRatings(JSON.parse(savedRatings));
+      } catch (e) {
+        setUserRatings({});
+      }
     }
-    
-    // Fetch dynamic companies from database
-    const fetchDynamicCompanies = async () => {
-      const companies = await listCompanies();
-      const formattedDeals = companies
-        .filter(c => c.is_active !== false)
-        .map(c => ({
-          id: c.id, // ID as string from Supabase
-          title: c.full_name,
-          company: c.full_name,
-          discount: 'Yeni', // Default label for new companies
-          type: c.category_id === 1 ? 'Restaurant' : 
-                c.category_id === 2 ? 'Shop' :
-                c.category_id === 3 ? 'Education' :
-                c.category_id === 4 ? 'Entertainment' : 'Tech',
-          typeId: c.category_id || 1,
-          color: '#4318ff',
-          image: (c as any).metadata?.image || null, 
-          rating: 5.0,
-          ratingsCount: 1,
-          isDynamic: true
-        }));
-      setDynamicDeals(formattedDeals);
-    };
-    
     fetchDynamicCompanies();
-  }, []);
+  }, [activeCategoryId]); // Refetch when category changes to ensure fresh data
 
   useEffect(() => {
     if (currentPage > 1) {
@@ -64,7 +134,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     }
   }, [currentPage]);
 
-  const handleRate = (e: React.MouseEvent, dealId: number, star: number) => {
+  const handleRate = (e: React.MouseEvent, dealId: string | number, star: number) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -95,18 +165,17 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     return userRatings[deal.id] ? baseCount + 1 : baseCount;
   };
 
-
   const allDeals = [...dynamicDeals];
 
-  const handleFavorite = (e: React.MouseEvent, dealId: number, title: string) => {
+  const handleFavorite = (e: React.MouseEvent, dealId: string | number, title: string) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
       router.push('/login');
       return;
     }
-    const isFav = user.favorites?.includes(dealId);
-    toggleFavorite(dealId);
+    const isFav = user.favorites?.includes(dealId as any);
+    toggleFavorite(dealId as any);
 
     if (!isFav) {
       addNotification({
@@ -133,7 +202,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     });
   }
 
-  const totalPages = Math.ceil((filteredDeals.length + 1) / itemsPerPage);
+  const totalPages = Math.ceil((filteredDeals.length + 0.1) / itemsPerPage);
   const paginatedDeals = filteredDeals.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const showComingSoonCard = paginatedDeals.length < itemsPerPage && currentPage === totalPages;
 
@@ -142,7 +211,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
       <div className="container" id="deals">
         <div className={styles.grid}>
           {paginatedDeals.map((deal, index) => {
-            const isFavorite = user?.favorites?.includes(deal.id);
+            const isFavorite = user?.favorites?.includes(deal.id as any);
             const displayRating = getDisplayRating(deal);
             return (
               <div
@@ -150,25 +219,12 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                 className={styles.card}
                 style={{ animationDelay: `${index * 0.05}s` }}
                 onClick={() => {
-                  if (deal.isDynamic) {
-                    router.push(user ? `/company/${deal.id}` : '/login');
-                  } else {
-                    router.push(user ? `/company/${deal.id}` : '/login');
-                  }
+                  router.push(user ? `/company/${deal.id}` : '/login');
                 }}
               >
                 <div className={styles.cardImage}>
-                  {deal.image ? (
-                    deal.image.toLowerCase().includes('/video/') || deal.image.endsWith('.mp4') ? (
-                      <video src={deal.image} className={styles.mainImg} autoPlay muted loop playsInline />
-                    ) : (
-                      <img src={deal.image} alt={deal.title} className={styles.mainImg} />
-                    )
-                  ) : (
-                    <div className={styles.placeholderImg} style={{ backgroundColor: deal.color + '10' }}>
-                      <Tag size={32} style={{ color: deal.color }} />
-                    </div>
-                  )}
+                  <DealImage src={deal.image} title={deal.title} color={deal.color} />
+                  
                   <div className={styles.overlay}></div>
                   <div className={styles.ratingBubble}>
                     <Star size={12} fill="#ffae00" color="#ffae00" />
@@ -197,7 +253,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                       <span className={styles.ratingsCount}>({getDisplayCount(deal)})</span>
                     </div>
                   </div>
-                  <h3>{deal.title}</h3>
+                  <h3 className={styles.cardTitle}>{deal.title}</h3>
                   <p className={styles.company}>{deal.company}</p>
 
                   <div className={styles.starRatingRow}>
@@ -220,7 +276,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                               onClick={(e) => handleRate(e, deal.id, star)}
                             >
                               <Star
-                                size={20}
+                                size={18}
                                 color={active ? "#ffae00" : "#cbd5e1"}
                                 fill={active ? "#ffae00" : "none"}
                               />
@@ -230,7 +286,6 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                       </div>
                     </div>
                   </div>
-
 
                   <div className={styles.cardFooter}>
                     <div className={styles.studentNotice}>
