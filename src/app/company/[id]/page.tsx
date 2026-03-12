@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Star, Heart, Flag, Info, X, AlertTriangle, GraduationCap, MapPin, Clock } from 'lucide-react';
 import styles from '../company.module.css';
-
 
 export default function CompanyProfile() {
     const { t } = useLanguage();
     const { id } = useParams();
+    const router = useRouter();
     const { user, addNotification, toggleFavorite, toggleCompanyFavorite } = useAuth();
 
     const [selectedDeal, setSelectedDeal] = useState<any>(null);
@@ -32,21 +32,30 @@ export default function CompanyProfile() {
     useEffect(() => {
         const fetchCompanyFromDb = async () => {
             try {
-                const supabase = (await import('@/lib/supabase/client')).createClient();
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, email, metadata, category_id, role')
-                    .eq('id', id as string)
-                    .maybeSingle();
-
-                if (error) {
-                    console.error("DEBUG: Fetch error:", error);
+                // Ensure ID is a string and handle potential URL encoding
+                const idParam = typeof id === 'string' ? decodeURIComponent(id) : '';
+                if (!idParam) {
                     setIsDbLoading(false);
                     return;
                 }
 
-                if (data && data.role === 'Company') {
+                const supabase = (await import('@/lib/supabase/client')).createClient();
+                
+                // 1. Try fetching by ID (UUID)
+                const { data, error: idError } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, email, metadata, category_id, role')
+                    .eq('id', idParam)
+                    .maybeSingle();
+
+                if (data && data.role?.toLowerCase() === 'company') {
                     const metadata = data.metadata || {};
+                    // If a slug exists in metadata and it's different from the URL param, redirect to slug
+                    if (metadata.slug && metadata.slug !== idParam) {
+                        router.replace(`/company/${metadata.slug}`);
+                        return;
+                    }
+
                     setDynamicCompany({
                         id: data.id,
                         name: data.full_name || data.email || 'Adsız Müəssisə',
@@ -55,16 +64,44 @@ export default function CompanyProfile() {
                         branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
                         deals: metadata.deals || []
                     });
+                    setIsDbLoading(false);
+                    return;
+                }
+
+                // 2. Fallback: If not found by ID, maybe it's a name or slug in the metadata
+                const { data: searchData, error: sError } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, email, metadata, category_id, role')
+                    .eq('role', 'Company')
+                    .or(`full_name.ilike.%${idParam}%,metadata->slug.eq."${idParam}"`)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (searchData) {
+                    const metadata = searchData.metadata || {};
+                    // If we found it via name search but it has a slug, redirect to slug for consistency
+                    if (metadata.slug && metadata.slug !== idParam) {
+                        router.replace(`/company/${metadata.slug}`);
+                        return;
+                    }
+
+                    setDynamicCompany({
+                        id: searchData.id,
+                        name: searchData.full_name || searchData.email,
+                        tagline: metadata.tagline || (searchData.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
+                        image: metadata.image || '/hero-bg.jpg',
+                        branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
+                        deals: metadata.deals || []
+                    });
                 }
             } catch (err) {
-                console.error("DEBUG: Unexpected error:", err);
+                console.error("DEBUG: Unexpected error in fetchCompanyFromDb:", err);
             } finally {
                 setIsDbLoading(false);
             }
         };
-        if (id) fetchCompanyFromDb();
-        else setIsDbLoading(false);
-    }, [id]);
+        fetchCompanyFromDb();
+    }, [id, router]);
 
     if (isDbLoading) return <div className={styles.loadingWrapper}><div className={styles.loader}></div><p>Yüklənir...</p></div>;
     if (!dynamicCompany) return <div className={styles.errorWrapper}><h2>Müəssisə tapılmadı</h2><p>Düzgün linkdən istifadə etdiyinizə əmin olun.</p></div>;
@@ -241,7 +278,7 @@ export default function CompanyProfile() {
                                             </div>
 
                                             <div className={styles.cardImage}>
-                                                <img src={deal.image} alt={deal.title} className={styles.dealImg} />
+                                                {deal.image ? <img src={deal.image} alt={deal.title} className={styles.dealImg} /> : <div className={styles.placeholderImg}><Info size={40} /></div>}
                                                 <div className={styles.discountBadge}>-{deal.discount}</div>
                                                 <div className={styles.ratingBubble}>
                                                     <Star size={12} fill="#ffae00" color="#ffae00" />
@@ -260,7 +297,7 @@ export default function CompanyProfile() {
                                                     </div>
                                                 </div>
                                                 <h3>{deal.title}</h3>
-                                                <p>{deal.desc}</p>
+                                                <p>{deal.description || deal.desc}</p>
 
                                                 <div className={styles.starRatingRow}>
                                                     <div className={styles.starRating}>
@@ -307,7 +344,7 @@ export default function CompanyProfile() {
                         <div className={styles.modalBody}>
                             <div className={styles.detailsView}>
                                 <div className={styles.detailsHeader}>
-                                    <span className={styles.detailsIcon}>{selectedDeal.icon}</span>
+                                    <span className={styles.detailsIcon}>{selectedDeal.icon || '🍱'}</span>
                                     <div className={styles.detailsTitle}>
                                         <h2>{selectedDeal.title}</h2>
                                         <span className={styles.priceTag}>{selectedDeal.price || "Xüsusi Təklif"}</span>
