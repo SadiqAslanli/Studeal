@@ -84,6 +84,28 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
         const deals = meta?.deals || [];
         const companySlug = meta?.slug || company.id;
 
+        if (deals.length === 0) {
+          allMenus.push({
+            id: `company_${company.id}`,
+            companyId: company.id,
+            companySlug: companySlug,
+            companyName: company.full_name || 'Sahibkar',
+            title: company.full_name || 'Yeni Sahibkar',
+            discount: 'Yeni',
+            image: company.image_url,
+            type: company.category_id === 1 ? 'Restaurant' : 
+                  company.category_id === 2 ? 'Shop' :
+                  company.category_id === 3 ? 'Education' :
+                  company.category_id === 4 ? 'Entertainment' : 'Tech',
+            typeId: company.category_id || 1,
+            color: '#4318ff',
+            rating: 5.0,
+            ratingsCount: 0,
+            isDynamic: true,
+            createdAt: company.created_at || new Date().toISOString()
+          });
+        }
+
         deals.forEach((deal: any) => {
           allMenus.push({
             ...deal,
