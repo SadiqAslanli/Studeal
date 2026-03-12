@@ -10,15 +10,18 @@ export default function LoadingScreen() {
     const [shouldRender, setShouldRender] = useState(true);
 
     useEffect(() => {
-        // Stop body from scrolling
+        // If we've already shown the loader in this session, skip it or make it very fast
+        const hasLoaded = sessionStorage.getItem('app_loaded');
+        const delay = hasLoaded ? 400 : 800; // Much faster than 2200ms
+
         document.body.style.overflow = 'hidden';
 
         const timer = setTimeout(() => {
             setIsVisible(false);
-            // Re-enable scroll
             document.body.style.overflow = 'unset';
-            setTimeout(() => setShouldRender(false), 800);
-        }, 2200);
+            sessionStorage.setItem('app_loaded', 'true');
+            setTimeout(() => setShouldRender(false), 500);
+        }, delay);
 
         return () => {
             clearTimeout(timer);
