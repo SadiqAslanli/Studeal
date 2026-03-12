@@ -240,7 +240,7 @@ export default function CompanyDashboard() {
                     image: imageUrl,
                     // @ts-ignore
                     metadata: {
-                        ...(user.metadata || {}),
+                        ...((user as any).metadata || {}),
                         slug: slug,
                         image: imageUrl
                     }
