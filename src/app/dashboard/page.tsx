@@ -154,8 +154,12 @@ export default function CompanyDashboard() {
             };
             updateUser({
                 // @ts-ignore
-                deals: [dealToSave, ...currentDeals]
+                deals: [dealToSave, ...currentDeals],
             });
+
+            // Redirect to the company's public profile page after adding a new deal
+            const slug = (user as any)?.metadata?.slug || slugify((user as any)?.fullName || user?.name || '');
+            router.push(`/company/${slug}`);
         }
 
         setIsUploading(false);

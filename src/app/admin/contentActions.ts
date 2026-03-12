@@ -48,11 +48,16 @@ export async function getFeaturedDeals() {
     return data;
 }
 
-export async function addFeaturedDeal(deal: { title: string; description: string; discount: string; image_url: string }) {
+export async function addFeaturedDeal(deal: { title: string; description: string; discount: string; image_url: string; company_id?: string }) {
     const supabase = createAdminClient();
     const { data, error } = await supabase.from('featured_deals').insert(deal).select().single();
     if (error) return { ok: false, error: error.message };
+    
     revalidatePath('/admin');
+    revalidatePath('/');
+    if (deal.company_id) {
+        revalidatePath(`/company/${deal.company_id}`);
+    }
     return { ok: true, data };
 }
 
@@ -78,7 +83,7 @@ export async function addMessage(msg: { name: string; email: string; type: strin
     const supabase = await createClient();
     const { error } = await supabase.from('messages').insert(msg);
     if (error) return { ok: false, error: error.message };
-    
+
     revalidatePath('/admin');
     return { ok: true };
 }
@@ -101,9 +106,9 @@ export async function getAdRequests() {
     return data;
 }
 
-export async function submitAdRequest(data: { 
-    company_id?: string; 
-    company_name: string; 
+export async function submitAdRequest(data: {
+    company_id?: string;
+    company_name: string;
     image_url?: string;
     content?: string;
     phone?: string;

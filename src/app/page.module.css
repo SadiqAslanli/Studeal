@@ -353,6 +353,25 @@
   color: var(--text);
 }
 
+.logoText {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-transform: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+}
+
+.logoStu {
+  color: var(--primary) !important;
+}
+
+.logoDeal {
+  color: #000000 !important;
+}
+
 .headerLeft {
   display: flex;
   align-items: center;
@@ -918,6 +937,14 @@
   position: relative;
   overflow: hidden;
   margin-top: 100px;
+}
+
+.footer .logoStu {
+  color: var(--primary);
+}
+
+.footer .logoDeal {
+  color: white !important;
 }
 
 .footerBlob1,

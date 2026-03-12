@@ -19,44 +19,44 @@ interface DealListProps {
  * Handles loading states and fallbacks for images and videos.
  */
 function DealImage({ src, title, color }: { src?: string | null, title: string, color?: string }) {
-    const [error, setError] = useState(false);
-    const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-    // If no source or error during loading, show placeholder
-    if (!src || error || src === "null" || src === "undefined") {
-        return (
-            <div className={styles.placeholderImg} style={{ backgroundColor: (color || '#4318ff') + '15' }}>
-                <ImageOff size={44} style={{ opacity: 0.3 }} />
-                <span className={styles.placeholderText}>{title}</span>
-            </div>
-        );
-    }
-
-    const isVideo = src.toLowerCase().includes('/video/') || src.endsWith('.mp4');
-
-    if (isVideo) {
-        return <video src={src} className={styles.mainImg} autoPlay muted loop playsInline />;
-    }
-
+  // If no source or error during loading, show placeholder
+  if (!src || error || src === "null" || src === "undefined") {
     return (
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            {!loaded && (
-                <div className={styles.placeholderImg} style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-                    <ImageOff size={44} style={{ opacity: 0.3 }} />
-                </div>
-            )}
-            <img 
-                src={src} 
-                alt={title} 
-                className={styles.mainImg} 
-                onLoad={() => setLoaded(true)}
-                onError={() => {
-                    console.error("Image load failed:", src);
-                    setError(true);
-                }}
-            />
-        </div>
+      <div className={styles.placeholderImg} style={{ backgroundColor: (color || '#4318ff') + '15' }}>
+        <ImageOff size={44} style={{ opacity: 0.3 }} />
+        <span className={styles.placeholderText}>{title}</span>
+      </div>
     );
+  }
+
+  const isVideo = src.toLowerCase().includes('/video/') || src.endsWith('.mp4');
+
+  if (isVideo) {
+    return <video src={src} className={styles.mainImg} autoPlay muted loop playsInline />;
+  }
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {!loaded && (
+        <div className={styles.placeholderImg} style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+          <ImageOff size={44} style={{ opacity: 0.3 }} />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={title}
+        className={styles.mainImg}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          console.error("Image load failed:", src);
+          setError(true);
+        }}
+      />
+    </div>
+  );
 }
 
 export default function DealList({ activeCategoryId, searchQuery, sortOption }: DealListProps) {
@@ -74,13 +74,13 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
     try {
       const companies = await listCompanies();
       const allMenus: any[] = [];
-      
+
       companies.filter(c => c.is_active !== false).forEach(company => {
         let meta = company.metadata;
         if (typeof meta === 'string') {
           try { meta = JSON.parse(meta); } catch (e) { meta = {}; }
         }
-        
+
         const deals = meta?.deals || [];
         const companySlug = meta?.slug || company.id;
 
@@ -93,9 +93,9 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
             title: company.full_name || 'Yeni Sahibkar',
             discount: 'Yeni',
             image: company.image_url,
-            type: company.category_id === 1 ? 'Restaurant' : 
-                  company.category_id === 2 ? 'Shop' :
-                  company.category_id === 3 ? 'Education' :
+            type: company.category_id === 1 ? 'Restaurant' :
+              company.category_id === 2 ? 'Shop' :
+                company.category_id === 3 ? 'Education' :
                   company.category_id === 4 ? 'Entertainment' : 'Tech',
             typeId: company.category_id || 1,
             color: '#4318ff',
@@ -114,9 +114,9 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
             companySlug: companySlug,
             companyName: company.full_name || 'Restaurant',
             image: deal.image || company.image_url, // Use deal image if exists, else company image
-            type: company.category_id === 1 ? 'Restaurant' : 
-                  company.category_id === 2 ? 'Shop' :
-                  company.category_id === 3 ? 'Education' :
+            type: company.category_id === 1 ? 'Restaurant' :
+              company.category_id === 2 ? 'Shop' :
+                company.category_id === 3 ? 'Education' :
                   company.category_id === 4 ? 'Entertainment' : 'Tech',
             typeId: company.category_id || 1,
             color: '#4318ff',
@@ -129,7 +129,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
       });
       // Sort: Newest first
       allMenus.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-      
+
       setDynamicDeals(allMenus);
     } catch (error) {
       console.error("Failed to fetch dynamic companies:", error);
@@ -244,7 +244,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
               >
                 <div className={styles.cardImage}>
                   <DealImage src={deal.image} title={deal.title} color={deal.color} />
-                  
+
                   <div className={styles.overlay}></div>
                   <div className={styles.ratingBubble}>
                     <Star size={12} fill="#ffae00" color="#ffae00" />

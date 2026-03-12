@@ -40,7 +40,7 @@ export default function CompanyProfile() {
                 }
 
                 const supabase = (await import('@/lib/supabase/client')).createClient();
-                
+
                 let profileData = null;
                 const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idParam);
 
@@ -51,7 +51,7 @@ export default function CompanyProfile() {
                         .select('id, full_name, email, metadata, category_id, role, image_url')
                         .eq('id', idParam)
                         .maybeSingle();
-                    
+
                     if (data && data.role?.toLowerCase() === 'company') {
                         profileData = data;
                     }
@@ -81,13 +81,30 @@ export default function CompanyProfile() {
                         return;
                     }
 
+                    // Fetch featured deals for this company from Supabase
+                    const { data: featuredData } = await supabase
+                        .from('featured_deals')
+                        .select('*')
+                        .eq('company_id', profileData.id);
+
+                    // Combine profile deals with featured deals
+                    const profileDeals = metadata.deals || [];
+                    const companyFeaturedDeals = (featuredData || []).map(fd => ({
+                        id: fd.id,
+                        title: fd.title,
+                        description: fd.description,
+                        discount: fd.discount,
+                        image: fd.image_url,
+                        isFeatured: true
+                    }));
+
                     setDynamicCompany({
                         id: profileData.id,
                         name: profileData.full_name || profileData.email || 'Adsız Müəssisə',
                         tagline: metadata.tagline || (profileData.category_id === 1 ? 'Ləzzətli təkliflər' : 'Xüsusi endirimlər'),
                         image: profileData.image_url || metadata.image || '/hero-bg.jpg',
                         branches: metadata.branches || [{ id: 1, address: 'Baş ofis', city: 'Bakı', workHours: '09:00 - 22:00' }],
-                        deals: metadata.deals || []
+                        deals: [...companyFeaturedDeals, ...profileDeals]
                     });
                 }
             } catch (err) {
@@ -166,14 +183,14 @@ export default function CompanyProfile() {
                             <h1>{currentCompany.name}</h1>
                             <p className={styles.tagline}>{currentCompany.tagline}</p>
                         </div>
-                        <button 
+                        <button
                             className={`${styles.companyFavBtn} ${isCompanyFavorite ? styles.isFavorite : ''}`}
                             onClick={() => toggleCompanyFavorite(currentCompany.id)}
                         >
-                            <Heart 
-                                size={24} 
-                                fill={isCompanyFavorite ? "#ff4d4d" : "rgba(255,255,255,0.2)"} 
-                                color={isCompanyFavorite ? "#ff4d4d" : "white"} 
+                            <Heart
+                                size={24}
+                                fill={isCompanyFavorite ? "#ff4d4d" : "rgba(255,255,255,0.2)"}
+                                color={isCompanyFavorite ? "#ff4d4d" : "white"}
                                 style={{ transform: isCompanyFavorite ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.2s ease' }}
                             />
                         </button>
@@ -182,153 +199,153 @@ export default function CompanyProfile() {
             </header>
 
             <main className={styles.content}>
-                    <div className={styles.mainLayout}>
-                        {/* Branches Sidebar */}
-                        <aside className={styles.branchesSidebar}>
-                            <div className={styles.sidebarHeader}>
-                                <h3>Filiallar</h3>
-                                <select 
-                                    className={styles.citySelect}
-                                    value={cityFilter}
-                                    onChange={(e) => setCityFilter(e.target.value)}
-                                >
-                                    <option value="All">Bütün filiallar</option>
-                                    <option value="Bakı">Bakı</option>
-                                    <option value="Gəncə">Gəncə</option>
-                                    <option value="Sumqayıt">Sumqayıt</option>
-                                    <option value="Naxçıvan">Naxçıvan</option>
-                                </select>
-                            </div>
-                            
-                            <div className={styles.branchesList}>
-                                {currentCompany.branches?.filter((b: any) => cityFilter === "All" ? true : b.city === cityFilter).map((branch: any) => (
-                                    <div key={branch.id} className={styles.branchCard}>
-                                        <div className={styles.branchInfo}>
-                                            <MapPin size={16} className={styles.pinIcon} />
-                                            <div>
-                                                <h4>{branch.address}</h4>
-                                                <div className={styles.workHours}>
-                                                    <Clock size={12} />
-                                                    <span>{branch.workHours}</span>
-                                                </div>
+                <div className={styles.mainLayout}>
+                    {/* Branches Sidebar */}
+                    <aside className={styles.branchesSidebar}>
+                        <div className={styles.sidebarHeader}>
+                            <h3>Filiallar</h3>
+                            <select
+                                className={styles.citySelect}
+                                value={cityFilter}
+                                onChange={(e) => setCityFilter(e.target.value)}
+                            >
+                                <option value="All">Bütün filiallar</option>
+                                <option value="Bakı">Bakı</option>
+                                <option value="Gəncə">Gəncə</option>
+                                <option value="Sumqayıt">Sumqayıt</option>
+                                <option value="Naxçıvan">Naxçıvan</option>
+                            </select>
+                        </div>
+
+                        <div className={styles.branchesList}>
+                            {currentCompany.branches?.filter((b: any) => cityFilter === "All" ? true : b.city === cityFilter).map((branch: any) => (
+                                <div key={branch.id} className={styles.branchCard}>
+                                    <div className={styles.branchInfo}>
+                                        <MapPin size={16} className={styles.pinIcon} />
+                                        <div>
+                                            <h4>{branch.address}</h4>
+                                            <div className={styles.workHours}>
+                                                <Clock size={12} />
+                                                <span>{branch.workHours}</span>
                                             </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </aside>
-
-                        <div className={styles.dealsContent}>
-                            <div className={styles.sectionHeader}>
-                                <h2 className={styles.sectionTitle}>{t.dashboard.activeDeals}</h2>
-                                <div className={styles.companyStats}>
-                                    <div className={styles.ratingSection}>
-                                        <div className={styles.headerStars}>
-                                            {[1, 2, 3, 4, 5].map(s => (
-                                                <Star
-                                                    key={s}
-                                                    size={20}
-                                                    onClick={() => handleCompanyRate(s)}
-                                                    fill={(companyRating >= s) ? "#ffae00" : "none"}
-                                                    color={(companyRating >= s) ? "#ffae00" : "#cbd5e1"}
-                                                    className={styles.headerStar}
-                                                    style={{ cursor: 'pointer' }}
-                                                />
-                                            ))}
-                                        </div>
-                                        <span className={styles.ratingNumber}>
-                                            ⭐ {companyRating > 0 ? companyRating.toFixed(1) : "0.0"} ({reviewCount} rəy)
-                                        </span>
-                                    </div>
-                                    <span className={styles.locationStat}>📍 {currentCompany.branches?.length || 1} məkanda</span>
                                 </div>
-                            </div>
+                            ))}
+                        </div>
+                    </aside>
 
-                            <div className={styles.dealsGrid}>
-                                {currentCompany.deals.map((deal: any) => {
-                                    const isFavorite = user?.favorites?.includes(deal.id);
-
-                                    return (
-                                        <div key={deal.id} className={styles.dealCard} onClick={() => setSelectedDeal(deal)}>
-                                            <div className={styles.cardHeader}>
-                                                <button
-                                                    className={`${styles.iconBtn} ${isFavorite ? styles.isFavorite : ''}`}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        toggleFavorite(deal.id);
-                                                    }}
-                                                >
-                                                    <Heart 
-                                                        size={20} 
-                                                        fill={isFavorite ? "#ff4d4d" : "rgba(0,0,0,0.1)"} 
-                                                        color={isFavorite ? "#ff4d4d" : "white"} 
-                                                        style={{ transform: isFavorite ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.2s ease' }}
-                                                    />
-                                                </button>
-                                                <button className={styles.iconBtn} onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setReportingDeal(deal);
-                                                }}>
-                                                    <Flag size={20} />
-                                                </button>
-                                            </div>
-
-                                            <div className={styles.cardImage}>
-                                                {deal.image ? <img src={deal.image} alt={deal.title} className={styles.dealImg} /> : <div className={styles.placeholderImg}><Info size={40} /></div>}
-                                                <div className={styles.discountBadge}>-{deal.discount}</div>
-                                                <div className={styles.ratingBubble}>
-                                                    <Star size={12} fill="#ffae00" color="#ffae00" />
-                                                    <span>{(menuRatings[deal.id]?.score || 0).toFixed(1)}</span>
-                                                </div>
-                                                <div className={styles.infoOverlay}><Info size={32} /></div>
-                                            </div>
-
-                                            <div className={styles.cardBody}>
-                                                <div className={styles.cardTop}>
-                                                    <span className={styles.typeBadge}>Menyu</span>
-                                                    <div className={styles.ratingBox}>
-                                                        <Star size={13} color="#ffae00" fill="#ffae00" />
-                                                        <span className={styles.ratingValue}>{(menuRatings[deal.id]?.score || 0).toFixed(1)}</span>
-                                                        <span className={styles.ratingsCount}>({menuRatings[deal.id]?.count || 0} rəy)</span>
-                                                    </div>
-                                                </div>
-                                                <h3>{deal.title}</h3>
-                                                <p>{deal.description || deal.desc}</p>
-
-                                                <div className={styles.starRatingRow}>
-                                                    <div className={styles.starRating}>
-                                                        {[1, 2, 3, 4, 5].map(s => (
-                                                            <Star
-                                                                key={s}
-                                                                size={18}
-                                                                fill={(userMenuRatings[deal.id] >= s) ? "#ffae00" : "none"}
-                                                                color={(userMenuRatings[deal.id] >= s) ? "#ffae00" : "#cbd5e1"}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleMenuRate(deal.id, s);
-                                                                }}
-                                                                className={styles.star}
-                                                                style={{ cursor: userMenuRatings[deal.id] ? 'default' : 'pointer' }}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className={styles.cardFooter}>
-                                                    <div className={styles.studentNotice}>
-                                                        <GraduationCap size={14} /> Tələbə kartı
-                                                    </div>
-                                                    <button className={styles.btnGetDeal}>
-                                                        Ətraflı
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                    <div className={styles.dealsContent}>
+                        <div className={styles.sectionHeader}>
+                            <h2 className={styles.sectionTitle}>{t.dashboard.activeDeals}</h2>
+                            <div className={styles.companyStats}>
+                                <div className={styles.ratingSection}>
+                                    <div className={styles.headerStars}>
+                                        {[1, 2, 3, 4, 5].map(s => (
+                                            <Star
+                                                key={s}
+                                                size={20}
+                                                onClick={() => handleCompanyRate(s)}
+                                                fill={(companyRating >= s) ? "#ffae00" : "none"}
+                                                color={(companyRating >= s) ? "#ffae00" : "#cbd5e1"}
+                                                className={styles.headerStar}
+                                                style={{ cursor: 'pointer' }}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className={styles.ratingNumber}>
+                                        ⭐ {companyRating > 0 ? companyRating.toFixed(1) : "0.0"} ({reviewCount} rəy)
+                                    </span>
+                                </div>
+                                <span className={styles.locationStat}>📍 {currentCompany.branches?.length || 1} məkanda</span>
                             </div>
                         </div>
+
+                        <div className={styles.dealsGrid}>
+                            {currentCompany.deals.map((deal: any) => {
+                                const isFavorite = user?.favorites?.includes(deal.id);
+
+                                return (
+                                    <div key={deal.id} className={styles.dealCard} onClick={() => setSelectedDeal(deal)}>
+                                        <div className={styles.cardHeader}>
+                                            <button
+                                                className={`${styles.iconBtn} ${isFavorite ? styles.isFavorite : ''}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleFavorite(deal.id);
+                                                }}
+                                            >
+                                                <Heart
+                                                    size={20}
+                                                    fill={isFavorite ? "#ff4d4d" : "rgba(0,0,0,0.1)"}
+                                                    color={isFavorite ? "#ff4d4d" : "white"}
+                                                    style={{ transform: isFavorite ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.2s ease' }}
+                                                />
+                                            </button>
+                                            <button className={styles.iconBtn} onClick={(e) => {
+                                                e.stopPropagation();
+                                                setReportingDeal(deal);
+                                            }}>
+                                                <Flag size={20} />
+                                            </button>
+                                        </div>
+
+                                        <div className={styles.cardImage}>
+                                            {deal.image ? <img src={deal.image} alt={deal.title} className={styles.dealImg} /> : <div className={styles.placeholderImg}><Info size={40} /></div>}
+                                            <div className={styles.discountBadge}>-{deal.discount}</div>
+                                            <div className={styles.ratingBubble}>
+                                                <Star size={12} fill="#ffae00" color="#ffae00" />
+                                                <span>{(menuRatings[deal.id]?.score || 0).toFixed(1)}</span>
+                                            </div>
+                                            <div className={styles.infoOverlay}><Info size={32} /></div>
+                                        </div>
+
+                                        <div className={styles.cardBody}>
+                                            <div className={styles.cardTop}>
+                                                <span className={styles.typeBadge}>Menyu</span>
+                                                <div className={styles.ratingBox}>
+                                                    <Star size={13} color="#ffae00" fill="#ffae00" />
+                                                    <span className={styles.ratingValue}>{(menuRatings[deal.id]?.score || 0).toFixed(1)}</span>
+                                                    <span className={styles.ratingsCount}>({menuRatings[deal.id]?.count || 0} rəy)</span>
+                                                </div>
+                                            </div>
+                                            <h3>{deal.title}</h3>
+                                            <p>{deal.description || deal.desc}</p>
+
+                                            <div className={styles.starRatingRow}>
+                                                <div className={styles.starRating}>
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <Star
+                                                            key={s}
+                                                            size={18}
+                                                            fill={(userMenuRatings[deal.id] >= s) ? "#ffae00" : "none"}
+                                                            color={(userMenuRatings[deal.id] >= s) ? "#ffae00" : "#cbd5e1"}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleMenuRate(deal.id, s);
+                                                            }}
+                                                            className={styles.star}
+                                                            style={{ cursor: userMenuRatings[deal.id] ? 'default' : 'pointer' }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className={styles.cardFooter}>
+                                                <div className={styles.studentNotice}>
+                                                    <GraduationCap size={14} /> Tələbə kartı
+                                                </div>
+                                                <button className={styles.btnGetDeal}>
+                                                    Ətraflı
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
+                </div>
             </main>
 
             {/* Modal for Menu Details */}
@@ -361,7 +378,7 @@ export default function CompanyProfile() {
 
                                 <div className={styles.termsBox}>
                                     <p>
-                                        <AlertTriangle size={18} style={{ flexShrink: 0 }} /> 
+                                        <AlertTriangle size={18} style={{ flexShrink: 0 }} />
                                         Bu təklif yalnız tələbə kartı təqdim edildikdə kassada keçərli olur. Daha ətraflı məlumat üçün restorana müraciət edin.
                                     </p>
                                 </div>

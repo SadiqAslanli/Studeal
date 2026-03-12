@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { ChevronLeft, ChevronRight, ArrowRight, Clock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import styles from './FeaturedSlider.module.css';
 import { getFeaturedDeals } from '@/app/admin/contentActions';
 
 export default function FeaturedSlider() {
     const { t } = useLanguage();
+    const router = useRouter();
     const [current, setCurrent] = useState(0);
     const [featuredItems, setFeaturedItems] = useState<any[]>([]);
 
@@ -47,17 +49,22 @@ export default function FeaturedSlider() {
                         <div
                             key={deal.id}
                             className={`${styles.slide} ${index === current ? styles.activeSlide : ''}`}
-                            style={{ display: index === current ? 'flex' : 'none' }}
+                            style={{ display: index === current ? 'flex' : 'none', cursor: deal.company_id ? 'pointer' : 'default' }}
+                            onClick={() => {
+                                if (deal.company_id) {
+                                    router.push(`/company/${deal.company_id}`);
+                                }
+                            }}
                         >
                             <div className={styles.slideMedia}>
                                 {isVideo ? (
-                                    <video 
-                                        src={deal.image_url} 
-                                        className={styles.slideVideo} 
-                                        autoPlay 
-                                        muted 
-                                        loop 
-                                        playsInline 
+                                    <video
+                                        src={deal.image_url}
+                                        className={styles.slideVideo}
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
                                     />
                                 ) : (
                                     <img src={deal.image_url} alt={deal.title} className={styles.slideImg} />
@@ -72,7 +79,7 @@ export default function FeaturedSlider() {
                                 <h3 className={styles.dealTitle}>{deal.title}</h3>
                                 <p className={styles.dealDesc}>{deal.description}</p>
                                 <button className={styles.btnAction}>
-                                    {t.featured.getNow} <ArrowRight size={18} />
+                                    {t.common?.showMore || 'Daha çox'} <ArrowRight size={18} />
                                 </button>
                             </div>
                         </div>
