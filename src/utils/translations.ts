@@ -21,7 +21,8 @@ export const translations = {
         nav: {
             home: "Ana Səhifə",
             points: "Xallarım",
-            feedback: "Təklifləriniz"
+            feedback: "Təklifləriniz",
+            sahibkarlar: "Sahibkarlar"
         },
         common: {
             backHome: "Ana Səhifəyə qayıt",
@@ -154,7 +155,7 @@ export const translations = {
             }
         },
         partnersPage: {
-            title: "Tərəfdaşlarımız",
+            title: "Sahibkarlar",
             subtitle: "Bizimlə əməkdaşlıq edən ən populyar brendlər",
             becomePartner: "Tərəfdaş olmaq istəyirsiniz?",
             contactUs: "Bizimlə əlaqə saxlayın",
@@ -417,7 +418,8 @@ export const translations = {
         nav: {
             home: "Home",
             points: "Points",
-            feedback: "Feedback"
+            feedback: "Feedback",
+            sahibkarlar: "Sahibkarlar"
         },
         common: {
             backHome: "Back to Home",
@@ -550,7 +552,7 @@ export const translations = {
             }
         },
         partnersPage: {
-            title: "Our Partners",
+            title: "Sahibkarlar",
             subtitle: "The most popular brands collaborating with us",
             becomePartner: "Want to become a partner?",
             contactUs: "Contact Us",
