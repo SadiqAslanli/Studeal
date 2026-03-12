@@ -23,7 +23,6 @@ import Hero from "@/components/Hero";
 import Filters from "@/components/Filters";
 import DealList from "@/components/DealList";
 import FeaturedSlider from "@/components/FeaturedSlider";
-import PartnersSection from "@/components/PartnersSection";
 import LoadingScreen from "@/components/LoadingScreen";
 import styles from "./page.module.css";
 import { useLanguage } from '@/context/LanguageContext';
@@ -148,7 +147,6 @@ export default function Home() {
             userName={user ? user.name : t.user}
           />
           <FeaturedSlider />
-          <PartnersSection />
           <Filters
             onCategoryChange={(id) => setActiveCategoryId(id)}
             onSortChange={(opt) => setSortOption(opt)}
