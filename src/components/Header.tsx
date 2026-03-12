@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Menu,
   X,
-  Heart
+  Heart,
+  Store
 } from 'lucide-react';
 import styles from '@/app/page.module.css';
 
@@ -104,6 +105,9 @@ export default function Header() {
       </Link>
       <Link href="/feedback" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
         <MessageSquare size={18} className={styles.navIcon} /> {t.nav.feedback}
+      </Link>
+      <Link href="/partners" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
+        <Store size={18} className={styles.navIcon} /> {t.nav.sahibkarlar}
       </Link>
       <Link href="/favorites" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>
         <div className={styles.iconWithBadge}>
