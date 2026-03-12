@@ -44,6 +44,7 @@ export type User = {
     usageCount: number;
     plan: string;
     deals?: any[];
+    image?: string;
 };
 
 type AuthContextType = {
@@ -83,6 +84,7 @@ type ProfileRow = {
     email: string | null | undefined; 
     full_name: string | null | undefined; 
     role: string | null | undefined; 
+    image_url?: string | null | undefined;
     metadata?: any;
 };
 
@@ -109,6 +111,7 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
         usageCount: meta.usageCount ?? 0,
         plan: meta.plan ?? 'bronze',
         deals: meta.deals ?? profile.metadata?.deals ?? [],
+        image: meta.image || profile.image_url || profile.metadata?.image || '',
     };
 }
 
@@ -117,8 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [studealData, setStudealData] = useState<Partial<User>>({});
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
-    const supabase = useMemo(() => createClient(), []);
-    const { url: supabaseUrl } = useMemo(() => getSupabaseBrowserConfig(), []);
+    const supabase = createClient();
+    const { url: supabaseUrl } = getSupabaseBrowserConfig();
     const authUrl = supabaseUrl;
     const apiUrl = supabaseUrl;
 
@@ -148,65 +151,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStudealData(newData);
         localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(newData));
 
-        // Sync to Supabase for public visibility - non-blocking try/catch
+        // Update local baseUser state for immediate UI feedback
+        setBaseUser(prev => {
+           if (!prev) return null;
+           const next = { ...prev };
+           if (updated.fullName) next.full_name = updated.fullName;
+           if (updated.image) next.image_url = updated.image;
+           return next;
+        });
+
+        // Sync to Supabase - non-blocking try/catch
         try {
+            const updatePayload: any = { metadata: newData };
+            if (updated.fullName) updatePayload.full_name = updated.fullName;
+            if (updated.image) updatePayload.image_url = updated.image;
+            
             await supabase
                 .from('profiles')
-                .update({ metadata: newData })
+                .update(updatePayload)
                 .eq('id', baseUser.id);
         } catch (e) {
-            console.warn("DEBUG: Supabase metadata sync failed:", e);
+            console.warn("DEBUG: Metadata sync failed:", e);
         }
     };
 
     const fetchProfile = async (userId: string, retryCount = 0): Promise<ProfileRow | null> => {
         try {
-            console.log("DEBUG: fetchProfile started for", userId, "attempt", retryCount + 1);
-            
-            // Try to fetch with metadata
             const { data, error } = await supabase
               .from('profiles')
-              .select('id, email, full_name, role, metadata')
+              .select('id, email, full_name, role, metadata, image_url')
               .eq('id', userId)
               .maybeSingle();
             
             if (error) {
-                // If it's a specific "lock broken" error, we retry up to 2 times
-                if (error.message.includes('AbortError') || error.message.includes('lock broken')) {
-                    if (retryCount < 2) {
-                        console.warn("DEBUG: fetchProfile lock error, retrying...", retryCount + 1);
-                        await new Promise(r => setTimeout(r, 200));
-                        return fetchProfile(userId, retryCount + 1);
-                    }
-                    console.error("DEBUG: fetchProfile aborted after multiple lock competition retries.");
-                    return null;
+                if ((error.message.includes('AbortError') || error.message.includes('lock broken')) && retryCount < 2) {
+                    await new Promise(r => setTimeout(r, 200));
+                    return fetchProfile(userId, retryCount + 1);
                 }
-
-                console.warn("DEBUG: fetchProfile first attempt error (possibly missing metadata column):", error.message);
                 
-                // Fallback attempt without metadata column
+                // Fallback attempt without metadata/image_url columns if they fail
                 const { data: fbData, error: fbError } = await supabase
                   .from('profiles')
                   .select('id, email, full_name, role')
                   .eq('id', userId)
                   .maybeSingle();
                 
-                if (fbError) {
-                    console.error("DEBUG: fetchProfile fallback error:", fbError.message);
-                    return null;
-                }
-                return fbData as ProfileRow | null;
+                return fbError ? null : (fbData as ProfileRow);
             }
             
             return data as ProfileRow | null;
         } catch (e: any) {
-            // Guard against AbortError in catch block too
             if ((e?.name === 'AbortError' || e?.message?.includes('Lock broken')) && retryCount < 2) {
-                console.warn("DEBUG: fetchProfile caught AbortError, retrying...", retryCount + 1);
                 await new Promise(r => setTimeout(r, 200));
                 return fetchProfile(userId, retryCount + 1);
             }
-            console.error("DEBUG: fetchProfile unexpected exception:", e);
             return null;
         }
     };
@@ -214,40 +212,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         let mounted = true;
 
-        // supabase.auth.onAuthStateChange is the most reliable way to handle session
-        // It fires 'INITIAL_SESSION' immediately upon registration.
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (!mounted) return;
-            
-            console.log("DEBUG: Auth State Changed:", event);
-            
+
+            // Handle sign out
             if (event === 'SIGNED_OUT' || !session?.user) {
                 setBaseUser(null);
                 setStudealData({});
                 setIsLoading(false);
                 return;
             }
-            
-            // For any event with a user, ensure we have a profile
-            try {
-                const profile = await fetchProfile(session.user.id);
-                if (mounted && profile) {
-                    setBaseUser(profile);
+
+            // INITIAL_SESSION = existing session on page load
+            // SIGNED_IN = fresh login
+            // TOKEN_REFRESHED = token renewed
+            if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                try {
+                    const profile = await fetchProfile(session.user.id);
+                    if (mounted && profile) {
+                        setBaseUser(profile);
+                    }
+                } catch (err) {
+                    console.error("DEBUG: Profile fetch failed:", err);
+                } finally {
+                    if (mounted) setIsLoading(false);
                 }
-            } catch (err) {
-                console.error("DEBUG: Failed to fetch profile on auth change:", err);
-            } finally {
-                if (mounted) setIsLoading(false);
+                return;
             }
+
+            // Any other event: just stop loading
+            if (mounted) setIsLoading(false);
         });
 
         return () => {
             mounted = false;
             subscription.unsubscribe();
         };
-    }, [supabase]);
+    }, []);
 
     const login = async (email: string, password: string): Promise<boolean> => {
         const { error } = await supabase.auth.signInWithPassword({ 
@@ -267,7 +268,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
-    // Only Students can register; Companies are created by Admin
     const register = async (userData: { email: string; password: string; name: string }): Promise<boolean> => {
         const { error } = await supabase.auth.signUp({
             email: userData.email.trim().toLowerCase(),
@@ -314,16 +314,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = async () => {
-        console.log("Forcing logout and page reload...");
-
-        // 1. Client-side signout
         await supabase.auth.signOut();
-
-        // 2. Clear all traces
         localStorage.clear();
         sessionStorage.clear();
-
-        // 3. Force full page reload to clear all state
         window.location.href = "/";
     };
 
