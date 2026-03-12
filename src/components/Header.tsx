@@ -38,9 +38,6 @@ export default function Header() {
   );
 
   const AuthButtons = () => {
-    // Hidden during loading to prevent flicker, but showing placeholder to avoid UI jump
-    if (authLoading && !user) return <div style={{ minWidth: '100px' }} />;
-
     return (
       <div className={styles.authBtns}>
         {user ? (
@@ -81,7 +78,13 @@ export default function Header() {
           <Link
             href="/login"
             className="btn-primary"
-            style={{ borderRadius: '50px', padding: '10px 25px', color: 'white', display: 'block' }}
+            style={{ 
+              borderRadius: '50px', 
+              padding: '10px 25px', 
+              color: 'white',
+              background: 'var(--primary)',
+              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)'
+            }}
             onClick={() => setIsMenuOpen(false)}
           >
             {t.login}

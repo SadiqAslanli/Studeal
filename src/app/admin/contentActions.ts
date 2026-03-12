@@ -78,6 +78,8 @@ export async function addMessage(msg: { name: string; email: string; type: strin
     const supabase = await createClient();
     const { error } = await supabase.from('messages').insert(msg);
     if (error) return { ok: false, error: error.message };
+    
+    revalidatePath('/admin');
     return { ok: true };
 }
 

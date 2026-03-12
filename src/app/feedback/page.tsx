@@ -24,7 +24,7 @@ export default function FeedbackPage() {
     const { user, addNotification } = useAuth();
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
-        name: user?.name || '',
+        name: user?.fullName || '',
         email: user?.email || '',
         type: 'suggestion',
         message: ''
