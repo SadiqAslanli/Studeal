@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import styles from './profile.module.css';
 
 export default function ProfilePage() {
-    const { user, updateUser, toggleFavorite } = useAuth();
+    const { user, updateUser, toggleFavorite, logout } = useAuth();
     const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState('plans');
     const [isEditing, setIsEditing] = useState(false);
@@ -118,6 +118,9 @@ export default function ProfilePage() {
                         onClick={() => setActiveTab('security')}
                     >
                         🔒 {t.profile.security}
+                    </button>
+                    <button className={styles.logoutBtn} onClick={logout}>
+                        🚪 {t.dashboard.logout}
                     </button>
                 </nav>
 
