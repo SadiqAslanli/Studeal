@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { unstable_noStore as noStore, revalidatePath } from "next/cache";
+import { slugify } from "@/utils/slugify";
 
 
 export type CompanyProfile = {
@@ -13,6 +14,8 @@ export type CompanyProfile = {
   category_id: number | null;
   image_url?: string | null;
   metadata?: any;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export async function listCompanies() {
@@ -96,7 +99,8 @@ export async function createCompanyUser(name: string, email: string, password: s
       image_url: imageUrl || null,
       metadata: { 
         image: imageUrl || null,
-        category_id: categoryId // Backup storage in metadata
+        category_id: categoryId, // Backup storage in metadata
+        slug: slugify(name)
       },
       updated_at: new Date().toISOString()
     };
