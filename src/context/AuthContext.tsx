@@ -323,10 +323,29 @@ export function AuthProvider({
     };
 
     const logout = async () => {
-        await supabase.auth.signOut();
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = "/";
+        setIsLoading(true);
+        try {
+            // 1. Client-side sign out
+            await supabase.auth.signOut();
+            
+            // 2. Server-side sign out (clears cookies)
+            const { logoutAction } = await import('@/app/auth-actions');
+            await logoutAction();
+        } catch (e) {
+            console.warn("Logout process warning:", e);
+        } finally {
+            // 3. Clear storage but PRESERVE language preference
+            const lang = localStorage.getItem('studeal_lang');
+            localStorage.clear();
+            sessionStorage.clear();
+            if (lang) localStorage.setItem('studeal_lang', lang);
+            
+            setUser(null);
+            setIsLoading(false);
+            
+            // 4. Force hard redirect to clear all internal state
+            window.location.href = "/";
+        }
     };
 
     const loginWithGoogle = () => {
