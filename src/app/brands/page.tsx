@@ -22,9 +22,9 @@ export default function BrandsPage() {
                 const formattedBrands = companies
                     .filter(c => c.is_active !== false)
                     .map(c => ({
-                        id: c.id,
+                        id: c.metadata?.slug || c.id,
                         company: c.full_name,
-                        image: (c as any).metadata?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800'
+                        image: c.image_url || c.metadata?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800'
                     }));
                 setUniqueBrands(formattedBrands);
             } catch (error) {
@@ -37,7 +37,7 @@ export default function BrandsPage() {
     }, []);
 
     const filteredBrands = uniqueBrands.filter(brand => 
-        brand.company.toLowerCase().includes(searchQuery.toLowerCase())
+        (brand.company || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -63,7 +63,7 @@ export default function BrandsPage() {
 
             <main className="container">
                 <div className={styles.brandsGrid}>
-                    {uniqueBrands.map((brand, index) => (
+                    {filteredBrands.map((brand, index) => (
                         <Link
                             href={`/company/${brand?.id}`}
                             key={brand?.id}
@@ -87,7 +87,7 @@ export default function BrandsPage() {
                     ))}
                 </div>
 
-                {uniqueBrands.length === 0 && (
+                {filteredBrands.length === 0 && (
                     <div className={styles.noResults}>
                         <Building2 size={48} />
                         <p>Axtarışınıza uyğun brend tapılmadı.</p>
