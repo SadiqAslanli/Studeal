@@ -116,61 +116,52 @@ function profileToUser(profile: ProfileRow, meta: Partial<User>): User {
     };
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [baseUser, setBaseUser] = useState<ProfileRow | null>(null);
-    const [studealData, setStudealData] = useState<Partial<User>>({});
-    const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({ 
+    children, 
+    initialUser = null 
+}: { 
+    children: React.ReactNode, 
+    initialUser?: User | null 
+}) {
+    const [user, setUser] = useState<User | null>(initialUser);
+    const [isLoading, setIsLoading] = useState(!initialUser);
     const router = useRouter();
     const supabase = createClient();
-    const { url: supabaseUrl } = getSupabaseBrowserConfig();
-    const authUrl = supabaseUrl;
-    const apiUrl = supabaseUrl;
+    
+    // Track if we've initialized the session to avoid redundant fetches
+    const [hasInitialized, setHasInitialized] = useState(!!initialUser);
 
-    useEffect(() => {
-        if (!baseUser) return;
-        const savedData = localStorage.getItem(`studeal_meta_${baseUser.id}`);
-        if (savedData) {
-            try {
-                setStudealData(JSON.parse(savedData));
-            } catch {
-                setStudealData(defaultStudealMeta);
-            }
-        } else {
-            setStudealData(defaultStudealMeta);
-            localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(defaultStudealMeta));
-        }
-    }, [baseUser?.id]);
-
-    const mergedUser = useMemo(() => {
-        if (!baseUser) return null;
-        return profileToUser(baseUser, studealData);
-    }, [baseUser, studealData]);
 
     const saveStudealMeta = async (updated: Partial<User> & Record<string, any>) => {
-        if (!baseUser) return;
+        if (!user) return;
         
-        // Merge with existing metadata to preserve deals, notifications etc.
-        const newData = { ...(studealData || {}), ...updated };
-        setStudealData(newData);
-        localStorage.setItem(`studeal_meta_${baseUser.id}`, JSON.stringify(newData));
-
-        // Update local baseUser state for immediate UI feedback
-        setBaseUser(prev => {
-           if (!prev) return null;
-           const next = { ...prev };
-           if (updated.fullName) next.full_name = updated.fullName;
-           if (updated.image) next.image_url = updated.image;
-           return next;
-        });
+        const newUser = { ...user, ...updated };
+        setUser(newUser);
+        
+        // Save to localStorage
+        const metaToSave = {
+            points: newUser.points,
+            favorites: newUser.favorites,
+            companyFavorites: newUser.companyFavorites,
+            notifications: newUser.notifications,
+            transactions: newUser.transactions,
+            usedDealsCount: newUser.usedDealsCount,
+            viewCount: newUser.viewCount,
+            usageCount: newUser.usageCount,
+            plan: newUser.plan,
+            deals: newUser.deals,
+            image: newUser.image,
+        };
+        localStorage.setItem(`studeal_meta_${user.id}`, JSON.stringify(metaToSave));
 
         // Sync to Supabase via Server Action
         try {
-            const updatePayload: any = { metadata: newData };
+            const updatePayload: any = { metadata: metaToSave };
             if (updated.fullName) updatePayload.full_name = updated.fullName;
             if (updated.image) updatePayload.image_url = updated.image;
             if (updated.categoryId) updatePayload.category_id = updated.categoryId;
             
-            await updateCompanyProfile(baseUser.id, updatePayload);
+            await updateCompanyProfile(user.id, updatePayload);
         } catch (e) {
             console.warn("DEBUG: Metadata sync failed:", e);
         }
@@ -216,40 +207,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (!mounted) return;
 
-            // Handle sign out
             if (event === 'SIGNED_OUT' || !session?.user) {
-                setBaseUser(null);
-                setStudealData({});
+                setUser(null);
                 setIsLoading(false);
                 return;
             }
 
-            // INITIAL_SESSION = existing session on page load
-            // SIGNED_IN = fresh login
-            // TOKEN_REFRESHED = token renewed
-            if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            // Only fetch if we don't have a user or if this is a fresh sign in
+            if (event === 'SIGNED_IN' || (!user && (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED'))) {
                 try {
                     const profile = await fetchProfile(session.user.id);
                     if (mounted && profile) {
-                        setBaseUser(profile);
+                        const meta = localStorage.getItem(`studeal_meta_${profile.id}`);
+                        const parsedMeta = meta ? JSON.parse(meta) : defaultStudealMeta;
+                        setUser(profileToUser(profile, parsedMeta));
                     }
                 } catch (err) {
                     console.error("DEBUG: Profile fetch failed:", err);
                 } finally {
                     if (mounted) setIsLoading(false);
                 }
-                return;
+            } else {
+                setIsLoading(false);
             }
-
-            // Any other event: just stop loading
-            if (mounted) setIsLoading(false);
         });
 
         return () => {
             mounted = false;
             subscription.unsubscribe();
         };
-    }, []);
+    }, [user === null]); // Only re-run if user becomes null
 
     const login = async (email: string, password: string): Promise<boolean> => {
         setIsLoading(true);
@@ -266,7 +253,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.user) {
             const profile = await fetchProfile(data.user.id);
             if (profile) {
-                setBaseUser(profile);
+                const meta = localStorage.getItem(`studeal_meta_${profile.id}`);
+                const parsedMeta = meta ? JSON.parse(meta) : defaultStudealMeta;
+                setUser(profileToUser(profile, parsedMeta));
             }
         }
         
@@ -275,12 +264,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const loginWithUser = (user: Partial<User> & { id: string }) => {
-        setBaseUser({
+        const profile: ProfileRow = {
             id: user.id,
             email: user.email ?? null,
             full_name: user.name || user.fullName || user.email || '',
             role: user.role || 'Company',
-        });
+        };
+        setUser(profileToUser(profile, defaultStudealMeta));
     };
 
     const register = async (userData: { email: string; password: string; name: string }): Promise<boolean> => {
@@ -298,34 +288,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const toggleFavorite = (dealId: number) => {
-        const currentFavs = studealData.favorites ?? [];
+        if (!user) return;
+        const currentFavs = user.favorites ?? [];
         const newFavs = currentFavs.includes(dealId) ? currentFavs.filter((id) => id !== dealId) : [...currentFavs, dealId];
         saveStudealMeta({ favorites: newFavs });
     };
 
     const toggleCompanyFavorite = (companyId: number) => {
-        const currentFavs = studealData.companyFavorites ?? [];
+        if (!user) return;
+        const currentFavs = user.companyFavorites ?? [];
         const newFavs = currentFavs.includes(companyId) ? currentFavs.filter((id) => id !== companyId) : [...currentFavs, companyId];
         saveStudealMeta({ companyFavorites: newFavs });
     };
 
     const addNotification = (notif: Omit<Notification, 'id' | 'date' | 'isRead'>) => {
+        if (!user) return;
         const newNotification: Notification = {
             ...notif,
             id: Date.now().toString(),
             date: new Date().toLocaleDateString('az-AZ'),
             isRead: false,
         };
-        saveStudealMeta({ notifications: [newNotification, ...(studealData.notifications ?? [])] });
+        saveStudealMeta({ notifications: [newNotification, ...(user.notifications ?? [])] });
     };
 
     const addTransaction = (trans: Omit<Transaction, 'id' | 'date'>) => {
+        if (!user) return;
         const newTransaction: Transaction = {
             ...trans,
             id: Date.now().toString(),
             date: new Date().toLocaleDateString('az-AZ'),
         };
-        saveStudealMeta({ transactions: [newTransaction, ...(studealData.transactions ?? [])] });
+        saveStudealMeta({ transactions: [newTransaction, ...(user.transactions ?? [])] });
     };
 
     const logout = async () => {
@@ -342,7 +336,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return (
         <AuthContext.Provider
             value={{
-                user: mergedUser,
+                user,
                 isLoading,
                 login,
                 loginWithUser,
@@ -354,8 +348,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 addNotification,
                 addTransaction,
                 loginWithGoogle,
-                authUrl,
-                apiUrl,
+                authUrl: getSupabaseBrowserConfig().url,
+                apiUrl: getSupabaseBrowserConfig().url,
             }}
         >
             {children}
