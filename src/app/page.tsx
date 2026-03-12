@@ -95,8 +95,8 @@ export default function Home() {
               key={ad.id || i}
               className={styles.adCard}
               onClick={() => {
-                if (ad.companyId) {
-                  router.push(`/company/${ad.companyId}`);
+                if (ad.company_id) {
+                  router.push(`/company/${ad.company_id}`);
                 } else if (!user) {
                   router.push('/login');
                 }
