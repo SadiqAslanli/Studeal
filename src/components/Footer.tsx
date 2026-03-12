@@ -83,7 +83,7 @@ export default function Footer() {
                         <h4 className={styles.footerTitle}>{t.footerSection.platform}</h4>
                         <ul className={styles.footerLinks}>
                             <li><Link href="/brands">{t.footerSection.brands}</Link></li>
-                            <li><Link href="/partners">{t.footerSection.partnerWithUs}</Link></li>
+                            <li><Link href="/partners">{t.nav.sahibkarlar}</Link></li>
                         </ul>
                     </div>
 
