@@ -29,7 +29,16 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  // Only verify session if we are hitting protected or sensitive routes
+  // This avoids a network call to Supabase on every single public page visit
+  const isProtectedPath = 
+    request.nextUrl.pathname.startsWith('/admin') || 
+    request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/profile');
+
+  if (isProtectedPath) {
+    await supabase.auth.getUser();
+  }
 
   return response;
 }
