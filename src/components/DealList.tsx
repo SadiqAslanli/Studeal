@@ -82,11 +82,14 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
         }
         
         const deals = meta?.deals || [];
+        const companySlug = meta?.slug || company.id;
+
         deals.forEach((deal: any) => {
           allMenus.push({
             ...deal,
             id: deal.id,
             companyId: company.id,
+            companySlug: companySlug,
             companyName: company.full_name || 'Restaurant',
             image: deal.image || company.image_url, // Use deal image if exists, else company image
             type: company.category_id === 1 ? 'Restaurant' : 
@@ -214,7 +217,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                 className={styles.card}
                 style={{ animationDelay: `${index * 0.05}s` }}
                 onClick={() => {
-                  router.push(`/company/${deal.companyId}`);
+                  router.push(`/company/${deal.companySlug}`);
                 }}
               >
                 <div className={styles.cardImage}>
@@ -286,7 +289,7 @@ export default function DealList({ activeCategoryId, searchQuery, sortOption }: 
                     <div className={styles.studentNotice}>
                       <GraduationCap size={14} /> {t.dealList.studentCard}
                     </div>
-                    <Link href={`/company/${deal.companyId}`} className={styles.btnView}>
+                    <Link href={`/company/${deal.companySlug}`} className={styles.btnView}>
                       {t.common.showMore}
                     </Link>
                   </div>
